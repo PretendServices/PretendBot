@@ -18,15 +18,15 @@ class Ticket(Cog):
     self.bot = bot 
     self.description = "Manage the ticket system in your server"
   
-  async def make_transcript(ctx: PretendContext, c: TextChannel):
-    # Generate a random 15-character ID for the filename
-    file_id = secrets.token_hex(7)
+    async def make_transcript(ctx: PretendContext, c: TextChannel):
+     # Generate a random 15-character ID for the filename
+     file_id = secrets.token_hex(7)
 
     # Set the output file path
-    output_path = f'/root/pretendlogs/logs/{file_id}.html'
+     output_path = f'/root/pretendlogs/logs/{file_id}.html'
 
     # Construct the command to export the chat using DiscordChatExporter CLI
-    command = [
+     command = [
         'dotnet',  # Replace with the actual path to dotnet if needed
         'DiscordChatExporter.Cli.dll',
         'export',
@@ -34,14 +34,14 @@ class Ticket(Cog):
         '-c', str(c.id),
         '-f', 'HtmlDark',  # You can change the format if needed
         '-o', output_path,
-    ]
+     ]
 
-    try:
+     try:
         # Run the command asynchronously
         await asyncio.create_subprocess_exec(*command)
         print(f"Transcript exported to: {output_path}")
         return "https://logs.pretend.best/"+file_id+".html"
-    except Exception as e:
+     except Exception as e:
         print(f"Error exporting transcript: {e}")
         return None
 
