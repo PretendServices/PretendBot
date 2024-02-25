@@ -7,7 +7,7 @@ from discord.abc import GuildChannel
 from discord.ui import View, Button, Select
 from discord.ext.commands import group, Cog, has_guild_permissions, bot_has_guild_permissions 
 from discord import PermissionOverwrite, Member, Embed, File, Role, CategoryChannel, TextChannel, Interaction, ButtonStyle, SelectOption
-import subprocess
+import secrets
 from tools.bot import Pretend 
 from tools.helpers import PretendContext 
 from tools.persistent.tickets import TicketTopic, TicketView
@@ -18,7 +18,7 @@ class Ticket(Cog):
     self.bot = bot 
     self.description = "Manage the ticket system in your server"
   
-  async def make_transcript(c: TextChannel):
+  async def make_transcript(ctx: PretendContext, c: TextChannel):
     # Generate a random 15-character ID for the filename
     file_id = secrets.token_hex(7)
 
@@ -30,7 +30,7 @@ class Ticket(Cog):
         'dotnet',  # Replace with the actual path to dotnet if needed
         'DiscordChatExporter.Cli.dll',
         'export',
-        '-t', 'YOUR_DISCORD_TOKEN',  # Replace with your Discord bot token
+        '-t', ctx.Bot.Token,  # Replace with your Discord bot token
         '-c', str(c.id),
         '-f', 'HtmlDark',  # You can change the format if needed
         '-o', output_path,
@@ -93,15 +93,14 @@ class Ticket(Cog):
    if check: 
     channel = ctx.guild.get_channel(check[0])
     if channel:
-      url = await self.make_transcript(ctx.channel)
+      url = await self.make_transcript(ctx, ctx.channel)
       e = Embed(
         color=self.bot.color,
         title=f"[Logs for {ctx.channel.name} `{ctx.channel.id}`]({url})",  # Hyperlink added to the title
         description=f"Closed by **{ctx.author}**",
         timestamp=datetime.datetime.now()
     )
-      await channel.send(embed=e) 
-      os.remove(file)
+      await channel.send(embed=e)
    
    await ctx.send(content="Deleting this channel in 5 seconds")  
    await asyncio.sleep(5)
