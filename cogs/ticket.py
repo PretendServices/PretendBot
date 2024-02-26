@@ -23,7 +23,7 @@ class Ticket(Cog):
   async def make_transcript(self, c: TextChannel):
     logId = secrets.token_hex(16)
     logs_directory = "/root/PretendLogs/logs"
-    file = f"{logs_directory}/transcript-{str(logId)}.html"
+    file = f"{logs_directory}/{str(logId)}.html"
     os.makedirs(logs_directory, exist_ok=True)
     messages = await chat_exporter.export(c)
     with open(file, "w", encoding="utf-8") as f:
