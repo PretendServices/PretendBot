@@ -106,7 +106,7 @@ class Utility(commands.Cog):
       
     check = await self.bot.db.fetchrow(
       """
-      SELECT * FROM stickymessages
+      SELECT * FROM stickymessage
       WHERE channel_id = $1
       AND guild_id = $2
       """, 
@@ -289,11 +289,11 @@ class Utility(commands.Cog):
     """
     Send a message that will always be the last message of a channel.
     """
-    sticky_message = self.bot.db.fetchrow("SELECT * FROM stickymessages WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
+    sticky_message = self.bot.db.fetchrow("SELECT * FROM stickymessage WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
     if sticky_message:
-      await self.bot.db.execute("DELETE FROM stickymessages WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
+      await self.bot.db.execute("DELETE FROM stickymessage WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
     # Rest of the code...
-    await self.bot.db.execute("INSERT INTO stickymessages VALUES ($1, $2, $3)", ctx.guild.id, ctx.channel.id, content)
+    await self.bot.db.execute("INSERT INTO stickymessage VALUES ($1, $2, $3)", ctx.guild.id, ctx.channel.id, content)
     await ctx.send_success(f"Sticky message set to {message.jump_url}")
     
   @commands.command(aliases=['pastusernanes', 'usernames', 'oldnames', 'pastnames'])
