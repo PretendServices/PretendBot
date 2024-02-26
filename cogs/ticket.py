@@ -1,6 +1,8 @@
 import os 
 import asyncio
 import datetime
+import chat_exporter
+import secrets
 
 from discord.abc import GuildChannel
 from discord.ui import View, Button, Select
@@ -11,20 +13,22 @@ from tools.bot import Pretend
 from tools.helpers import PretendContext 
 from tools.persistent.tickets import TicketTopic, TicketView
 from tools.predicates import get_ticket, manage_ticket, ticket_exists
+import os
 
 class Ticket(Cog):
   def __init__(self, bot: Pretend):
     self.bot = bot 
     self.description = "Manage the ticket system in your server"
   
-  async def make_transcript(self, c: TextChannel): 
-   filename = f"{c.name}.txt"
-   with open(filename, "w") as file:
-    async for msg in c.history(oldest_first=True):
-      if not msg.author.bot: 
-        file.write(f"{msg.created_at} -  {msg.author.display_name}: {msg.clean_content}\n")
-    
-    return filename 
+  async def make_transcript(self, c: TextChannel):
+    logId = secrets.token_hex(16)
+    logs_directory = "/root/PretendLogs/logs"
+    file = f"{logs_directory}/transcript-{str(logId)}.html"
+    os.makedirs(logs_directory, exist_ok=True)
+    messages = await chat_exporter.export(c)
+    with open(file, "w", encoding="utf-8") as f:
+      f.write(messages)
+    return f"https://logs.pretend.best/{logId}"
 
   @Cog.listener()
   async def on_guild_channel_delete(self, channel: GuildChannel):
@@ -74,10 +78,14 @@ class Ticket(Cog):
    if check: 
     channel = ctx.guild.get_channel(check[0])
     if channel:
-      file = await self.make_transcript(ctx.channel)
-      e = Embed(color=self.bot.color, title=f"Logs for {ctx.channel.name} `{ctx.channel.id}`", description=f"Closed by **{ctx.author}**", timestamp=datetime.datetime.now())
-      await channel.send(embed=e, file=File(file)) 
-      os.remove(file)
+      url = await self.make_transcript(ctx.channel)
+      e = Embed(
+    color=self.bot.color,
+    title=f"[Logs for {ctx.channel.name} `{ctx.channel.id}`]({url})",
+    description=f"Closed by **{ctx.author}**",
+    timestamp=datetime.datetime.now()
+)
+      await channel.send(embed=e) 
    
    await ctx.send(content="Deleting this channel in 5 seconds")  
    await asyncio.sleep(5)
