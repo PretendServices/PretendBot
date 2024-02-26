@@ -285,7 +285,7 @@ class Utility(commands.Cog):
    return await ctx.send(embed=embed)
   @commands.command()
   @has_guild_permissions(manage_messages=True)
-  async def stickymessage(self, ctx: PretendContext, message: discord.Message, *, content: str):
+  async def stickymessage(self, ctx: PretendContext, *, content: str):
     """
     Send a message that will always be the last message of a channel.
     """
