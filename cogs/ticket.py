@@ -86,7 +86,7 @@ class Ticket(Cog):
   @ticket.command(name="reset", aliases=['disable'], brief="manage server")
   @has_guild_permissions(manage_guild=True) 
   @ticket_exists()
-  async def ticket_remove(self, ctx: PretendContext):
+  async def ticket_reset(self, ctx: PretendContext):
     """disable the ticket module in the server"""
     for i in ['tickets', 'ticket_topics', 'opened_tickets']:
        await self.bot.db.execute(f"DELETE FROM {i} WHERE guild_id = $1", ctx.guild.id)
