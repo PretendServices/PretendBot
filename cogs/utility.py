@@ -294,7 +294,7 @@ class Utility(commands.Cog):
       await self.bot.db.execute("DELETE FROM stickymessage WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
     # Rest of the code...
     await self.bot.db.execute("INSERT INTO stickymessage VALUES ($1, $2, $3)", ctx.guild.id, ctx.channel.id, content)
-    await ctx.send_success(f"Sticky message set to {message.jump_url}")
+    await ctx.send_success(f"Sticky message set to {content}")
     
   @commands.command(aliases=['pastusernanes', 'usernames', 'oldnames', 'pastnames'])
   async def names(self, ctx: PretendContext, *, user: discord.User=commands.Author):
