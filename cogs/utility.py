@@ -114,12 +114,12 @@ class Utility(commands.Cog):
       message.guild.id
     )
     if check:
-      lastmsg = PretendRedis.jsonget(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}")
+      lastmsg = await PretendRedis.jsonget(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}")
       if lastmsg:
         lastmsg = await message.channel.fetch_message(lastmsg)
         await lastmsg.delete()
       newmsg = await message.channel.send(check['content'])
-      PretendRedis.jsonset(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}", {"id": newmsg.id})
+      await PretendRedis.jsonset(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}", {"id": newmsg.id})
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
     if message.is_system():
