@@ -8,7 +8,7 @@ import humanfriendly
 import dateutil.parser
 
 from discord.ext import commands
-from commands import has_guild_permissions
+from discord.ext.commands import has_guild_permissions
 from io import BytesIO
 from typing import Union, Optional, Any
 
