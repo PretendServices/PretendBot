@@ -14,7 +14,7 @@ from typing import Union, Optional, Any
 
 from shazamio import Shazam
 from ttapi import TikTokApi
-from tools.redis import Redis
+from tools.redis import PretendRedis
 from tools.bot import Pretend 
 from tools.misc.views import Donate
 from tools.validators import ValidTime
@@ -114,12 +114,12 @@ class Utility(commands.Cog):
       message.guild.id
     )
     if check:
-      lastmsg = Redis.get(name=f"sticky-{message.guild.id}-{message.channel.id}")
+      lastmsg = PretendRedis.jsonget(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}")
       if lastmsg:
         lastmsg = await message.channel.fetch_message(lastmsg)
         await lastmsg.delete()
       newmsg = await message.channel.send(check['content'])
-      Redis.set(name="sticky-{message.guild.id}-{message.channel.id}", value=newmsg.id)
+      PretendRedis.jsonset(PretendRedis, f"sticky-{message.guild.id}-{message.channel.id}", {"id": newmsg.id})
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
     if message.is_system():
