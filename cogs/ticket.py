@@ -79,12 +79,7 @@ class Ticket(Cog):
     channel = ctx.guild.get_channel(check[0])
     if channel:
       url = await self.make_transcript(ctx.channel)
-      e = Embed(
-    color=self.bot.color,
-    title=f"[Logs for {ctx.channel.name} `{ctx.channel.id}`]({url})",
-    description=f"Closed by **{ctx.author}**",
-    timestamp=datetime.datetime.now()
-)
+      e = Embed(color=self.bot.color, title=f"Logs for {ctx.channel.name} `{ctx.channel.id}`", description=f"Closed by **{ctx.author}**", timestamp=datetime.datetime.now(), url=url)
       await channel.send(embed=e) 
    
    await ctx.send(content="Deleting this channel in 5 seconds")  
