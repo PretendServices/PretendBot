@@ -8,13 +8,13 @@ import humanfriendly
 import dateutil.parser
 
 from discord.ext import commands
-
+from commands import has_guild_permissions
 from io import BytesIO
 from typing import Union, Optional, Any
 
 from shazamio import Shazam
 from ttapi import TikTokApi
-
+from tools.redis import Redis
 from tools.bot import Pretend 
 from tools.misc.views import Donate
 from tools.validators import ValidTime
@@ -99,7 +99,27 @@ class Utility(commands.Cog):
       await self.bot.db.execute("INSERT INTO seen VALUES ($1,$2,$3)", *args)
     else:
       await self.bot.db.execute("UPDATE seen SET time = $3 WHERE user_id = $1 AND guild_id = $2", *args)  
-
+  @commands.Cog.listener('on_message')
+  async def stickymessage_listener(self, message: discord.Message):
+    if message.author.bot: 
+      return 
+      
+    check = await self.bot.db.fetchrow(
+      """
+      SELECT * FROM stickymessages
+      WHERE channel_id = $1
+      AND guild_id = $2
+      """, 
+      message.channel.id, 
+      message.guild.id
+    )
+    if check:
+      lastmsg = Redis.get(f"sticky-{message.guild.id}-{message.channel.id}")
+      if lastmsg:
+        lastmsg = await message.channel.fetch_message(lastmsg)
+        await lastmsg.delete()
+      newmsg = await message.channel.send(check['content'])
+      Redis.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id)
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
     if message.is_system():
@@ -263,7 +283,18 @@ class Utility(commands.Cog):
 
    embed.set_image(url=member.display_avatar.url)
    return await ctx.send(embed=embed)
-  
+  @commands.command()
+  @has_guild_permissions(manage_messages=True)
+  async def stickymessage(self, ctx: PretendContext, message: discord.Message, *, content: str):
+    """
+    Send a message that will always be the last message of a channel.
+    """
+    if self.bot.db.fetchrow("SELECT * FROM stickymessages WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id):
+      await self.bot.db.execute("UPDATE stickymessages SET content = $1 WHERE channel_id = $2 AND guild_id = $3", content, ctx.channel.id, ctx.guild.id)
+      return
+    await self.bot.db.execute("INSERT INTO stickymessages VALUES ($1, $2, $3)", ctx.guild.id, ctx.channel.id, content)
+    await ctx.send_success(f"Sticky message set to {message.jump_url}")
+    
   @commands.command(aliases=['pastusernanes', 'usernames', 'oldnames', 'pastnames'])
   async def names(self, ctx: PretendContext, *, user: discord.User=commands.Author):
     """
