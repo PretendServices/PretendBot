@@ -116,8 +116,7 @@ class Utility(commands.Cog):
     if check:
       lastmsg = await self.bot.redis.get(f"sticky-{message.guild.id}-{message.channel.id}")
       if lastmsg:
-        ctx = await self.bot.get_context(message)
-        lastmsg = await ctx.channel.fetch_message(lastmsg)
+        lastmsg = await message.channel.fetch_message(str(lastmsg))
         await lastmsg.delete()
       newmsg = await message.channel.send(check['message'])
       await self.bot.redis.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id)
