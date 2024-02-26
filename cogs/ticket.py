@@ -28,7 +28,7 @@ class Ticket(Cog):
     messages = await chat_exporter.export(c)
     with open(file, "w", encoding="utf-8") as f:
       f.write(messages)
-    return f"https://logs.pretend.best/{logId}"
+    return f"https://logs.pretend.best/{logId}.html"
 
   @Cog.listener()
   async def on_guild_channel_delete(self, channel: GuildChannel):
