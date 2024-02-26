@@ -118,7 +118,7 @@ class Utility(commands.Cog):
       if lastmsg:
         lastmsg = await message.channel.fetch_message(lastmsg)
         await lastmsg.delete()
-      newmsg = await message.channel.send(check['content'])
+      newmsg = await message.channel.send(check['message'])
       await self.bot.redis.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id)
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
