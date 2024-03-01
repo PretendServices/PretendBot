@@ -3,7 +3,8 @@ import asyncio
 import discord
 import datetime
 from discord.ext import commands 
-
+import chat_exporter
+import secrets
 class TicketTopic(discord.ui.Modal, title="Add a ticket topic"): 
 
   name = discord.ui.TextInput(
@@ -89,12 +90,15 @@ class DeleteTicket(discord.ui.Button):
   def __init__(self): 
    super().__init__(emoji="🗑️", custom_id="ticket_close:persistent")
   
-  async def make_transcript(self, c: discord.TextChannel): 
-   filename = f"{c.name}.txt"
-   with open(filename, "w") as file:
-    async for msg in c.history(oldest_first=True):
-      if not msg.author.bot: file.write(f"{msg.created_at} -  {msg.author.display_name}: {msg.clean_content}\n")
-    return filename  
+  async def make_transcript(self, c: TextChannel):
+    logId = secrets.token_hex(16)
+    logs_directory = "/root/PretendLogs/logs"
+    file = f"{logs_directory}/{str(logId)}.html"
+    os.makedirs(logs_directory, exist_ok=True)
+    messages = await chat_exporter.export(c)
+    with open(file, "w", encoding="utf-8") as f:
+      f.write(messages)
+    return f"https://logs.pretend.best/{logId}"
 
   async def callback(self, interaction: discord.Interaction) -> None: 
    
@@ -120,10 +124,8 @@ class DeleteTicket(discord.ui.Button):
     if check: 
      channel = inter.guild.get_channel(check[0])
      if channel:
-      file = await self.make_transcript(inter.channel)
-      e = discord.Embed(color=inter.client.color, title=f"Logs for {interaction.channel.name} `{interaction.channel.id}`", description=f"Closed by **{inter.user}**", timestamp=datetime.datetime.now())
-      await channel.send(embed=e, file=discord.File(file)) 
-      os.remove(file)
+      url = await self.make_transcript(interaction.channel)
+      e = discord.Embed(color=self.bot.color, title=f"Logs for {interaction.channel.name} `{interaction.channel.id}`", description=f"Closed by **{interaction.author}**", timestamp=datetime.datetime.now(), url=url)
     await inter.response.edit_message(content="Deleting this channel in 5 seconds", view=None)  
     await asyncio.sleep(5)
     await inter.channel.delete(reason="ticket closed")
