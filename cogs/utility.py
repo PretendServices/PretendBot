@@ -114,12 +114,12 @@ class Utility(commands.Cog):
       message.guild.id
     )
     if check:
-      lastmsg = await self.bot.cache.get(f"sticky-{message.guild.id}-{message.channel.id}")
+      lastmsg = self.bot.cache.get(f"sticky-{message.guild.id}-{message.channel.id}")
       if lastmsg:
         lastmsg = await message.channel.fetch_message(str(lastmsg))
         await lastmsg.delete()
       newmsg = await message.channel.send(check['message'])
-      await self.bot.cache.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id, 3600)
+      self.bot.cache.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id, 3600)
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
     if message.is_system():
