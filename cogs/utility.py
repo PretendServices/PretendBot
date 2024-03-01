@@ -9,6 +9,7 @@ import dateutil.parser
 
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
+from discord import TextChannel
 from io import BytesIO
 from typing import Union, Optional, Any
 
@@ -283,7 +284,7 @@ class Utility(commands.Cog):
 
    embed.set_image(url=member.display_avatar.url)
    return await ctx.send(embed=embed)
-  @group(
+  @commands.group(
         name="stickymessage",
         aliases=["stickymsg", "sticky"],
         invoke_without_command=True,
@@ -292,8 +293,7 @@ class Utility(commands.Cog):
         return await ctx.create_pages()
 
   @stickymessage.command(name="add", brief="manage guild")
-  @has_permissions(manage_guild=True)
-  @query_limit("stickymessage")
+  @has_guild_permissions(manage_guild=True)
   async def stickymessage_add(
         self, ctx: PretendContext, channel: TextChannel, *, code: str
     ):
