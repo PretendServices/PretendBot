@@ -319,6 +319,24 @@ class Utility(commands.Cog):
         return await ctx.send_success(
             f"Added sticky message to {channel.mention}\n```{code}```"
         )
+  @stickymessage.command(name="remove", brief="manage guild")
+  @has_guild_permissions(manage_guild=True)
+  async def stickymessage_remove(self, ctx: PretendContext, *, channel: TextChannel):
+        """remove a sticky message from the server"""
+        check = await self.bot.db.fetchrow(
+            "SELECT * FROM stickymessage WHERE channel_id = $1", channel.id
+        )
+        if not check:
+            return await ctx.send_warning(
+                "There is no sticky message configured in this channel"
+            )
+
+        await self.bot.db.execute(
+            "DELETE FROM stickymessage WHERE channel_id = $1", channel.id
+        )
+        return await ctx.send_success(
+            f"Deleted the sticky message from {channel.mention}"
+        )
   @commands.command(aliases=['pastusernanes', 'usernames', 'oldnames', 'pastnames'])
   async def names(self, ctx: PretendContext, *, user: discord.User=commands.Author):
     """
