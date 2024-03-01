@@ -283,19 +283,42 @@ class Utility(commands.Cog):
 
    embed.set_image(url=member.display_avatar.url)
    return await ctx.send(embed=embed)
-  @commands.command()
-  @has_guild_permissions(manage_messages=True)
-  async def stickymessage(self, ctx: PretendContext, *, content: str):
-    """
-    Send a message that will always be the last message of a channel.
-    """
-    sticky_message = self.bot.db.fetchrow("SELECT * FROM stickymessage WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
-    if sticky_message:
-      await self.bot.db.execute("DELETE FROM stickymessage WHERE channel_id = $1 AND guild_id = $2", ctx.channel.id, ctx.guild.id)
-    # Rest of the code...
-    await self.bot.db.execute("INSERT INTO stickymessage VALUES ($1, $2, $3)", ctx.guild.id, ctx.channel.id, content)
-    await ctx.send_success(f"Sticky message set to {content}")
-    
+  @group(
+        name="stickymessage",
+        aliases=["stickymsg", "sticky"],
+        invoke_without_command=True,
+    )
+  async def stickymessage(self, ctx: PretendContext):
+        return await ctx.create_pages()
+
+  @stickymessage.command(name="add", brief="manage guild")
+  @has_permissions(manage_guild=True)
+  @query_limit("stickymessage")
+  async def stickymessage_add(
+        self, ctx: PretendContext, channel: TextChannel, *, code: str
+    ):
+        """add a sticky message to the server"""
+        check = await self.bot.db.fetchrow(
+            "SELECT * FROM stickymessage WHERE channel_id = $1", channel.id
+        )
+        if check:
+            args = [
+                "UPDATE stickymessage SET message = $1 WHERE channel_id = $2",
+                code,
+                channel.id,
+            ]
+        else:
+            args = [
+                "INSERT INTO stickymessage VALUES ($1,$2,$3)",
+                ctx.guild.id,
+                channel.id,
+                code,
+            ]
+
+        await self.bot.db.execute(*args)
+        return await ctx.send_success(
+            f"Added sticky message to {channel.mention}\n```{code}```"
+        )
   @commands.command(aliases=['pastusernanes', 'usernames', 'oldnames', 'pastnames'])
   async def names(self, ctx: PretendContext, *, user: discord.User=commands.Author):
     """
