@@ -126,7 +126,7 @@ class DeleteTicket(discord.ui.Button):
      channel = inter.guild.get_channel(check[0])
      if channel:
       url = await self.make_transcript(interaction.channel)
-      e = discord.Embed(color=self.bot.color, title=f"Logs for {interaction.channel.name} `{interaction.channel.id}`", description=f"Closed by **{interaction.author}**", timestamp=datetime.datetime.now(), url=url)
+      e = discord.Embed(color=interaction.client.color, title=f"Logs for {interaction.channel.name} `{interaction.channel.id}`", description=f"Closed by **{interaction.author}**", timestamp=datetime.datetime.now(), url=url)
     await inter.response.edit_message(content="Deleting this channel in 5 seconds", view=None)  
     await asyncio.sleep(5)
     await inter.channel.delete(reason="ticket closed")
