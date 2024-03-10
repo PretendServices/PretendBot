@@ -288,6 +288,8 @@ class Pretend(commands.AutoShardedBot):
    """
    The place where the command errors raise
    """
+   if not self.cache.get("error_codes"):
+    await self.cache.set("error_codes", {})
    channel_perms = ctx.channel.permissions_for(ctx.guild.me)
    
    if not channel_perms.send_messages or not channel_perms.embed_links: 
@@ -306,7 +308,7 @@ class Pretend(commands.AutoShardedBot):
      return
    if isinstance(error, (commands.MemberNotFound, commands.MissingPermissions, commands.EmojiNotFound)):
     return await ctx.send_warning(error)
-   if "snipe" in str(ctx.command):
+   if str(ctx.command) == "snipe":
     return await ctx.send_warning("There was an issue fetching snipes.")
    # guild id, channel id, user id, timestamp, error, and code
    code = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(6)) 
@@ -320,6 +322,7 @@ class Pretend(commands.AutoShardedBot):
     "code": code,
     "command": str(ctx.command)
    }
+   self.cache.get("error_codes")[code] = j
    await self.db.execute("INSERT INTO error_codes (code, info) VALUES ($1, $2)", code, json.dumps(j))
    await ctx.send(f"{code}", embed=discord.Embed(
         description=f"{self.warning} {ctx.author.mention}: An error occurred while performing the command **{ctx.command}**. Error Code: `{code}` Please report this code to a developer in the [Pretend Server](https://discord.gg/pretendbot).",

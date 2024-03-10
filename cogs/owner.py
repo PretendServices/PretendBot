@@ -3,7 +3,8 @@ import random
 import string
 import asyncio 
 import datetime
-
+import discord
+import json
 from discord import User, Member, Guild
 from discord.ext.commands import Cog, command, is_owner, group
 from discord.ext import tasks
@@ -156,6 +157,25 @@ class Owner(Cog):
     {'name': user.name, 'icon_url': user.display_avatar.url}
    )
 
+  @command(aliases=["trace"])
+  @is_owner()
+  async def error(self, ctx: PretendContext, code: str=""):
+   if not code:
+    return await ctx.send_warning("Please provide an error code to show info about.")
+   fl = await self.bot.db.fetch("SELECT * FROM error_codes;")
+   error_details = [x for x in fl if x.get("code") == code]
+   if len(error_details) == 0 or len(code) != 6:
+    return await ctx.send_warning("Please provide a **valid** error code.")
+   error_details = error_details[0]
+   error_details = json.loads(error_details.get("info"))
+   guild = self.bot.get_guild(error_details["guild_id"])
+   invites = await ctx.guild.invites()
+   invite = invites[0].url
+   embed = discord.Embed(
+            description=str(error_details["error"]),
+            color=0xD60606
+   ).add_field(name="Guild", value=f"{guild.name} [`{guild.id}`]({invite})", inline=False).add_field(name="Channel", value=f"<#{error_details['channel_id']}>", inline=False).add_field(name="User", value=f"<@{error_details['user_id']}> (`{error_details['user_id']}`)", inline=False).add_field(name="Command", value=f"**{error_details['command']}**").add_field(name="Timestamp", value=f"{error_details['timestamp']}").set_author(name=f"Error Code: {code}")
+   return await ctx.send(embed=embed)
   @command(aliases=['gban'])
   @is_owner()
   async def globalban(self, ctx: PretendContext, user: User, *, reason: str="Globally banned by a bot owner"):

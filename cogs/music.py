@@ -238,8 +238,10 @@ class Music(Cog):
   
    player.set_context(ctx) 
    player.awaiting = True
-   results = await player.get_tracks(query=query, ctx=ctx)
-
+   try:
+    results = await player.get_tracks(query=query, ctx=ctx)
+   except Exception as e:
+    return await ctx.send_warning("There was an issue fetching that track.")
    if not results: 
     await ctx.send_warning("No song found")
 

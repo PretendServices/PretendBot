@@ -506,7 +506,6 @@ class Lastfm(Cog):
     
     if not check: 
      return await ctx.lastfm_send(f"{'You don' if member.id == ctx.author.id else f'{member.mention} doesn'}'t have a **Last.Fm** account connected")
- 
     user = check[0]
     
     if check[2]: 
@@ -514,9 +513,15 @@ class Lastfm(Cog):
      mes = await ctx.send(**x)
     
     else: 
-     a = await self.lastfmhandler.get_tracks_recent(user, 1)  
-     u = await self.lastfmhandler.get_user_info(user)
-     album = a['recenttracks']['track'][0]['album']['#text']
+     try:
+         a = await asyncio.wait_for(self.lastfmhandler.get_tracks_recent(user, 1), timeout=15)  
+         u = await asyncio.wait_for(self.lastfmhandler.get_user_info(user), timeout=15)
+     except asyncio.TimeoutError:
+         return await ctx.send_warning("Could not connect to LastFM servers.")
+     try:
+         album = a['recenttracks']['track'][0]['album']['#text']
+     except Exception as e:
+         return await ctx.send_warning("There was an issue fetching your current track.")
      embed = Embed(color=self.bot.color)\
      .set_author(
        name=user, 

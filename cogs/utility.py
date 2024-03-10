@@ -533,44 +533,41 @@ class Utility(commands.Cog):
     """
     Get the most recent deleted message in the channel
     """
-
-    if not self.bot.cache.get('snipe'): 
+    try:
+     if not self.bot.cache.get('snipe'): 
       return await ctx.send_warning("No snipes found in this channel")
-    
-    snipes = [s for s in self.bot.cache.get('snipe') if s['channel'] == ctx.channel.id]
-    
-    if len(snipes) == 0:
-     return await ctx.send_warning("No snipes found in this channel")
-    
-    if index > len(snipes): 
-     return await ctx.send_warning(f"There are only **{len(snipes)}** snipes in this channel")
+     snipes = [s for s in self.bot.cache.get('snipe') if s['channel'] == ctx.channel.id]
+     if len(snipes) == 0:
+      return await ctx.send_warning("No snipes found in this channel")
+     if index > len(snipes): 
+      return await ctx.send_warning(f"There are only **{len(snipes)}** snipes in this channel")
+     result = snipes[::-1][index-1]
+     embed = discord.Embed(
+       color=self.bot.color, 
+       description=result['message'], 
+       timestamp=datetime.datetime.fromtimestamp(result['created_at']).replace(tzinfo=None)
+     )\
+     .set_author(
+       name=result['name'],
+       icon_url=result['avatar']
+     )\
+     .set_footer(text=f"{index}/{len(snipes)}")
 
-    result = snipes[::-1][index-1]
-    embed = discord.Embed(
-      color=self.bot.color, 
-      description=result['message'], 
-      timestamp=datetime.datetime.fromtimestamp(result['created_at']).replace(tzinfo=None)
-    )\
-    .set_author(
-      name=result['name'],
-      icon_url=result['avatar']
-    )\
-    .set_footer(text=f"{index}/{len(snipes)}")
-
-    if len(result['stickers']) > 0: 
-      sticker: discord.StickerItem = result['stickers'][0]
-      embed.set_image(url=sticker.url)
-    else:
-      if len(result['attachments']) > 0:
-        attachment: discord.Attachment = result['attachments'][0]
-        if ".mp4" in attachment.filename or ".mov" in attachment.filename: 
-          file = discord.File(BytesIO(await attachment.read()), filename=attachment.filename)
-          return await ctx.send(embed=embed, file=file)
-        else: 
-          embed.set_image(url=attachment.url)
+     if len(result['stickers']) > 0: 
+       sticker: discord.StickerItem = result['stickers'][0]
+       embed.set_image(url=sticker.url)
+     else:
+       if len(result['attachments']) > 0:
+         attachment: discord.Attachment = result['attachments'][0]
+         if ".mp4" in attachment.filename or ".mov" in attachment.filename: 
+           file = discord.File(BytesIO(await attachment.read()), filename=attachment.filename)
+           return await ctx.send(embed=embed, file=file)
+         else: 
+           embed.set_image(url=attachment.url)
     
-    return await ctx.send(embed=embed)   
-  
+     return await ctx.send(embed=embed)   
+    except Exception as e:
+     return await ctx.send_warning("There was an error getting snipes.")
   @commands.hybrid_command(aliases=['mc'])
   async def membercount(self, ctx: PretendContext, invite: discord.Invite=None):
     """
