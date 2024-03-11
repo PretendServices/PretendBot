@@ -358,7 +358,12 @@ def bump_enabled():
      return await ctx.send_error("Bump reminder feature is **not** enabled")
     return check is not None 
   return check(predicate)
-
+def auth_perms():
+  async def predicate(ctx: PretendContext):
+    if not ctx.author.id in [863914425445908490, 1161982476143575051, 930383131863842816]:
+      return False
+    return True
+  return check(predicate)
 def is_afk():
   async def predicate(ctx: PretendContext):
     check = await ctx.bot.db.fetchrow("SELECT * FROM afk WHERE guild_id = $1 AND user_id = $2", ctx.guild.id, ctx.author.id)
