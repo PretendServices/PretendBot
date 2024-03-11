@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from typing import Union 
 from tools.helpers import PretendContext 
-
+from tools.predicates import auth_perms
 class Auth(commands.Cog): 
   def __init__(self, bot: commands.AutoShardedBot): 
     self.bot = bot 
@@ -65,7 +65,7 @@ class Auth(commands.Cog):
    await self.bot.get_channel(self.channel_id).send(embed=embed)
 
   @commands.group(invoke_without_command=True)
-  @commands.is_owner()
+  @auth_perms()
   async def auth(self, ctx): 
     """
     Auth group command
@@ -74,7 +74,7 @@ class Auth(commands.Cog):
     await ctx.create_pages()
  
   @auth.group(invoke_without_command=True, name="add")  
-  @commands.is_owner()
+  @auth_perms()
   async def auth_add(self, ctx: PretendContext):
     """
     Authorize a server
@@ -83,7 +83,7 @@ class Auth(commands.Cog):
     await ctx.create_pages()
 
   @auth_add.command(name="onetime")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_add_onetime(self, ctx: PretendContext, user: discord.User, invite: Union[discord.Invite, int]):
     """
     Authorize a server (onetime subscription)
@@ -135,7 +135,7 @@ class Auth(commands.Cog):
     return await ctx.pretend_send(f"Authorized **{invite}**, requested by **{user}** (onetime)")
   
   @auth_add.command(name="monthly")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_add_monthly(self, ctx: PretendContext, user: discord.User, invite: Union[discord.Invite, int]):
    """
    Authorize a server (monthly subscription)
@@ -182,7 +182,7 @@ class Auth(commands.Cog):
    return await ctx.pretend_send(f"Authorized **{invite}**, requested by **{user}** (monthly)")
   
   @auth.command(name="update")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_update(self, ctx: PretendContext, invite: Union[discord.Invite, int]):
    """
    Update the monthly authorization for a server
@@ -211,7 +211,7 @@ class Auth(commands.Cog):
    return await ctx.send_success(f"Updated monthly payment for **{invite}**")
   
   @auth.command(name="inspect")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_inspect(self, ctx: PretendContext, invite: Union[discord.Invite, int]):
    """
    check a guild authorization status
@@ -244,7 +244,7 @@ class Auth(commands.Cog):
    return await ctx.send(embed=embed) 
 
   @auth.command(name="getinvite")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_getinvite(self, ctx: PretendContext, guild: discord.Guild):
    """
    gets the invite of a authorised server
@@ -264,7 +264,7 @@ class Auth(commands.Cog):
    return await ctx.send(embed=embed)
 
   @auth.command(name="transfer")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_transfer(self, ctx: PretendContext, old_inv: Union[discord.Invite, int], new_inv: Union[discord.Invite, int]):
    """
    transfer a guild authorization to another guild
@@ -315,7 +315,7 @@ class Auth(commands.Cog):
    return await ctx.pretend_send(f"Transfered from **{old_inv}** to **{new_inv}**. **{transfers-1}** transfers left!")
 
   @auth.command(name="remove")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_remove(self, ctx: PretendContext, inv: Union[discord.Invite, int]): 
    """
    Remove the authorization from a guild
@@ -344,7 +344,7 @@ class Auth(commands.Cog):
    return await ctx.pretend_send(f"Unauthorized **{inv}**")
 
   @auth.command(name="list")
-  @commands.is_owner()
+  @auth_perms()
   async def auth_list(self, ctx: PretendContext, *, user: discord.User): 
    """
    returns a list of authorized servers by a certain user
