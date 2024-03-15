@@ -160,6 +160,8 @@ class Owner(Cog):
   @command(name="globalenable")
   @is_owner()
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
+    if not cmd:
+      return await ctx.send_warning("Please provide a command to enable.")
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
     cmd = self.bot.get_command(cmd).name
@@ -172,6 +174,8 @@ class Owner(Cog):
   @command(name="globaldisable")
   @is_owner()
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
+    if not cmd:
+      return await ctx.send_warning("Please provide a command to disable.")
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
     cmd = self.bot.get_command(cmd).name
