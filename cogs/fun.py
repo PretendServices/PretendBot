@@ -972,8 +972,6 @@ class Fun(Cog):
     if member.id in [461914901624127489, 1174502631696252962] or member.id in ["461914901624127489", "1174502631696252962"]:
         m = 100
         mn = 20
-    if member.id == 1120260824041267280:
-        m = 500
     embed = Embed(color=self.bot.color, description=f"{member.nick or member.global_name or member.name}'s penis\n\n8{'=' * random.randint(mn, m)}D")
     await ctx.reply(embed=embed) 
   
