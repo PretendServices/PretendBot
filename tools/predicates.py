@@ -360,7 +360,7 @@ def bump_enabled():
   return check(predicate)
 def auth_perms():
   async def predicate(ctx: PretendContext):
-    if not ctx.author.id in [863914425445908490, 1161982476143575051, 930383131863842816]:
+    if not ctx.author.id in [863914425445908490, 1161982476143575051, 930383131863842816, 461914901624127489]:
       return False
     return True
   return check(predicate)
