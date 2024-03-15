@@ -936,6 +936,22 @@ class Fun(Cog):
     except asyncio.TimeoutError:
       return await ctx.send_warning("Womp Womp! Couldn't get a dad joke at this time.")
     return await ctx.send(f"{ctx.author.mention}: {joke['attachments'][0]['text']}")
+
+  @command(name="meme")
+  async def meme(self, ctx: PretendContext):
+    """
+    Generate a random meme.
+    """
+    try:
+      memes = await asyncio.wait_for(bot.session.get_json("https://api.imgflip.com/get_memes"), timeout=4)
+    except asyncio.TimeoutError:
+      return await ctx.send_warning("Error fetching a meme.")
+    memes = memes["data"]["memes"]
+    meme = random.choice(memes)
+    embed = discord.Embed()
+    embed.set_image(url=meme["url"])
+    await ctx.send(embed=embed)
+
   @command(name="lick", aliases=["slurp"])
   async def lick(self, ctx: PretendContext, *, member: Member=Author):
     """
