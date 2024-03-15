@@ -948,7 +948,7 @@ class Fun(Cog):
       return await ctx.send_warning("Error fetching a meme.")
     memes = memes["data"]["memes"]
     meme = random.choice(memes)
-    embed = discord.Embed()
+    embed = discord.Embed(color=0x2b2d31)
     embed.set_image(url=meme["url"])
     await ctx.send(embed=embed)
 
