@@ -163,10 +163,6 @@ class Owner(Cog):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
     cmd = self.bot.get_command(cmd).name
-    result = await self.bot.db.fetchrow("SELECT disabled FROM global_disabled_cmds WHERE cmd = $1;", cmd)
-    if result:
-      if not result.get("disabled"):
-        return await ctx.send_warning("This command is already globally enabled.")
     await self.bot.db.execute(
     "DELETE FROM global_disabled_cmds WHERE cmd = $1;", 
     cmd
