@@ -19,7 +19,18 @@ async def disabled_command(ctx: PretendContext):
   ): 
     await ctx.send_error(f"The command **{str(ctx.command)}** is **disabled** in this server")   
     return False 
- 
+
+  global_disabled = await ctx.bot.db.fetchrow(
+   """
+   SELECT disabled FROM global_disabled_cmds
+   WHERE cmd = $1
+   """,
+   await ctx.bot.get_command(str(ctx.command)).name
+  )
+  if global_disabled:
+    if global_disabled.get("disabled"):
+      await ctx.send_warning("This command is currently disabled by the admin team of pretend, for further information please join the [Pretend Server](https://discord.gg/pretendbot).")   
+      return False 
   return True
 
 @bot.tree.context_menu(name='avatar')
