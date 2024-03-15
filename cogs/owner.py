@@ -162,7 +162,11 @@ class Owner(Cog):
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
-    await self.bot.db.execute("INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) ON CONFLICT (cmd) DO UPDATE SET disabled = VALUES(disabled);", cmd, False)
+    await self.bot.db.execute(
+    "INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) "
+    "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled;", 
+    cmd, False
+    )
     return await ctx.send_success(f"The command {cmd} has been globally enabled.")
 
   @command(name="globaldisable")
@@ -170,7 +174,11 @@ class Owner(Cog):
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
-    await self.bot.db.execute("INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) ON CONFLICT (cmd) DO UPDATE SET disabled = VALUES(disabled);", cmd, True)
+    await self.bot.db.execute(
+    "INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) "
+    "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled;", 
+    cmd, True
+    )
     return await ctx.send_success(f"The command {cmd} has been globally disabled.")
 
   @command(aliases=["trace"])
