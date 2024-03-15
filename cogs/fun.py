@@ -943,7 +943,7 @@ class Fun(Cog):
     Generate a random meme.
     """
     try:
-      memes = await asyncio.wait_for(bot.session.get_json("https://api.imgflip.com/get_memes"), timeout=4)
+      memes = await asyncio.wait_for(self.bot.session.get_json("https://api.imgflip.com/get_memes"), timeout=4)
     except asyncio.TimeoutError:
       return await ctx.send_warning("Error fetching a meme.")
     memes = memes["data"]["memes"]
