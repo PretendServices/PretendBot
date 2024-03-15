@@ -926,6 +926,13 @@ class Fun(Cog):
     )
     return await ctx.send(embed=embed)
 
+  @command(name="dadjoke", aliases=["cringejoke"])
+  async def dadjoke(self, ctx: PretendContext):
+    try:
+      joke = await asyncio.wait_for(self.bot.session.get_json("https://icanhazdadjoke.com/slack"), timeout=2)
+    except asyncio.TimeoutError:
+      return await ctx.send_warning("Womp Womp! Couldn't get a dad joke at this time.")
+    return await ctx.send(f"{ctx.author.mention}: {joke['attachments'][0]['text']}")
   @command(name="lick", aliases=["slurp"])
   async def lick(self, ctx: PretendContext, *, member: Member=Author):
     """
