@@ -162,6 +162,11 @@ class Owner(Cog):
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
     if not cmd:
       return await ctx.send_warning("Please provide a command to enable.")
+    if cmd in ["*", "all", "ALL"]:
+      await self.bot.db.execute(
+        "DELETE FROM global_disabled_cmds;"
+      )
+      return await ctx.send_success(f"All commands have been globally enabled.")
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
     cmd = self.bot.get_command(cmd).name
@@ -176,6 +181,8 @@ class Owner(Cog):
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
     if not cmd:
       return await ctx.send_warning("Please provide a command to disable.")
+    if cmd in ["globalenable", "globaldisable"]:
+      return await ctx.send_warning("Unable to globally disable this command.")
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
     cmd = self.bot.get_command(cmd).name
