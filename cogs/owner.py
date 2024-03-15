@@ -162,6 +162,9 @@ class Owner(Cog):
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
+    result = await self.bot.db.fetchrow("SELECT disabled FROM global_disabled_cmds WHERE cmd = $1;", cmd)
+    if not result.get("disabled"):
+      return await ctx.send_warning("This command is already globally enabled.")
     await self.bot.db.execute(
     "INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) "
     "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled;", 
@@ -174,6 +177,9 @@ class Owner(Cog):
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
+    result = await self.bot.db.fetchrow("SELECT disabled FROM global_disabled_cmds WHERE cmd = $1;", cmd)
+    if result.get("disabled"):
+      return await ctx.send_warning("This command is already globally disabled.")
     await self.bot.db.execute(
     "INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) "
     "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled;", 
