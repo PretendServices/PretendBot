@@ -162,7 +162,7 @@ class Owner(Cog):
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
-    cmd = bot.get_command(cmd).name
+    cmd = self.bot.get_command(cmd).name
     result = await self.bot.db.fetchrow("SELECT disabled FROM global_disabled_cmds WHERE cmd = $1;", cmd)
     if result:
       if not result.get("disabled"):
@@ -179,7 +179,7 @@ class Owner(Cog):
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
     if not self.bot.get_command(cmd):
       return await ctx.send_warning("Command does not exist.")
-    cmd = bot.get_command(cmd).name
+    cmd = self.bot.get_command(cmd).name
     result = await self.bot.db.fetchrow("SELECT disabled FROM global_disabled_cmds WHERE cmd = $1;", cmd)
     if result:
       if result.get("disabled"):
