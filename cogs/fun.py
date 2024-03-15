@@ -926,25 +926,6 @@ class Fun(Cog):
     )
     return await ctx.send(embed=embed)
 
-  @command(name="fuck", aliases=["rape"])
-  async def fuck(self, ctx: PretendContext, *, member: Member=Author):
-    """
-    Do some sus stuff to someone
-    """
-    if not ctx.channel.is_nsfw():
-      return await ctx.send_error("This channel is not marked as nsfw.")
-    if ctx.author.id == member.id:
-      return await ctx.send_error("You can't fuck yourself.")
-    res = ["You use protection but the condom breaks :0", "You explode in that nigget!", "You pull out like a pussy..", "You got caught by your parents."]
-    embed = Embed(color=self.bot.color, description=f"You do some weird stuff to {member.nick or member.global_name or member.name}..")
-    try:
-        fuck = await asyncio.wait_for(self.bot.session.get_json("http://api.nekos.fun:8080/api/anal"), timeout=6)
-    except asyncio.TimeoutError:
-        return await ctx.send_error("There was an error with the API.")
-    embed.set_footer(text=random.choice(res))
-    embed.set_image(url=fuck["image"])
-    await ctx.reply(embed=embed)
-
   @command(name="lick", aliases=["slurp"])
   async def lick(self, ctx: PretendContext, *, member: Member=Author):
     """
