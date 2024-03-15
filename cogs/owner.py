@@ -186,6 +186,20 @@ class Owner(Cog):
     )
     return await ctx.send_success(f"The command {cmd} has been globally disabled.")
 
+  @command(name="globaldisabledlist", aliases=["gdl"])
+  @is_owner()
+  async def globaldisabledlist(self, ctx: PretendContext, cmd: str=""):
+    global_disabled_cmds = await self.bot.db.fetch("SELECT * FROM global_disabled_cmds;")
+    disabled_list = [
+      f"{obj.cmd} - disabled by <@{obj.disabled_by}>" 
+      for obj in global_disabled_cmds
+    ] 
+    return await ctx.paginate(
+     disabled_list,
+     f"Globally Disabled Commands:",
+     {"name": ctx.guild.name, "icon_url": ctx.guild.icon}
+    )
+
   @command(aliases=["trace"])
   @is_owner()
   async def error(self, ctx: PretendContext, code: str=""):
