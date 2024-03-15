@@ -28,7 +28,7 @@ async def disabled_command(ctx: PretendContext):
    ctx.bot.get_command(str(ctx.command)).name
   )
   if global_disabled:
-    if global_disabled.get("disabled"):
+    if global_disabled.get("disabled") and ctx.author.id not in ctx.bot.owner_ids:
       await ctx.send_warning("This command is currently disabled by the admin team of pretend, for further information please join the [Pretend Server](https://discord.gg/pretendbot).")   
       return False 
   return True
