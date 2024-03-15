@@ -386,3 +386,17 @@ def reminder_exists():
     return False 
    return True
   return check(predicate)
+
+def whitelist_enabled():
+ async def predicate(ctx: PretendContext):
+  if not await ctx.bot.db.fetchrow(
+    """
+    SELECT * FROM whitelist_state
+    WHERE guild_id = $1
+    """,
+    ctx.guild.id
+  ):
+   await ctx.send_warning(f"Whitelist is **not** enabled")
+   return False
+  return True
+ return check(predicate)
