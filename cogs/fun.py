@@ -928,6 +928,9 @@ class Fun(Cog):
 
   @command(name="dadjoke", aliases=["cringejoke"])
   async def dadjoke(self, ctx: PretendContext):
+    """
+    Get a random dad joke.
+    """
     try:
       joke = await asyncio.wait_for(self.bot.session.get_json("https://icanhazdadjoke.com/slack"), timeout=2)
     except asyncio.TimeoutError:

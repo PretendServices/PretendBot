@@ -160,6 +160,9 @@ class Owner(Cog):
   @command(name="globalenable")
   @is_owner()
   async def globalenable(self, ctx: PretendContext, cmd: str=""):
+    """
+    Globally enable a command.
+    """
     if not cmd:
       return await ctx.send_warning("Please provide a command to enable.")
     if cmd in ["*", "all", "ALL"]:
@@ -179,6 +182,9 @@ class Owner(Cog):
   @command(name="globaldisable")
   @is_owner()
   async def globaldisable(self, ctx: PretendContext, cmd: str=""):
+    """
+    Globally disable a command.
+    """
     if not cmd:
       return await ctx.send_warning("Please provide a command to disable.")
     if cmd in ["globalenable", "globaldisable"]:
@@ -199,7 +205,10 @@ class Owner(Cog):
 
   @command(name="globaldisabledlist", aliases=["gdl"])
   @is_owner()
-  async def globaldisabledlist(self, ctx: PretendContext, cmd: str=""):
+  async def globaldisabledlist(self, ctx: PretendContext):
+    """
+    Show all commands that are globally disabled.
+    """
     global_disabled_cmds = await self.bot.db.fetch("SELECT * FROM global_disabled_cmds;")
     if len(global_disabled_cmds) <= 0:
       return await ctx.send_warning("There are no globally disabled commands.")
