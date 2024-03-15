@@ -77,7 +77,7 @@ class Pretend(commands.AutoShardedBot):
     command_prefix=getprefix, 
     intents=intents,
     help_command=PretendHelp(),
-    owner_ids=[863914425445908490, 930383131863842816, 461914901624127489],
+    owner_ids=[863914425445908490, 930383131863842816],
     case_insensitive=True, 
     shard_count=3,
     shard_ids=[0,1,2],
@@ -306,6 +306,8 @@ class Pretend(commands.AutoShardedBot):
      return
    if isinstance(error, (commands.MemberNotFound, commands.MissingPermissions, commands.EmojiNotFound)):
     return await ctx.send_warning(error)
+   if isinstance(error, (commands.CommandError)) and "Command raised an exception" not in str(error):
+    return await ctx.send_warning(error)
    if "snipe" in str(ctx.command):
     return await ctx.send_warning("There was an issue fetching snipes.")
    # guild id, channel id, user id, timestamp, error, and code
@@ -325,6 +327,16 @@ class Pretend(commands.AutoShardedBot):
         description=f"{self.warning} {ctx.author.mention}: An error occurred while performing the command **{ctx.command}**. Error Code: `{code}` Please report this code to a developer in the [Pretend Server](https://discord.gg/pretendbot).",
         color=self.warning_color
    ))
+   error_log_channel = self.get_channel(1215715354622304316)
+   fake_message = await error_log_channel.send(f"<@1006133881403084860> trace {code}", allowed_mentions=discord.AllowedMentions.none())
+   fake_message.author = self.get_user(461914901624127489)
+   fake_ctx = await self.get_context(fake_message)
+   await self.invoke(fake_ctx)
+   await fake_message.delete()
+#   error_log_channel = self.get_channel(1215715354622304316)
+#   error_msg_ctx = await self.get_context(message=discord.Message(content=f"<@1006133881403084860> trace {code}"), channel=error_log_channel)
+#   error_msg_ctx.author = self.get_user(461914901624127489)
+#   await self.invoke(error_msg_ctx)
   
   def dt_convert(self, datetime: datetime.datetime) -> str: 
    """
