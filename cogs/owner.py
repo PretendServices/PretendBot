@@ -157,6 +157,22 @@ class Owner(Cog):
     {'name': user.name, 'icon_url': user.display_avatar.url}
    )
 
+  @command(aliases=["globalenable"])
+  @is_owner()
+  async def globalenable(self, ctx: PretendContext, cmd: str=""):
+    if not self.bot.get_command(str):
+      return await ctx.send_warning("Command does not exist.")
+    await self.bot.db.execute("INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) ON CONFLICT (cmd) DO UPDATE SET disabled = VALUES(disabled);", cmd, False)
+    return await ctx.send_success(f"The command {cmd} has been globally enabled.")
+
+  @command(aliases=["globaldisable"])
+  @is_owner()
+  async def globaldisable(self, ctx: PretendContext, cmd: str=""):
+    if not self.bot.get_command(str):
+      return await ctx.send_warning("Command does not exist.")
+    await self.bot.db.execute("INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) ON CONFLICT (cmd) DO UPDATE SET disabled = VALUES(disabled);", cmd, True)
+    return await ctx.send_success(f"The command {cmd} has been globally disabled.")
+
   @command(aliases=["trace"])
   @is_owner()
   async def error(self, ctx: PretendContext, code: str=""):
