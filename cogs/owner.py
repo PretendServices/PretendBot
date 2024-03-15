@@ -190,8 +190,10 @@ class Owner(Cog):
   @is_owner()
   async def globaldisabledlist(self, ctx: PretendContext, cmd: str=""):
     global_disabled_cmds = await self.bot.db.fetch("SELECT * FROM global_disabled_cmds;")
+    if len(global_disabled_cmds) <= 0:
+      return await ctx.send_warning("There are no globally disabled commands.")
     disabled_list = [
-      f"{obj.cmd} - disabled by <@{obj.disabled_by}>" 
+      f"{obj.get('cmd')} - disabled by <@{obj.get('disabled_by')}>" 
       for obj in global_disabled_cmds
     ] 
     return await ctx.paginate(
