@@ -22,7 +22,7 @@ async def disabled_command(ctx: PretendContext):
 
   global_disabled = await ctx.bot.db.fetchrow(
    """
-   SELECT disabled FROM global_disabled_cmds
+   SELECT disabled FROM 
    WHERE cmd = $1
    """,
    await ctx.bot.get_command(str(ctx.command)).name
