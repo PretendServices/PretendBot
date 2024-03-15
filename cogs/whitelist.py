@@ -144,7 +144,7 @@ class Whitelist(Cog):
 
         await ctx.send_success(
             f"Removed {user.mention} from the **whitelist**"
-            if i != True
+            if i is True
             else
             f"Removed {user.mention} from the **whitelist** - failed to kick the member"
         )
