@@ -180,9 +180,9 @@ class Owner(Cog):
       if result.get("disabled"):
         return await ctx.send_warning("This command is already globally disabled.")
     await self.bot.db.execute(
-    "INSERT INTO global_disabled_cmds (cmd, disabled) VALUES ($1, $2) "
-    "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled;", 
-    cmd, True
+    "INSERT INTO global_disabled_cmds (cmd, disabled, disabled_by) VALUES ($1, $2, $3) "
+    "ON CONFLICT (cmd) DO UPDATE SET disabled = EXCLUDED.disabled, disabled_by = EXCLUDED.disabled_by;", 
+    cmd, True, str(ctx.author.id)
     )
     return await ctx.send_success(f"The command {cmd} has been globally disabled.")
 
