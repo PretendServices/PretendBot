@@ -25,7 +25,7 @@ async def disabled_command(ctx: PretendContext):
    SELECT disabled FROM 
    WHERE cmd = $1
    """,
-   await ctx.bot.get_command(str(ctx.command)).name
+   ctx.bot.get_command(str(ctx.command)).name
   )
   if global_disabled:
     if global_disabled.get("disabled"):
