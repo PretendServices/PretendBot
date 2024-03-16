@@ -345,7 +345,7 @@ class Utility(commands.Cog):
 
     results = await self.bot.db.fetch("SELECT * FROM usernames WHERE user_id = $1", user.id)
     if len(results) == 0: 
-      return await ctx.send_error("This user doesn't have past usernames")
+      return await ctx.send_error(f"{'You' if user == ctx.author else f'{user.mention}'} doesn't have **past usernames**")
     
     users = sorted(results, key=lambda m: m['time'], reverse=True)
 
