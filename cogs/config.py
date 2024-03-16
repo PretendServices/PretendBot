@@ -498,6 +498,9 @@ class Config(Cog):
    if len(prefix) > 7:
      raise BadArgument("Prefix is too long!")
    
+   if not prefix:
+     return await ctx.send_warning(f"Self prefix is **too short**")
+
    try: 
     await self.bot.db.execute("INSERT INTO selfprefix VALUES ($1,$2)", ctx.author.id, prefix)
    except: 
