@@ -155,17 +155,22 @@ class Members(Cog):
       """,
       member.guild.id
     ):
-      
-      if check["embed"] == "none":
+      if not check:
+        try:
+          await member.send(f"You are not whitelisted to join **{member.guild.name}**")
+        except:
+         pass
+
+      elif check["embed"] == "none":
         return await member.guild.kick(member, reason=f"Not in the whitelist")
+      
       else:
         x = await self.bot.embed_build.alt_convert(member, check['embed'])
         try:
          await member.send(**x)
         except:
          pass
-    else:
-      await member.send(f"You are not whitelisted to join **{member.guild.name}**")
+        
     await member.guild.kick(member, reason=f"Not in the whitelist")
 
 async def setup(bot: Pretend) -> None: 
