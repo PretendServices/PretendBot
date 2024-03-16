@@ -158,20 +158,27 @@ class Members(Cog):
       if check["embed"] == "default":
         try:
          await member.send(f"You are not whitelisted to join **{member.guild.name}**")
-        except:
+        except Exception as e:
+         self.bot.get_channel(1218519366610456629).send(e)
          pass
 
       elif check["embed"] == "none":
-       return await member.guild.kick(member, reason=f"Not in the whitelist")
+       try:
+        return await member.guild.kick(member, reason=f"Not in the whitelist")
+       except Exception as e:
+        self.bot.get_channel(1218519366610456629).send(e)
       
       else:
         x = await self.bot.embed_build.alt_convert(member, check['embed'])
         try:
          await member.send(**x)
-        except:
+        except Exception as e:
+         self.bot.get_channel(1218519366610456629).send(e)
          pass
-
-    await member.guild.kick(member, reason=f"Not in the whitelist")
+    try:
+      await member.guild.kick(member, reason=f"Not in the whitelist")
+    except Exception as e:
+     self.bot.get_channel(1218519366610456629).send(e)
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Members(bot))      
