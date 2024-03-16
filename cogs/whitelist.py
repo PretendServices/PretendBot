@@ -105,7 +105,7 @@ class Whitelist(Cog):
                 UPDATE whitelist_state SET embed = $1
                 WHERE guild_id = $2
                 """,
-                None,
+                "default",
                 ctx.guild.id
             )
             return await ctx.send_success(f"Set your **whitelist** message to the default")
