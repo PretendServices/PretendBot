@@ -171,7 +171,10 @@ class Whitelist(Cog):
             return await ctx.send_error(f"No users are **whitelisted**")
         
         await ctx.paginate(
-            [f"{self.bot.get_user(result["user_id"]).mention}" for result in results],
+            [
+                f"{self.bot.get_user(result['user_id']).mention}"
+                for result in results
+            ],
             title=f"Whitelist Users ({len(results)})",
             author={
                 "name": ctx.guild.name,
