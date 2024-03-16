@@ -315,6 +315,9 @@ class Pretend(commands.AutoShardedBot):
     elif isinstance(error, commands.GuildNotFound):
       return await ctx.send_warning(f"Guild not found")
     
+    elif isinstance(error, commands.MissingPermissions):
+      return await ctx.send_warning(f"You are **missing** the following permission: `{', '.join(permission for permission in error.missing_permissions)}`")
+    
     elif isinstance(error, commands.BadUnionArgument):
       if error.converters == (discord.Member, discord.User):
         return await ctx.send_warning(f"Member not found")
