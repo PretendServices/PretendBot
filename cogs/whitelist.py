@@ -174,7 +174,7 @@ class Whitelist(Cog):
             ctx.guild.id,
             user.id
         ):
-            return await ctx.send_warning(f"{user.mention} is already **whitelisted**")
+            return await ctx.send_warning(f"{user.mention} is not **whitelisted**")
         
         await self.bot.db.execute(
             """
