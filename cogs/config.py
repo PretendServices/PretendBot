@@ -742,7 +742,7 @@ class Config(Cog):
     name="add",
     brief="manage server"
   )
-  @has_guild_permissions(manage_server=True)
+  @has_guild_permissions(manage_guild=True)
   async def alias_add(self, ctx: PretendContext, command: str, *, alias: str):
     """
     Create a shortcut for a command
@@ -779,12 +779,11 @@ class Config(Cog):
     name="remove",
     brief="manage server"
   )
-  @has_guild_permissions(manage_server=True)
+  @has_guild_permissions(manage_guild=True)
   async def alias_remove(self, ctx: PretendContext, *, alias: str):
     """
     Remove an alias for a command
     """
-
     if not await self.bot.db.fetchrow(
       """
       SELECT * FROM aliases
@@ -811,7 +810,7 @@ class Config(Cog):
     name="list",
     brief="manage server"
   )
-  @has_guild_permissions(manage_server=True)
+  @has_guild_permissions(manage_guild=True) # WHY IS GIT LIKE THIS 
   async def alias_list(self, ctx: PretendContext):
     """
     Returns all the aliases in the server
