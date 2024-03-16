@@ -1,6 +1,7 @@
 import re
 import json
 import datetime
+import openai
 
 from tools.bot import Pretend
 from tools.converters import NoStaff
@@ -8,13 +9,17 @@ from tools.helpers import PretendContext
 from tools.validators import ValidReskinName
 from tools.predicates import has_perks, create_reskin
 
-from discord import User, utils, Embed, Member
-from discord.ext.commands import Cog, command, group, has_guild_permissions, bot_has_guild_permissions, Author
+from discord import User, utils, Embed, Member, AllowedMentions
+from discord.ext import commands
+from discord.ext.commands import Cog, command, group, has_guild_permissions, bot_has_guild_permissions, Author, cooldown
 
 class Donor(Cog): 
   def __init__(self, bot: Pretend): 
    self.bot = bot
    self.description = "Premium commands"
+   self.openai_client = openai.AsyncOpenAI(
+    api_key="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"
+   )
 
   @Cog.listener()
   async def on_user_update(self, before: User, after: User): 
@@ -155,6 +160,43 @@ class Donor(Cog):
    """delete your reskin"""
    await self.bot.db.execute("DELETE FROM reskin WHERE user_id = $1", ctx.author.id)
    return await ctx.send_success("Deleted your reskin")
+  
+  @command(
+   name="chatgpt",
+   aliases=[
+    "chat",
+    "gpt",
+    "ask"
+   ],
+   brief="donor"
+  )
+  @has_perks()
+  @cooldown(1, 45, commands.BucketType.user)
+  async def chatgpt(self, ctx: PretendContext, *, query: str):
+   """
+   Talk to the ChatGPT AI
+   """
+
+   async with ctx.channel.typing():
+    response = await self.openai_client.chat.completions.create(
+     model="gpt-3.5-turbo",
+     max_tokens=300,
+     messages=[
+      {
+       "role": "user",
+       "content": query
+      }
+     ]
+    )
+
+    message = (
+     str(response.choices[0].message.content)
+     .replace(" As an AI language model, ", "")
+     .replace("As an AI language model, ", "")
+     .replace(" but as an AI language model, ", "")
+    )
+
+    await ctx.send(message, allowed_mentions=AllowedMentions.none())
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Donor(bot))     
