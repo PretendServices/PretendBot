@@ -326,6 +326,21 @@ class Pretend(commands.AutoShardedBot):
         color=self.warning_color
    ))
   
+  def get_command(self, *args, **kwargs):
+   """
+   Check if a command is private & return None if it is
+   """
+   
+   if cmd := super().get_command(*args, **kwargs):
+    if (
+     (c := cmd.cog_name)
+     and c.lower() in ["jishaku", "owner", "auth"]
+     or cmd.hidden
+    ):
+     return None
+    
+    return cmd
+
   def dt_convert(self, datetime: datetime.datetime) -> str: 
    """
    Get a detailed version of a datetime value

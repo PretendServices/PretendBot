@@ -725,5 +725,117 @@ class Config(Cog):
    await role.edit(color=color.value, reason=f"Color changed by {ctx.author}")
    await ctx.send(embed=Embed(color=color.value, description=f"{ctx.author.mention}: Changed the role's color to `{color.hex}`"))
 
+  @group(
+    name="alias",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_server=True)
+  async def alias(self, ctx: PretendContext):
+    """
+    Manage shortcuts for commands
+    """
+
+    await ctx.create_pages()
+
+  @alias.command(
+    name="add",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_server=True)
+  async def alias_add(self, ctx: PretendContext, command: str, *, alias: str):
+    """
+    Create a shortcut for a command
+    """
+
+    if not self.bot.get_command(command):
+      return await ctx.send_error(f"`{command}` is not a command")
+
+    if self.bot.get_command(alias):
+      return await ctx.send_error(f"`{alias}` is already a command")
+    
+    if check := await self.bot.db.fetch(
+      """
+      SELECT alias FROM aliases
+      WHERE guild_id = $1
+      """
+    ):
+      if len(check) >= 75:
+        return await ctx.send_warning(f"You can only have **75 aliases**")
+      
+    await self.bot.db.execute(
+      """
+      INSERT INTO aliases
+      VALUES ($1, $2, $3)
+      """,
+      ctx.guild.id,
+      command,
+      alias
+    )
+    await ctx.send_success(f"Added `{alias}` as an alias for `{command}`")
+
+  @alias.command(
+    name="remove",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_server=True)
+  async def alias_remove(self, ctx: PretendContext, *, alias: str):
+    """
+    Remove an alias for a command
+    """
+
+    if not await self.bot.db.fetchrow(
+      """
+      SELECT * FROM aliases
+      WHERE guild_id = $1
+      AND alias = $2
+      """,
+      ctx.guild.id,
+      alias
+    ):
+      return await ctx.send_warning(f"`{alias}` is **not** an alias")
+    
+    await self.bot.db.execute(
+      """
+      DELETE FROM aliases
+      WHERE guild_id = $1
+      AND alias = $2
+      """,
+      ctx.guild.id,
+      alias
+    )
+    return await ctx.send_success(f"Removed the **alias** for `{alias}`")
+  
+  @alias.command(
+    name="list",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_server=True)
+  async def alias_list(self, ctx: PretendContext):
+    """
+    Returns all the aliases in the server
+    """
+
+    results = await self.bot.db.fetch(
+      """
+      SELECT * FROM aliases
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    )
+    if not results:
+      return await ctx.send_warning(f"No **aliases** are set")
+    
+    await ctx.paginate(
+      [
+        f"`{result['alias']}` runs the command **{result['command']}**"
+        for result in results
+      ],
+      title=f"Aliases ({len(results)})",
+      author={
+        "name": ctx.guild.name,
+        "icon_url": ctx.guild.icon.url or None
+      }
+    )
+
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))
