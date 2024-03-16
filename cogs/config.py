@@ -727,7 +727,8 @@ class Config(Cog):
 
   @group(
     name="alias",
-    brief="manage server"
+    brief="manage server",
+    invoke_without_command=True
   )
   @has_guild_permissions(manage_server=True)
   async def alias(self, ctx: PretendContext):
@@ -757,7 +758,8 @@ class Config(Cog):
       """
       SELECT alias FROM aliases
       WHERE guild_id = $1
-      """
+      """,
+      ctx.guild.id
     ):
       if len(check) >= 75:
         return await ctx.send_warning(f"You can only have **75 aliases**")
