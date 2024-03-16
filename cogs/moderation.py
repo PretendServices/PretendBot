@@ -955,5 +955,26 @@ class Moderation(Cog):
    
    await ctx.message.add_reaction("✅")
 
+  @channel.command(
+   name="topic",
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_topic(self, ctx: PretendContext, channel: TextChannel, *, topic: str):
+   """
+   Change a channel's topic
+   """
+
+   if len(topic) > 1024:
+    return await ctx.send_warning(f"Channel topics can't be over **1024 characters**")
+
+   try:
+    await channel.edit(topic=topic)
+   except Forbidden:
+    return await ctx.send_warning(f"Couldn't change {channel.mention}'s topic")
+   
+   await ctx.send_success(f"Changed {channel.mention}'s topic to `{topic}`")
+
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  

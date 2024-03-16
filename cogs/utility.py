@@ -671,12 +671,12 @@ class Utility(commands.Cog):
      def vc(mem: discord.Member):
       if mem.voice: 
        channelname = mem.voice.channel.name 
-       deaf = "<:deafened:1047125267098914816>" if mem.voice.self_deaf or mem.voice.deaf else "<:undeafened:1035864650169987153>"
-       mute = "<:muted:1035858405212041316>" if mem.voice.self_mute or mem.voice.mute else "<:unmuted:1035864651130490970>"
-       stream = "<:stream:1047125265404407859>" if mem.voice.self_stream else ""
-       video = "<:video:1047125268038430760>" if mem.voice.self_video else ""
+       deaf = "<:deafened:1188943549870387332>" if mem.voice.self_deaf or mem.voice.deaf else "<:undeafened:1188943560897200199>"
+       mute = "<:muted:1188945885510500442>" if mem.voice.self_mute or mem.voice.mute else "<:unmuted:1188943586868346960>"
+       stream = "<:stream:1188943574264447037>" if mem.voice.self_stream else ""
+       video = "<:video:1188945875716812840>" if mem.voice.self_video else ""
        channelmembers = f"with {len(mem.voice.channel.members)-1} other member{'s' if len(mem.voice.channel.members) > 2 else ''}" if len(mem.voice.channel.members) > 1 else ""
-       return f"{deaf} {mute} {stream} {video} **in voice channel** {channelname} {channelmembers}\n"
+       return f" {deaf} {mute} {stream} {video} **in voice channel** {channelname} {channelmembers}\n"
       return ""
      
      embed = discord.Embed(

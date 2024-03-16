@@ -835,12 +835,11 @@ class Fun(Cog):
     Choose between options
     """
 
-    choices1 = choices.split(", ")
-    if len(choices1) == 1: 
-      return await ctx.reply("please put a `,` between your choices")
+    if len(choices := choices.split(", ")) == 1:
+      return await ctx.send_warning(f"Not enough **choices**- seperate your choices with a `,`")
     
-    final = random.choice(choices1)
-    await ctx.reply(final)
+    final = random.choice(choices).strip()
+    return await ctx.pretend_send(f"I chose `{final}`")
 
   @command(name="quickpoll", aliases=['poll'])
   async def quickpoll_cmd(self, ctx: PretendContext, *, question: str): 
@@ -960,7 +959,7 @@ class Fun(Cog):
     res = ["You slurp that mf.", "Lick Lick!", "Slurp!"]
     embed = Embed(color=self.bot.color, description=f"You lick {member.nick or member.global_name or member.name}!")
     try:
-        lick = await asyncio.wait_for(self.bot.session.get_json("http://api.nekos.fun:8080/api/lick"), timeout=6)
+        lick = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/lick"), timeout=6)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed.set_footer(text=random.choice(res))
@@ -986,7 +985,7 @@ class Fun(Cog):
     Kiss a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json("http://api.nekos.fun:8080/api/kiss"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/kiss"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(color=self.bot.color, description=f"*Aww how cute!* **{ctx.author.name}** kissed **{member.name}**")
@@ -999,7 +998,7 @@ class Fun(Cog):
     Cuddle a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json("http://api.nekos.fun:8080/api/cuddle"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/cuddle"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
@@ -1015,7 +1014,7 @@ class Fun(Cog):
     Hug a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"http://api.nekos.fun:8080/api/{ctx.command.name}"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/hug"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
@@ -1031,7 +1030,7 @@ class Fun(Cog):
     Pat a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"http://api.nekos.fun:8080/api/{ctx.command.name}"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/pat"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
@@ -1047,7 +1046,7 @@ class Fun(Cog):
     Slap a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"http://api.nekos.fun:8080/api/{ctx.command.name}"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/slap"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
@@ -1063,7 +1062,7 @@ class Fun(Cog):
     Start laughing
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"http://api.nekos.fun:8080/api/{ctx.command.name}"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/laugh"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
@@ -1079,7 +1078,7 @@ class Fun(Cog):
     Start crying
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"http://api.nekos.fun:8080/api/{ctx.command.name}"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/cry"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
 
