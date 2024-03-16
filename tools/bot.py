@@ -298,7 +298,7 @@ class Pretend(commands.AutoShardedBot):
    
     ignored = [
       commands.CheckFailure,
-      commands.CommandNotFound
+      commands.NotOwner
     ]
 
     if type(error) in ignored:
