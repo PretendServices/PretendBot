@@ -3,7 +3,7 @@ import json
 import asyncio
 import datetime
 
-from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role
+from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, ChannelType
 from discord.ext.commands import Cog, hybrid_command, has_guild_permissions, command, group, CurrentChannel, bot_has_guild_permissions 
 from discord.abc import GuildChannel
 
@@ -834,6 +834,127 @@ class Moderation(Cog):
      return await ctx.send_success(f"Edited {member.mention}'s roles: {', '.join(role_mentions)}") 
    else: 
     return await ctx.send_error("There are no roles that you can give") 
+   
+  @group(
+   name="channel",
+   brief="manage channels",
+   invoke_without_command=True
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel(self, ctx: PretendContext):
+   """
+   Manage channels in your sever
+   """
+
+   await ctx.create_pages()
+
+  @channel.command(
+   name="create",
+   aliases=[
+    "make"
+   ],
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_create(self, ctx: PretendContext, *, name: str):
+   """
+   Create a channel in your server
+   """
+
+   channel = await ctx.guild.create_text_channel(
+    name=name
+   )
+   return await ctx.send_success(f"Created {channel.mention}")
+  
+  @channel.command(
+   name="remove",
+   aliases=[
+    "delete",
+    "del"
+   ],
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_remove(self, ctx: PretendContext, *, channel: TextChannel):
+   """
+   Delete a channel in your server
+   """
+
+   try:
+    await channel.delete(reason=f"Deleted by {ctx.author} ({ctx.author.id})")
+   except Forbidden:
+    return await ctx.send_warning(f"Couldn't delete {channel.mention}")
+
+   await ctx.send_success(f"Deleted channel `#{channel.name}`")
+
+  @channel.command(
+   name="rename",
+   aliases=[
+    "name"
+   ],
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_rename(self, ctx: PretendContext, channel: TextChannel, *, name: str):
+   """
+   Rename a channel
+   """
+
+   if len(name) > 150:
+    return await ctx.send_error(f"Channel names can't be over **150 characters**")
+   
+   name = name.replace(" ", "-")
+
+   try:
+    await channel.edit(name=name)
+   except Forbidden:
+    return await ctx.send_warning(f"Couldn't rename {channel.mention}")
+   
+   await ctx.send_success(f"Renamed `#{channel.name}` to **{name}**")
+
+  @channel.command(
+   name="category",
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_category(self, ctx: PretendContext, channel: TextChannel, *, category: CategoryChannel):
+   """
+   Move a channel to a new category
+   """
+
+   position = int(category.position)
+   try:
+    await channel.edit(position=position)
+   except Forbidden:
+    return await ctx.send_warning(f"Couldn't change {channel.mention}'s category")
+   
+   await ctx.send_success(f"Moved {channel.mention} under {category.mention}")
+
+  @channel.command(
+   name="nsfw",
+   aliases=[
+    "naughty"
+   ],
+   brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def channel_nsfw(self, ctx: PretendContext, *, channel: TextChannel):
+   """
+   Toggle NSFW for a channel
+   """
+
+   try:
+    await channel.edit(nsfw=not channel.nsfw)
+   except Forbidden:
+    return await ctx.send_warning(f"Couldn't mark/unmark {channel.mention} as NSFW")
+   
+   await ctx.message.add_reaction("✅")
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  
