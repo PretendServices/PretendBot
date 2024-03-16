@@ -10,6 +10,8 @@ import discord
 import datetime
 import colorgram
 import json
+import aiohttp
+
 from PIL import Image
 from typing import Any, List, Union, Optional, Set
 from copy import copy
@@ -286,63 +288,109 @@ class Pretend(commands.AutoShardedBot):
     await self.start_loops()
 
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
-   """
-   The place where the command errors raise
-   """
-   channel_perms = ctx.channel.permissions_for(ctx.guild.me)
+    """
+    The place where the command errors raise
+    """
+    channel_perms = ctx.channel.permissions_for(ctx.guild.me)
    
-   if not channel_perms.send_messages or not channel_perms.embed_links: 
-    return
+    if not channel_perms.send_messages or not channel_perms.embed_links: 
+      return
    
-   if isinstance(error, (commands.CommandOnCooldown, commands.NotOwner)): 
-    return 
-   if isinstance(error, commands.CommandNotFound):
-    if check := await self.db.fetchrow(
-      """
-      SELECT * FROM aliases
-      WHERE guild_id = $1
-      AND alias = $2
-      """,
-      ctx.guild.id,
-      ctx.invoked_with
-    ):
-     message = copy(ctx.message)
-     message.content = message.content.replace(ctx.invoked_with, check["command"])
+    ignored = [
+      commands.CheckFailure,
+      commands.CommandNotFound
+    ]
 
-     return await self.process_commands(message)
-    else:
-     return
+    if type(error) in ignored:
+      return
+    
+    if isinstance(error, commands.MemberNotFound):
+      return await ctx.send_warning(f"Member not found")
+    elif isinstance(error, commands.UserNotFound):
+      return await ctx.send_warning(f"User not found")
+    elif isinstance(error, commands.RoleNotFound):
+      return await ctx.send_warning(f"Role not found")
+    elif isinstance(error, commands.ChannelNotFound):
+      return await ctx.send_warning(f"Channel not found")
+    elif isinstance(error, commands.GuildNotFound):
+      return await ctx.send_warning(f"Guild not found")
+    
+    elif isinstance(error, commands.BadUnionArgument):
+      if error.converters == (discord.Member, discord.User):
+        return await ctx.send_warning(f"Member not found")
+      elif error.converters == (discord.Guild, discord.Invite):
+        return await ctx.send_warning(f"Invalid invite code")
+      else:
+        return await ctx.send_warning(
+          f"Couldn't convert **{error.param.name}** into "
+          + f"`{', '.join(converter.__name__ for converter in error.converters)}`"
+        )
+    elif isinstance(error, commands.BadArgument):
+      return await ctx.send_warning(error)
+    elif isinstance(error, commands.MissingRequiredArgument):
+      return await ctx.send_help(ctx.command)
+      
+    elif isinstance(error, commands.CommandNotFound):
+      if check := await self.db.fetchrow(
+        """
+        SELECT * FROM aliases
+        WHERE guild_id = $1
+        AND alias = $2
+        """,
+        ctx.guild.id,
+        ctx.invoked_with
+      ):
+        message = copy(ctx.message)
+        message.content = message.content.replace(ctx.invoked_with, check["command"])
 
-   if isinstance(error, commands.MissingRequiredArgument):
-    return await ctx.send_help(ctx.command)
-   if isinstance(error, (RenameRateLimit, LastFmException, WrongMessageLink)):
-    return await ctx.send_warning(error.message)
-   if isinstance(error, commands.CheckFailure): 
-    if isinstance(error, commands.MissingPermissions): 
-     return await ctx.send_warning(f"You are **missing** the following permission: `{error.missing_permissions[0]}`")
+        return await self.process_commands(message)
+      else:
+        return
+      
+    elif isinstance(error, discord.HTTPException):
+      if error.code == 50035:
+        return await ctx.send_warning(f"Failed to send **embed**\n```{error}```")
+    elif isinstance(error, aiohttp.ClientConnectionError):
+      return await ctx.send_error(f"Failed to connect to the **API**")
+    elif isinstance(error, aiohttp.ClientResponseError):
+      if error.status == 522:
+        return await ctx.send_warning(f"Timed out while getting data from the **API**")
+      else:
+        return await ctx.send_warning(f"API returned `{error.status}`, try again later")
+      
     else:
-     return
-   if isinstance(error, (commands.MemberNotFound, commands.MissingPermissions, commands.EmojiNotFound)):
-    return await ctx.send_warning(error)
-   if "snipe" in str(ctx.command):
-    return await ctx.send_warning("There was an issue fetching snipes.")
-   # guild id, channel id, user id, timestamp, error, and code
-   code = "".join(random.choice(string.ascii_letters + string.digits) for _ in range(6)) 
-   current_date = discord.utils.format_dt(datetime.datetime.now(), style="R")
-   j = {
-    "guild_id": ctx.guild.id, 
-    "channel_id": ctx.channel.id,
-    "user_id": ctx.author.id,
-    "timestamp": current_date,
-    "error": str(error),
-    "code": code,
-    "command": str(ctx.command)
-   }
-   await self.db.execute("INSERT INTO error_codes (code, info) VALUES ($1, $2)", code, json.dumps(j))
-   await ctx.send(f"{code}", embed=discord.Embed(
-        description=f"{self.warning} {ctx.author.mention}: An error occurred while performing the command **{ctx.command}**. Error Code: `{code}` Please report this code to a developer in the [Pretend Server](https://discord.gg/pretendbot).",
-        color=self.warning_color
-   ))
+      code = "".join(
+        random.choice(string.ascii_letters + string.digits)
+        for _ in range(6)
+      )
+      now = discord.utils.format_dt(
+        datetime.datetime.now(),
+        style="R"
+      )
+
+      j = {
+        "guild_id": ctx.guild.id,
+        "channel_id": ctx.channel.id,
+        "user_id": ctx.author.id,
+        "timestamp": now,
+        "error": str(error),
+        "code": code,
+        "command": str(ctx.command.qualified_name) or "N/A"
+      }
+
+      await self.db.execute(
+        """
+        INSERT INTO error_codes (code, info)
+        VALUES ($1, $2)
+        """,
+        code,
+        json.dumps(j)
+      )
+      return await ctx.send_warning(
+        f"An error occurred wile performing the **{ctx.command.qualified_name}** command."
+        + f"Please report the attached code to a developer in the [Pretend Server](https://discord.gg/pretendbot)",
+        content=f"`{code}`"
+      )
 
   def dt_convert(self, datetime: datetime.datetime) -> str: 
    """
