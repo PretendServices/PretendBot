@@ -8,7 +8,7 @@ import datetime
 from discord import Interaction, ButtonStyle, Embed, Member, TextChannel, User, Message, AllowedMentions, File 
 from discord.ui import Button, View, button
 
-from discord.ext.commands import BadArgument, Cog, hybrid_command, hybrid_group, Author, command
+from discord.ext.commands import BadArgument, Cog, hybrid_command, hybrid_group, Author, command, is_owner
 
 from typing import List
 from aiogtts import aiogTTS
@@ -949,22 +949,22 @@ class Fun(Cog):
     embed.set_image(url=meme["url"])
     await ctx.send(embed=embed)
 
-  @command(name="lick", aliases=["slurp"])
-  async def lick(self, ctx: PretendContext, *, member: Member=Author):
-    """
-    Lick someone!
-    """
-    if ctx.author.id == member.id:
-      return await ctx.send_error("You can't lick yourself!")
-    res = ["You slurp that mf.", "Lick Lick!", "Slurp!"]
-    embed = Embed(color=self.bot.color, description=f"You lick {member.nick or member.global_name or member.name}!")
-    try:
-        lick = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/lick"), timeout=6)
-    except asyncio.TimeoutError:
-        return await ctx.send_error("There was an error with the API.")
-    embed.set_footer(text=random.choice(res))
-    embed.set_image(url=lick["image"])
-    await ctx.reply(embed=embed)
+  # @command(name="lick", aliases=["slurp"])
+#  async def lick(self, ctx: PretendContext, *, member: Member=Author):
+#    """
+#    Lick someone!
+#    """
+#    if ctx.author.id == member.id:
+#      return await ctx.send_error("You can't lick yourself!")
+#    res = ["You slurp that mf.", "Lick Lick!", "Slurp!"]
+#    embed = Embed(color=self.bot.color, description=f"You lick {member.nick or member.global_name or member.name}!")
+#    try:
+#        lick = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/lick"), timeout=6)
+#    except asyncio.TimeoutError:
+#        return await ctx.send_error("There was an error with the API.")
+#    embed.set_footer(text=random.choice(res))
+#    embed.set_image(url=lick["image"])
+#    await ctx.reply(embed=embed)
 
   @command()
   async def pp(self, ctx: PretendContext, *, member: Member=Author):
@@ -1056,24 +1056,24 @@ class Fun(Cog):
     .set_image(url=lol["image"])
     return await ctx.reply(embed=embed)
 
-  @hybrid_command()
-  async def laugh(self, ctx: PretendContext): 
-    """
-    Start laughing
-    """
-    try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/laugh"), timeout=2)
-    except asyncio.TimeoutError:
-        return await ctx.send_error("There was an error with the API.")
-    embed = Embed(
-      color=self.bot.color, 
-      description=f"**{ctx.author.name}** laughs"
-    )\
-    .set_image(url=lol["image"])
-    return await ctx.reply(embed=embed)
+  # @hybrid_command()
+  # async def laugh(self, ctx: PretendContext): 
+    # """
+    # Start laughing
+    # """
+    # try:
+        # lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/laugh"), timeout=2)
+    # except asyncio.TimeoutError:
+        # return await ctx.send_error("There was an error with the API.")
+    # embed = Embed(
+      # color=self.bot.color, 
+      # description=f"**{ctx.author.name}** laughs"
+    # )\
+    # .set_image(url=lol["image"])
+    # return await ctx.reply(embed=embed)
 
-  @hybrid_command()
-  async def cry(self, ctx: PretendContext):
+  # @hybrid_command()
+  # async def cry(self, ctx: PretendContext):
     """
     Start crying
     """
