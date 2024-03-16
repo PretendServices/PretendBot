@@ -392,11 +392,13 @@ class Pretend(commands.AutoShardedBot):
         code,
         json.dumps(j)
       )
-      return await ctx.send_warning(
-        f"An error occurred wile performing the **{ctx.command.qualified_name}** command."
-        + f"Please report the attached code to a developer in the [Pretend Server](https://discord.gg/pretendbot)",
-        content=f"`{code}`"
+      embed = discord.Embed(
+        description=f"An error occurred while running the **{ctx.command.qualified_name}** command."
+        + f" Please report the attached code to a developer in the [Pretend Server](https://discord.gg/pretendbot)",
+        color=self.color
       )
+
+      return await ctx.send(embed=embed, content=f"`{code}`")
 
   def dt_convert(self, datetime: datetime.datetime) -> str: 
    """
