@@ -14,7 +14,8 @@ class Whitelist(Cog):
         name="whitelist",
         aliases=[
             "wl"
-        ]
+        ],
+        invoke_without_command=True
     )
     @has_permissions(administrator=True)
     async def whitelist(self, ctx: PretendContext):
