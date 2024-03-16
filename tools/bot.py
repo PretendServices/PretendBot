@@ -12,6 +12,7 @@ import colorgram
 import json
 from PIL import Image
 from typing import Any, List, Union, Optional, Set
+from copy import copy
 
 from num2words import num2words
 from humanize import precisedelta
@@ -293,8 +294,23 @@ class Pretend(commands.AutoShardedBot):
    if not channel_perms.send_messages or not channel_perms.embed_links: 
     return
    
-   if isinstance(error, (commands.CommandOnCooldown, commands.CommandNotFound, commands.NotOwner)): 
+   if isinstance(error, (commands.CommandOnCooldown, commands.NotOwner)): 
     return 
+   if isinstance(error, commands.CommandNotFound):
+    if check := await self.db.fetchrow(
+      """
+      SELECT * FROM aliases
+      WHERE guild_id = $1
+      AND alias = $2
+      """,
+      ctx.guild.id,
+      ctx.invoked_with
+    ):
+     message = copy(ctx.message)
+     message.content = message.content.replace(ctx.invoked_with, check["command"])
+
+     await self.process_commands(message)
+
    if isinstance(error, commands.MissingRequiredArgument):
     return await ctx.send_help(ctx.command)
    if isinstance(error, (RenameRateLimit, LastFmException, WrongMessageLink)):
