@@ -730,7 +730,7 @@ class Config(Cog):
     brief="manage server",
     invoke_without_command=True
   )
-  @has_guild_permissions(manage_server=True)
+  @has_guild_permissions(manage_guild=True)
   async def alias(self, ctx: PretendContext):
     """
     Manage shortcuts for commands
