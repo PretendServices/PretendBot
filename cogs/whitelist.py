@@ -15,7 +15,8 @@ class Whitelist(Cog):
         aliases=[
             "wl"
         ],
-        invoke_without_command=True
+        invoke_without_command=True,
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     async def whitelist(self, ctx: PretendContext):
@@ -26,7 +27,8 @@ class Whitelist(Cog):
         await ctx.create_pages()
 
     @whitelist.command(
-        name="enable"
+        name="enable",
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     async def whitelist_enable(self, ctx: PretendContext):
@@ -53,7 +55,8 @@ class Whitelist(Cog):
         await ctx.send_success(f"Enabled the **whitelist**")
 
     @whitelist.command(
-        name="disable"
+        name="disable",
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     @whitelist_enabled()
@@ -72,7 +75,34 @@ class Whitelist(Cog):
         await ctx.send_success(f"Disabled the **whitelist**")
 
     @whitelist.command(
-        name="add"
+        name="message",
+        aliases=[
+            "msg",
+            "dm"
+        ],
+        brief="administrator"
+    )
+    @has_permissions(administrator=True)
+    @whitelist_enabled()
+    async def whitelist_message(self, ctx: PretendContext, *, code: str):
+        """
+        Change the message sent to users when not in the whitelist
+        """
+    
+        await self.bot.db.execute(
+            """
+            INSERT INTO whitelist_state (embed)
+            VALUES ($1)
+            """,
+            code
+        )
+        await ctx.send_success(
+            f"Set your **custom** whitelist message"
+        )
+
+    @whitelist.command(
+        name="add",
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     @whitelist_enabled()
@@ -103,7 +133,8 @@ class Whitelist(Cog):
         await ctx.send_success(f"Added {user.mention} to the **whitelist**")
 
     @whitelist.command(
-        name="remove"
+        name="remove",
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     @whitelist_enabled()
@@ -151,7 +182,8 @@ class Whitelist(Cog):
         )
 
     @whitelist.command(
-        name="list"
+        name="list",
+        brief="administrator"
     )
     @has_permissions(administrator=True)
     @whitelist_enabled()

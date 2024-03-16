@@ -10,7 +10,7 @@ from discord import Embed, User, Member
 
 from collections import defaultdict
 
-from tools.bot import Pretend 
+from tools.bot import Pretend, PretendContext
 
 class Members(Cog): 
   def __init__(self, bot: Pretend): 
@@ -148,10 +148,24 @@ class Members(Cog):
     member.guild.id,
     member.id
    ):
-    try:
-     await member.send(f"You are not whitelisted to join **{member.guild.name}**")
-    except:
-     pass
+    if check := await self.bot.db.fetchrow(
+      """
+      SELECT embed FROM whitelist_state
+      WHERE guild_id = $1
+      """,
+      member.guild.id
+    ):
+      
+      if check["embed"] == "none":
+        return await member.guild.kick(member, reason=f"Not in the whitelist")
+      else:
+        x = await self.bot.embed_build.alt_convert(member, check['embed'])
+        try:
+         await member.send(**x)
+        except:
+         pass
+    else:
+      await member.send(f"You are not whitelisted to join **{member.guild.name}**")
     await member.guild.kick(member, reason=f"Not in the whitelist")
 
 async def setup(bot: Pretend) -> None: 
