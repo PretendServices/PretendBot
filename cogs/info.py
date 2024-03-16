@@ -154,5 +154,25 @@ class Info(Cog):
 
    await ctx.reply(ctx.author.mention, view=self.create_bot_invite(ctx.guild.me))
 
+  @hybrid_command(
+    name="credits"
+  )
+  async def credits(self, ctx: PretendContext):
+    """
+    Get more specific credits for the bot
+    """
+
+    embed = Embed(
+      description=f"[**Nick**](<https://discord.com/users/863914425445908490>): Owns the bot, develops"
+      + f"\n[**Adam**](<https://discord.com/users/930383131863842816>): Owns the bot, created the website"
+      + f"\n[**Lucky**](<https://discord.com/users/461914901624127489>): Helps with hosting (Large and in charge dick boi)",
+      color=self.bot.color
+    ).set_author(
+      name=self.bot.user.name,
+      icon_url=self.bot.user.avatar.url
+    )
+
+    await ctx.send(embed=embed)
+
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Info(bot))    
