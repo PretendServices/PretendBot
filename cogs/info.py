@@ -11,6 +11,8 @@ from discord import User, Embed, __version__, utils, Permissions
 from discord.ext.commands import Cog, command, hybrid_command
 from discord.ui import View, Button
 
+from platform import python_version
+
 class Info(Cog):
   def __init__(self, bot: Pretend):
     self.bot = bot 
@@ -107,7 +109,7 @@ class Info(Cog):
 
     embed = Embed(
       color=self.bot.color, 
-      description=f"Premium multi-purpose discord bot made by [**sent**](https://discord.com/users/371224177186963460)\nUsed by **{sum(g.member_count for g in self.bot.guilds):,}** members in **{len(self.bot.guilds):,}** servers"
+      description=f"Premium multi-purpose discord bot made by [**The Pretend Team**](https://discord.com/invite/pretendbot)\nUsed by **{sum(g.member_count for g in self.bot.guilds):,}** members in **{len(self.bot.guilds):,}** servers"
     )\
     .set_author(
       name=self.bot.user.name, 
@@ -115,7 +117,7 @@ class Info(Cog):
     )\
     .add_field(
       name="System", 
-      value=f"**commands:** {len(set(self.bot.walk_commands()))}\n**discord.py:** {__version__}\n**Python:** 3.10.6\n**Lines:** {self.bot.lines:,}"
+      value=f"**commands:** {len(set(self.bot.walk_commands()))}\n**discord.py:** {__version__}\n**Python:** {python_version()}\n**Lines:** {self.bot.lines:,}"
     )\
     .set_footer(
       text=f"running for {self.bot.uptime}"
