@@ -63,7 +63,7 @@ class Donate(View):
   async def paypal_payment(self, interaction: Interaction, button: Button):
    await self.button_callback(interaction=interaction, button=button)
 
-  @button(emoji="<:stripe:1194992457935487017>", custom_id="stripe")
+  @button(emoji="<:stripe:1194992457935487017>", custom_id="stripe (card)")
   async def bitcoin_payment(self, interaction: Interaction, button: Button):
    await self.button_callback(interaction=interaction, button=button) 
   
