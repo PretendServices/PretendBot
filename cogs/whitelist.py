@@ -91,10 +91,11 @@ class Whitelist(Cog):
     
         await self.bot.db.execute(
             """
-            INSERT INTO whitelist_state (embed)
-            VALUES ($1)
+            UPDATE whitelist_state SET embed = $1
+            WHERE guild_id = $2
             """,
-            code
+            code,
+            ctx.guild.id
         )
         await ctx.send_success(
             f"Set your **custom** whitelist message"
