@@ -139,7 +139,7 @@ class Members(Cog):
    Check for user IDs in the whitelist
    """
 
-   if await self.bot.db.fetchrow(
+   if not await self.bot.db.fetchrow(
     """
     SELECT * FROM whitelist
     WHERE guild_id = $1
