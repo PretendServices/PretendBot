@@ -133,5 +133,26 @@ class Members(Cog):
        if not r.status in [204, 429]:
         await self.bot.db.execute("DELETE FROM username_track WHERE webhook_url = $1", result['webhook_url'])
 
+  @Cog.listener("on_member_join")
+  async def whitelist_check(self, member: Member):
+   """
+   Check for user IDs in the whitelist
+   """
+
+   if await self.bot.db.fetchrow(
+    """
+    SELECT * FROM whitelist
+    WHERE guild_id = $1
+    AND user_id = $2
+    """,
+    member.guild.id,
+    member.id
+   ):
+    try:
+     await member.send(f"You are not whitelisted to join **{member.guild.name}**")
+    except:
+     pass
+    await member.guild.kick(member, reason=f"Not in the whitelist")
+
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Members(bot))      
