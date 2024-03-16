@@ -114,6 +114,10 @@ class Emoji(Cog):
     """
 
     emojis = [f"{e} `{e.id}` - {e.name}" for e in self.bot.emojis if query in e.name]
+
+    if not emojis:
+      return await ctx.warn(f"No **emojis** found")
+
     return await ctx.paginate(emojis, f"Emojis containing {query} ({len(emojis)})")
   
   @emoji_group.command(name="zip")
