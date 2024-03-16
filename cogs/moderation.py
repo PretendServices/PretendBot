@@ -927,9 +927,8 @@ class Moderation(Cog):
    Move a channel to a new category
    """
 
-   position = int(category.position)
    try:
-    await channel.edit(position=position)
+    await channel.edit(category=category)
    except Forbidden:
     return await ctx.send_warning(f"Couldn't change {channel.mention}'s category")
    
