@@ -70,7 +70,7 @@ class Boosterrole(Cog):
 
     async def no_callback(interaction: Interaction): 
       return await interaction.response.edit_message(
-        embed=Embed(color=self.bot.yes_color, description="Alright you changed your mind"),
+        embed=Embed(color=self.bot.color, description=f"{ctx.author.mention}: Cancelling action..."),
         view=None
       ) 
 
