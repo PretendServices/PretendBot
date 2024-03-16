@@ -94,6 +94,9 @@ class Pretend(commands.AutoShardedBot):
     member_cache=discord.MemberCacheFlags(
       joined=True,
       voice=True
+    ),
+    activity=discord.CustomActivity(
+      name="/pretendbot"
     )
    )
 
