@@ -325,21 +325,6 @@ class Pretend(commands.AutoShardedBot):
         description=f"{self.warning} {ctx.author.mention}: An error occurred while performing the command **{ctx.command}**. Error Code: `{code}` Please report this code to a developer in the [Pretend Server](https://discord.gg/pretendbot).",
         color=self.warning_color
    ))
-  
-  def get_command(self, *args, **kwargs):
-   """
-   Check if a command is private & return None if it is
-   """
-   
-   if cmd := super().get_command(*args, **kwargs):
-    if (
-     (c := cmd.cog_name)
-     and c.lower() in ["jishaku", "owner", "auth"]
-     or cmd.hidden
-    ):
-     return None
-    
-    return cmd
 
   def dt_convert(self, datetime: datetime.datetime) -> str: 
    """
