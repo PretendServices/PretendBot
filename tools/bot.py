@@ -310,6 +310,8 @@ class Pretend(commands.AutoShardedBot):
      message.content = message.content.replace(ctx.invoked_with, check["command"])
 
      return await self.process_commands(message)
+    else:
+     return
 
    if isinstance(error, commands.MissingRequiredArgument):
     return await ctx.send_help(ctx.command)
