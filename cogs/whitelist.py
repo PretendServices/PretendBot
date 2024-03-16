@@ -89,17 +89,38 @@ class Whitelist(Cog):
         Change the message sent to users when not in the whitelist
         """
     
-        await self.bot.db.execute(
-            """
-            UPDATE whitelist_state SET embed = $1
-            WHERE guild_id = $2
-            """,
-            code,
-            ctx.guild.id
-        )
-        await ctx.send_success(
-            f"Set your **custom** whitelist message"
-        )
+        if code.lower().strip() == "none":
+            await self.bot.db.execute(
+                """
+                UPDATE whitelist_state SET embed = $1
+                WHERE guild_id = $2
+                """,
+                "none",
+                ctx.guild.id
+            )
+            return await ctx.send_success(f"Removed your **whitelist** message- users will no longer be notified")
+        elif code.lower().strip() == "default":
+            await self.bot.db.execute(
+                """
+                UPDATE whitelist_state SET embed = $1
+                WHERE guild_id = $2
+                """,
+                None,
+                ctx.guild.id
+            )
+            return await ctx.send_success(f"Set your **whitelist** message to the default")
+        else:
+            await self.bot.db.execute(
+                """
+                UPDATE whitelist_state SET embed = $1
+                WHERE guild_id = $2
+                """,
+                code,
+                ctx.guild.id
+            )
+            await ctx.send_success(
+                f"Set your **custom** whitelist message"
+            )
 
     @whitelist.command(
         name="add",
