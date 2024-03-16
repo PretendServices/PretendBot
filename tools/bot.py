@@ -393,9 +393,9 @@ class Pretend(commands.AutoShardedBot):
         json.dumps(j)
       )
       embed = discord.Embed(
-        description=f"An error occurred while running the **{ctx.command.qualified_name}** command."
-        + f" Please report the attached code to a developer in the [Pretend Server](https://discord.gg/pretendbot)",
-        color=self.color
+        description=f"{self.warning} {ctx.author.mention}: An error occurred while running the **{ctx.command.qualified_name}** command."
+        + f"\nPlease report the attached code to a developer in the [Pretend Server](https://discord.gg/pretendbot)",
+        color=self.warning_color
       )
 
       return await ctx.send(embed=embed, content=f"`{code}`")
