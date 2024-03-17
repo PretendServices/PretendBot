@@ -91,7 +91,7 @@ class Moderation(Cog):
     user.id
    ):
     user = await self.bot.get_user(check["moderator_id"])
-    await guild.ban(user, reason=f"Hard banned by {user.name} ({user.id}): {check["reason"]}")
+    await guild.ban(user, reason=f"Hard banned by {user.name} ({user.id}): {check['reason']}")
 
   @Cog.listener()
   async def on_member_remove(self, member: Member):
@@ -1453,7 +1453,7 @@ class Moderation(Cog):
      ),
      view=None
     )
-    
+
    await ctx.confirmation_send(f"Are you sure you want to **hardban** {member.mention}?", yes_callback, no_callback)
 
 async def setup(bot: Pretend) -> None: 
