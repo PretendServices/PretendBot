@@ -3,8 +3,8 @@ import json
 import asyncio
 import datetime
 
-from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, Message
-from discord.ext.commands import Cog, hybrid_command, has_guild_permissions, command, group, CurrentChannel, bot_has_guild_permissions 
+from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, Message, Thread
+from discord.ext.commands import Cog, hybrid_command, has_guild_permissions, command, group, CurrentChannel, bot_has_guild_permissions, hybrid_group
 from discord.abc import GuildChannel
 
 from typing import Union, Optional
@@ -123,7 +123,7 @@ class Moderation(Cog):
     roles = [ctx.guild.get_role(r) for r in json.loads(check[0]) if ctx.guild.get_role(r)]
     await member.edit(
       roles=[
-       r for r in roles if r.is_assignable() and not r.position > ctx.author.top_role.position if ctx.author.top_role
+       r for r in roles if r.is_assignable() and not r.position > ctx.author.top_role.position
       ],
       reason=f"roles restored by {ctx.author}"
     )
@@ -486,7 +486,7 @@ class Moderation(Cog):
       reason=f"Bot messages purged by {ctx.author}"
     )
   
-  @hybrid_command(brief="manage channels")
+  @hybrid_group(brief="manage channels")
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
   async def lock(self, ctx: PretendContext, *, channel: TextChannel=CurrentChannel):
@@ -502,7 +502,38 @@ class Moderation(Cog):
    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason=f"channel locked by {ctx.author}") 
    return await ctx.send_success(f"Locked {channel.mention}")
   
-  @hybrid_command(brief="manage channels")
+  @lock.command(
+    name="all",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def lock_all(self, ctx: PretendContext):
+   """
+   Lock all channels
+   """
+
+   loadingmsg = await ctx.pretend_send(f"Locking `{len(ctx.guild.channels)}` channels...")
+
+   async with self.locks[ctx.guild.id]:
+    for channel in ctx.guild.channels:
+      if channel.overwrites_for(ctx.guild.default_role).send_messages is False: 
+        continue
+
+      overwrites = channel.overwrites_for(ctx.guild.default_role)
+      overwrites.send_messages = False
+
+      await channel.set_permissions(
+        ctx.guild.default_role,
+        overwrite=overwrites,
+        reason=f"All channels were locked by {ctx.author} ({ctx.author.id})"
+      )
+      await asyncio.sleep(1.5)
+
+   await loadingmsg.delete()
+   return await ctx.send_success(f"Locked **all** channels")
+  
+  @hybrid_group(brief="manage channels")
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
   async def unlock(self, ctx: PretendContext, *, channel: TextChannel=CurrentChannel):
@@ -517,6 +548,34 @@ class Moderation(Cog):
    overwrites.send_messages = None 
    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason=f"channel unlocked by {ctx.author}") 
    return await ctx.send_success(f"Unlocked {channel.mention}")
+  
+  @unlock.command(
+    name="all",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def unlock_all(self, ctx: PretendContext):
+   """
+   Unlock all locked channels
+   """
+
+   loadingmsg = await ctx.pretend_send(f"Unlocking `{len(ctx.guild.channels)}` channels...")
+
+   async with self.locks[ctx.guild.id]:
+    for channel in ctx.guild.channels:
+      if (
+       channel.overwrites_for(ctx.guild.default_role).send_messages is True
+       or not channel.overwrites_for(ctx.guild.default_role).send_messages
+      ):
+        continue
+
+      overwrites = channel.overwrites_for(ctx.guild.default_role)
+      overwrites.send_messages = None 
+      await channel.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason=f"All channels unlocked by {ctx.author} ({ctx.author.id})")
+
+   await loadingmsg.delete()
+   await ctx.send_success(f"Unlocked all channels")
   
   @hybrid_command(brief="manage channels")
   @has_guild_permissions(manage_channels=True)
@@ -1035,6 +1094,129 @@ class Moderation(Cog):
    
    await message.unpin(reason=f"Unpinned by {ctx.author} ({ctx.author.id})")
    await ctx.message.add_reaction("✅")
+
+  @group(
+   name="thread",
+   brief="manage threads",
+   invoke_without_command=True
+  )
+  @has_guild_permissions(manage_threads=True)
+  @bot_has_guild_permissions(manage_threads=True)
+  async def thread(self, ctx: PretendContext):
+   """
+   Manage threads
+   """
+
+   await ctx.create_pages()
+
+  @thread.command(
+   name="lock",
+   brief="manage threads"
+  )
+  @has_guild_permissions(manage_threads=True)
+  @bot_has_guild_permissions(manage_threads=True)
+  async def thread_lock(self, ctx: PretendContext, thread: Thread = None):
+   """
+   Lock a thread
+   """
+
+   thread = thread or ctx.channel
+
+   if not isinstance(thread, Thread):
+    return await ctx.send_warning(f"{thread.mention} is not a thread")
+
+   if thread.locked:
+    return await ctx.send_warning(f"{thread.mention} is already locked")
+   
+   await thread.edit(locked=True, reason=f"Locked by {ctx.author} ({ctx.author.id})")
+   await ctx.message.add_reaction("✅")
+  
+  @thread.command(
+   name="unlock",
+   brief="manage threads"
+  )
+  @has_guild_permissions(manage_threads=True)
+  @bot_has_guild_permissions(manage_threads=True)
+  async def thread_unlock(self, ctx: PretendContext, thread: Thread = None):
+   """
+   Unlock a locked thread
+   """
+
+   thread = thread or ctx.channel
+
+   if not isinstance(thread, Thread):
+    return await ctx.send_warning(f"{thread.mention} is not a thread")
+   
+   if not thread.locked:
+    return await ctx.send_warning(f"{thread.mention} is **not** locked")
+   
+   await thread.edit(locked=False, reason=f"Unlocked by {ctx.author} ({ctx.author.id})")
+   await ctx.message.add_reaction("✅")
+
+  @command(
+   name="reactionmute",
+   aliases=[
+    "rmute"
+   ],
+   brief="manage messages"
+  )
+  @has_guild_permissions(manage_messages=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def reactionmute(self, ctx: PretendContext, member: NoStaff):
+   """
+   Revoke a member's reaction permissions
+   """
+
+   member: Member = member
+
+   if ctx.channel.overwrites_for(member).add_reactions is False:
+    return await ctx.send_warning(f"{member.mention} is **already** reaction muted")
+
+   async with self.locks[ctx.guild.id]:
+    for role in member.roles:
+     if role.id != ctx.guild.id:
+      if role.permissions.add_reactions:
+        await member.remove_roles(role, reason=f"Reaction muted by {ctx.author} ({ctx.author.id})")
+
+   overwrites = ctx.channel.overwrites_for(member)
+   overwrites.add_reactions = False
+
+   await ctx.channel.set_permissions(
+    member,
+    overwrite=overwrites,
+    reason=f"Reaction permissions removed by {ctx.author} ({ctx.author.id})"
+   )
+
+  @command(
+   name="reactionunmute",
+   aliases=[
+    "runmute"
+   ],
+   brief="manage messages"
+  )
+  @has_guild_permissions(manage_messages=True)
+  @bot_has_guild_permissions(manage_channels=True)
+  async def reactionunmute(self, ctx: PretendContext, member: NoStaff):
+   """
+   Grant a reaction muted member reaction permissions
+   """
+
+   member: Member = member
+
+   if (
+    ctx.channel.overwrites_for(member).add_reactions is True
+    or not ctx.channel.overwrites_for(member).add_reactions
+   ):
+    return await ctx.send_warning(f"{member.mention} is **not** reaction muted")
+   
+   overwrites = ctx.channel.overwrites_for(member)
+   overwrites.add_reactions = True
+
+   await ctx.channel.set_permissions(
+    member,
+    overwrite=overwrites,
+    reason=f"Reaction unmuted by {ctx.author} ({ctx.author.id})"
+   )
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  
