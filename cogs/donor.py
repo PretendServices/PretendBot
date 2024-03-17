@@ -11,7 +11,7 @@ from tools.predicates import has_perks, create_reskin
 
 from discord import User, utils, Embed, Member, AllowedMentions, Interaction
 from discord.ext import commands
-from discord.ext.commands import Cog, command, group, has_guild_permissions, bot_has_guild_permissions, Author, cooldown
+from discord.ext.commands import Cog, command, group, has_guild_permissions, bot_has_guild_permissions, Author, cooldown, hybrid_command
 
 class Donor(Cog): 
   def __init__(self, bot: Pretend): 
@@ -180,7 +180,7 @@ class Donor(Cog):
 
    return await ctx.confirmation_send(f"Are you sure you want to **remove** your reskin?", yes_callback, no_callback)
   
-  @command(
+  @hybrid_command(
    name="chatgpt",
    aliases=[
     "chat",
