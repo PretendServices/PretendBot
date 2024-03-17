@@ -18,7 +18,7 @@ class Donor(Cog):
    self.bot = bot
    self.description = "Premium commands"
    self.openai_client = openai.AsyncOpenAI(
-    api_key="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"
+    api_key="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"
    )
 
   @Cog.listener()
