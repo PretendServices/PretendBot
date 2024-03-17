@@ -106,7 +106,7 @@ class Responders(Cog):
    if check: 
     return await ctx.send_warning(f"An autoresponder for **{trigger}** already exists")
    else: 
-     await self.bot.db.execute("INSERT INTO autoresponder VALUES ($1,$2,$3, $4)", ctx.guild.id, trigger, resp, strict)
+     await self.bot.db.execute("INSERT INTO autoresponder VALUES ($1,$2,$3, $4)", ctx.guild.id, trigger.lower(), resp.lower(), strict)
    
    return await ctx.send_success(f"Added autoresponder for **{trigger}** - {resp} {'(not strict)' if strict is False else ''}")
   

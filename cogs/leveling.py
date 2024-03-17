@@ -425,7 +425,7 @@ class Leveling(Cog):
     )
     @has_guild_permissions(manage_guild=True)
     @leveling_enabled()
-    async def level_set(self, ctx: PretendContext, level: int, *, member: LevelMember):
+    async def level_set(self, ctx: PretendContext, member: LevelMember, level: int):
       """
       set a level to a member
       """
