@@ -1456,5 +1456,51 @@ class Moderation(Cog):
 
    await ctx.confirmation_send(f"Are you sure you want to **hardban** {member.mention}?", yes_callback, no_callback)
 
+  @command(
+   name="unhardban",
+   brief="administrator & antinuke admin"
+  )
+  @has_guild_permissions(administrator=True)
+  @bot_has_guild_permissions(ban_members=True)
+  @admin_antinuke()
+  async def unhardban(self, ctx: PretendContext, user: User, *, reason: str):
+   """
+   Unhardban a hardbanned member
+   """
+
+   check = await self.bot.db.fetchrow(
+    """
+    SELECT * FROM hardban
+    WHERE guild_id = $1
+    AND user_id = $2
+    """,
+    ctx.guild.id, 
+    user.id
+   )
+
+   if not check:
+    return await ctx.send_warning(f"{user.mention} is **not** hardbanned")
+   
+   if ctx.author.id != ctx.guild.owner.id and ctx.author.id != check["moderator_id"]:
+    moderator = self.bot.get_user(check["moderator_id"])
+    return await ctx.send_warning(f"Only {moderator.mention}/{ctx.guild.owner.mention} can unhardban {user.mention}")
+   
+   await self.bot.db.execute(
+    """
+    DELETE FROM hardban
+    WHERE guild_id = $1
+    AND user_id = $2
+    """,
+    ctx.guild.id, 
+    user.id
+   )
+
+   try:
+    await ctx.guild.unban(user, reason=f"Unhardbanned by {ctx.author} ({ctx.author.id}): {reason}")
+   except:
+    pass
+
+   await ctx.send_success(f"Unhardbanned {user.mention}")
+
 async def setup(bot: Pretend) -> None: 
-  await bot.add_cog(Moderation(bot))  
+  await bot.add_cog(Moderation(bot))
