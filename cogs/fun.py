@@ -998,7 +998,7 @@ class Fun(Cog):
     Pinch a member
     """
 
-    response = self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=pinch&format=gif")
+    response = await self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=pinch&format=gif")
     embed = Embed(color=self.bot.color, description=f"**{ctx.author.name}** pinches **{member.name}**")
     embed.set_author(url=response["url"])
 
