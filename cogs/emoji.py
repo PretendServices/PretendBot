@@ -373,7 +373,8 @@ class Emoji(Cog):
     return await ctx.send_success(f"Added [**sticker**]({stick.url}) with the name **{name}**")
   
   @sticker.command(
-    name="tag"
+    name="tag",
+    brief="manage expressions"
   )
   @has_guild_permissions(manage_expressions=True)
   @bot_has_guild_permissions(manage_expressions=True)
