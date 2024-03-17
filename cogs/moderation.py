@@ -525,7 +525,7 @@ class Moderation(Cog):
        """,
        ctx.guild.id
       ):
-       if await ctx.guild.get_role(check["role_id"]):
+       if ctx.guild.get_role(check["role_id"]):
         role = ctx.guild.get_role(check["role_id"])
        else:
         role = ctx.guild.default_role
@@ -719,7 +719,7 @@ class Moderation(Cog):
        """,
        ctx.guild.id
       ):
-       if await ctx.guild.get_role(check["role_id"]):
+       if ctx.guild.get_role(check["role_id"]):
         role = ctx.guild.get_role(check["role_id"])
        else:
         role = ctx.guild.default_role
