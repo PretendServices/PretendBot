@@ -197,7 +197,7 @@ class Messages(Cog):
     words = message.content.lower().split()
     results = await self.bot.db.fetch("SELECT response FROM autoresponder WHERE guild_id = $1", message.guild.id)
     for result in results:
-     if result["trigger"] in words:
+     if str(result["trigger"]).lower() in words:
       bucket = await self.get_ratelimit(message)
       
       if bucket: 
