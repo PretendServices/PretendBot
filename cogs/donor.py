@@ -165,7 +165,8 @@ class Donor(Cog):
      embed=Embed(
       description=f"{self.bot.yes} {ctx.author.mention}: Removed your **reskin**",
       color=self.bot.yes_color
-     )
+     ),
+     view=None
     )
 
    async def no_callback(interaction: Interaction):
@@ -173,7 +174,8 @@ class Donor(Cog):
      embed=Embed(
       description=f"{ctx.author.mention}: Cancelling action...",
       color=self.bot.color
-     )
+     ),
+     view=None
     )
 
    return await ctx.confirmation_send(f"Are you sure you want to **remove** your reskin?", yes_callback, no_callback)
