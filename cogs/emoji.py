@@ -384,7 +384,7 @@ class Emoji(Cog):
     """
 
     if not ctx.guild.vanity_url:
-      return await ctx.send_warning(f"There is not **vanity url**")
+      return await ctx.send_warning(f"There is no **vanity url** set")
     
     message = await ctx.pretend_send(f"Adding **gg/{ctx.guild.vanity_url_code}** to `{len(ctx.guild.stickers)}` stickers...")
 

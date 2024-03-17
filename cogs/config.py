@@ -746,12 +746,13 @@ class Config(Cog):
     brief="manage server"
   )
   @has_guild_permissions(manage_guild=True)
-  async def alias_add(self, ctx: PretendContext, command: str, *, alias: str):
+  async def alias_add(self, ctx: PretendContext, alias: str, *, command: str):
     """
     Create a shortcut for a command
     """
 
-    if not self.bot.get_command(command):
+    _command = self.bot.get_command(command)
+    if not _command:
       return await ctx.send_error(f"`{command}` is not a command")
 
     if self.bot.get_command(alias):
@@ -776,7 +777,7 @@ class Config(Cog):
       command,
       alias
     )
-    await ctx.send_success(f"Added `{alias}` as an alias for `{command}`")
+    await ctx.send_success(f"Added `{alias}` as an alias for `{_command.qualified_name}`")
 
   @alias.command(
     name="remove",
@@ -807,7 +808,7 @@ class Config(Cog):
       ctx.guild.id,
       alias
     )
-    return await ctx.send_success(f"Removed the **alias** for `{alias}`")
+    return await ctx.send_success(f"Removed the **alias** `{alias}`")
   
   @alias.command(
     name="list",
