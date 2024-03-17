@@ -508,15 +508,15 @@ class Moderation(Cog):
   )
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
-  async def lock_all(self, ctx: PretendContext):
+  async def lock_all(self, ctx: PretendContext, *, reason: str = "No reason provided"):
    """
    Lock all channels
    """
 
    loadingmsg = await ctx.pretend_send(f"Locking `{len(ctx.guild.channels)}` channels...")
 
-   async with self.locks[ctx.guild.id]:
-    for channel in ctx.guild.channels:
+   async with ctx.channel.typing():
+    for channel in ctx.guild.text_channels:
       if channel.overwrites_for(ctx.guild.default_role).send_messages is False: 
         continue
 
@@ -526,7 +526,7 @@ class Moderation(Cog):
       await channel.set_permissions(
         ctx.guild.default_role,
         overwrite=overwrites,
-        reason=f"All channels were locked by {ctx.author} ({ctx.author.id})"
+        reason=f"{ctx.author} ({ctx.author.id}) locked all channels: {reason}"
       )
       await asyncio.sleep(1.5)
 
