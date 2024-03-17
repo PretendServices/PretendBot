@@ -934,7 +934,7 @@ class Fun(Cog):
       joke = await asyncio.wait_for(self.bot.session.get_json("https://icanhazdadjoke.com/slack"), timeout=2)
     except asyncio.TimeoutError:
       return await ctx.send_warning("Womp Womp! Couldn't get a dad joke at this time.")
-    return await ctx.send(f"{ctx.author.mention}: {joke['attachments'][0]['text']}")
+    return await ctx.pretend_send(f"{joke['attachments'][0]['text']}")
 
   @command(name="meme")
   async def meme(self, ctx: PretendContext):
