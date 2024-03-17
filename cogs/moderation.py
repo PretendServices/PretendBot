@@ -1000,7 +1000,7 @@ class Moderation(Cog):
    message: Message = message
 
    if message.pinned:
-    return await ctx.send_warning(f"That [message]({message.jump_url}) is already **pinned**")
+    return await ctx.send_warning(f"That message is already **pinned**")
    
    try:
     await message.pin(reason=f"Pinned by {ctx.author} ({ctx.author.id})")
@@ -1008,6 +1008,32 @@ class Moderation(Cog):
     if " Cannot execute action on a system message" in str(e):
      return await ctx.send_warning(f"You can't **pin** system messages")
 
+   await ctx.message.add_reaction("✅")
+
+  @command(
+   name="unpin",
+   brief="manage messages"
+  )
+  @has_guild_permissions(manage_messages=True)
+  @bot_has_guild_permissions(manage_messages=True)
+  async def unpin(self, ctx: PretendContext, message: ValidMessage = None):
+   """
+   Unpin a message
+   """
+
+   if not message:
+    if ctx.message.reference:
+     message = await ctx.fetch_message(int(ctx.message.reference.message_id))
+    else:
+     async for message in ctx.channel.history(limit=2):
+      message = message
+
+   message: Message = message
+
+   if not message.pinned:
+    return await ctx.send_warning(f"That message is **not** pinned")
+   
+   await message.unpin(reason=f"Unpinned by {ctx.author} ({ctx.author.id})")
    await ctx.message.add_reaction("✅")
 
 async def setup(bot: Pretend) -> None: 
