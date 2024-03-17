@@ -1186,6 +1186,7 @@ class Moderation(Cog):
     overwrite=overwrites,
     reason=f"Reaction permissions removed by {ctx.author} ({ctx.author.id})"
    )
+   await ctx.message.add_reaction("✅")
 
   @command(
    name="reactionunmute",
@@ -1217,6 +1218,7 @@ class Moderation(Cog):
     overwrite=overwrites,
     reason=f"Reaction unmuted by {ctx.author} ({ctx.author.id})"
    )
+   await ctx.message.add_reaction("✅")
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  
