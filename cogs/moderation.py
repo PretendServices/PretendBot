@@ -3,7 +3,7 @@ import json
 import asyncio
 import datetime
 
-from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, Message, Thread
+from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, Message, Thread, Guild
 from discord.ext.commands import Cog, hybrid_command, has_guild_permissions, command, group, CurrentChannel, bot_has_guild_permissions, hybrid_group
 from discord.abc import GuildChannel
 
@@ -74,6 +74,24 @@ class Moderation(Cog):
     if re := await self.bot.db.fetchrow("SELECT role_id FROM jail WHERE guild_id = $1", member.guild.id): 
      if role := member.guild.get_role(re[0]):  
       await member.add_roles(role, reason="member jailed")
+
+  @Cog.listener("on_member_unban")
+  async def hardban_check(self, guild: Guild, user: User):
+   """
+   Listen for hardbans
+   """
+
+   if check := await self.bot.db.fetchrow(
+    """
+    SELECT * FROM hardban
+    WHERE guild_id = $1
+    AND user_id = $2
+    """,
+    guild.id,
+    user.id
+   ):
+    user = await self.bot.get_user(check["moderator_id"])
+    await guild.ban(user, reason=f"Hard banned by {user.name} ({user.id}): {check["reason"]}")
 
   @Cog.listener()
   async def on_member_remove(self, member: Member):
@@ -1393,6 +1411,50 @@ class Moderation(Cog):
     reason=f"Reaction unmuted by {ctx.author} ({ctx.author.id})"
    )
    await ctx.message.add_reaction("✅")
+
+  @command(
+   name="hardban",
+   brief="administrator & antinuke admin"
+  )
+  @has_guild_permissions(administrator=True)
+  @bot_has_guild_permissions(ban_members=True)
+  @admin_antinuke()
+  async def hardban(self, ctx: PretendContext, member: NoStaff, *, reason: str = "No reason provided"):
+   """
+   Keep a member banned from the server
+   """
+
+   member: Member = member
+
+   async def yes_callback(interaction: Interaction):
+    await self.bot.db.execute(
+      """
+      INSERT INTO hardban
+      VALUES ($1, $2, $3, $4)
+      """,
+      ctx.guild.id,
+      member.id,
+      reason,
+      ctx.author.id
+    )
+    await ctx.guild.ban(member, reason=f"Hardbanned by {ctx.author} ({ctx.author.id}): {reason}")
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{self.bot.yes} {interaction.user.mention}: Hardbanned {member.mention}",
+      color=self.bot.yes_color
+     ),
+     view=None
+    )
+   async def no_callback(interaction: Interaction):
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{ctx.author.mention}: Cancelling action...",
+      color=self.bot.color
+     ),
+     view=None
+    )
+    
+   await ctx.confirmation_send(f"Are you sure you want to **hardban** {member.mention}?", yes_callback, no_callback)
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  
