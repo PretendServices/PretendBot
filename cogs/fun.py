@@ -963,7 +963,7 @@ class Fun(Cog):
    except asyncio.TimeoutError:
        return await ctx.send_error("There was an error with the API.")
    embed.set_footer(text=random.choice(res))
-   embed.set_image(url=lick.url["image"])
+   embed.set_image(url=lick["url"])
    await ctx.reply(embed=embed)
 
   @command()
