@@ -36,7 +36,8 @@ from discord import (
  WebhookMessage,
  TextChannel,
  Guild,
- utils
+ utils,
+ Thread
 )
 
 def guild_perms(**perms: bool) -> Any:
@@ -385,6 +386,9 @@ class PretendContext(Context):
    check = await self.bot.db.fetchrow("SELECT * FROM reskin WHERE user_id = $1", self.author.id)
    
    if check and self.guild.me.guild_permissions.manage_webhooks and await self.reskin_enabled(): 
+    if isinstance(self.channel, Thread):
+      return await super().send(*args, **kwargs)
+
     webhooks = [w for w in await self.channel.webhooks() if w.user.id == self.bot.user.id]
     
     if len(webhooks) > 0: 
