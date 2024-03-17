@@ -3,7 +3,7 @@ import json
 import asyncio
 import datetime
 
-from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, ChannelType
+from discord import Member, PermissionOverwrite, Embed, Interaction, utils, TextChannel, User, Object, Role, Forbidden, CategoryChannel, Message
 from discord.ext.commands import Cog, hybrid_command, has_guild_permissions, command, group, CurrentChannel, bot_has_guild_permissions 
 from discord.abc import GuildChannel
 
@@ -14,7 +14,7 @@ from humanfriendly import format_timespan
 from tools.bot import Pretend
 from tools.helpers import PretendContext, Invoking
 from tools.converters import NoStaff, NewRoleConverter
-from tools.validators import ValidTime, ValidNickname
+from tools.validators import ValidTime, ValidNickname, ValidMessage
 from tools.predicates import is_jail, admin_antinuke
 from tools.misc.views import BoosterMod
 
@@ -712,6 +712,7 @@ class Moderation(Cog):
     await ctx.send_success(f"Removed {member.mention}'s warns")
 
   @warn.command(name="list")
+  @has_guild_permissions(manage_messages=True)
   async def warn_list(self, ctx: PretendContext, *, member: Member): 
     """
     returns all warns that an user has
@@ -977,6 +978,39 @@ class Moderation(Cog):
     return await ctx.send_warning(f"Couldn't change {channel.mention}'s topic")
    
    await ctx.send_success(f"Changed {channel.mention}'s topic to `{topic}`")
+
+  @command(
+   name="pin",
+   brief="manage messages"
+  )
+  @has_guild_permissions(manage_messages=True)
+  @bot_has_guild_permissions(manage_messages=True)
+  async def pin(self, ctx: PretendContext, message: ValidMessage = None):
+   """
+   Pin a message
+   """
+
+   if not message:
+    if ctx.message.reference:
+     message = ctx.fetch_message(int(ctx.message.reference.message_id))
+    else:
+     async for message in ctx.channel.history(limit=1):
+      message = message
+
+   message: Message = message
+
+   if message.pinned:
+    return await ctx.send_warning(f"That [message]({message.jump_url}) is already **pinned**")
+   
+   if message.type in (
+    "pins_add",
+    "channel_follow_add",
+    "thread_created"
+   ):
+    return await ctx.send_warning(f"You can't **pin** system messages")
+   
+   await message.pin(reason=f"Pinned by {ctx.author} ({ctx.author.id})")
+   await ctx.message.add_reaction("✅")
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))  
