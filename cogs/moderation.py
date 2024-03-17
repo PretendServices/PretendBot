@@ -1002,14 +1002,12 @@ class Moderation(Cog):
    if message.pinned:
     return await ctx.send_warning(f"That [message]({message.jump_url}) is already **pinned**")
    
-   if message.type in (
-    "pins_add",
-    "channel_follow_add",
-    "thread_created"
-   ):
-    return await ctx.send_warning(f"You can't **pin** system messages")
-   
-   await message.pin(reason=f"Pinned by {ctx.author} ({ctx.author.id})")
+   try:
+    await message.pin(reason=f"Pinned by {ctx.author} ({ctx.author.id})")
+   except Exception as e:
+    if " Cannot execute action on a system message" in e:
+     return await ctx.send_warning(f"You can't **pin** system messages")
+
    await ctx.message.add_reaction("✅")
 
 async def setup(bot: Pretend) -> None: 
