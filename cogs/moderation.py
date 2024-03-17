@@ -656,7 +656,7 @@ class Moderation(Cog):
     name="role",
     brief="manage server"
   )
-  @has_guild_permissions(manage_server=True)
+  @has_guild_permissions(manage_guild=True)
   async def lock_role(self, ctx: PretendContext, role: Role):
    """
    Set the default role for lockdown
