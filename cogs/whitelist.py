@@ -48,9 +48,10 @@ class Whitelist(Cog):
         await self.bot.db.execute(
             """
             INSERT INTO whitelist_state
-            VALUES ($1)
+            VALUES ($1, $2)
             """,
-            ctx.guild.id
+            ctx.guild.id,
+            "default"
         )
         await ctx.send_success(f"Enabled the **whitelist**")
 
