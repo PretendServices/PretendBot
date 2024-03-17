@@ -985,11 +985,11 @@ class Fun(Cog):
     Kiss a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/kiss"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=kiss&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(color=self.bot.color, description=f"*Aww how cute!* **{ctx.author.name}** kissed **{member.name}**")
-    embed.set_image(url=lol["image"])
+    embed.set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
   @hybrid_command()
@@ -998,14 +998,14 @@ class Fun(Cog):
     Cuddle a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json("https://nekos.life/api/v2/img/cuddle"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=cuddle&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
       color=self.bot.color,
       description=f"*Aww how cute!* **{ctx.author.name}** cuddles **{member.name}**"
     )\
-    .set_image(url=lol["image"])
+    .set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
   @hybrid_command()
@@ -1014,14 +1014,14 @@ class Fun(Cog):
     Hug a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/hug"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://api.otakugifs.xyz/gif?reaction=hug&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
       color=self.bot.color, 
       description=f"*Aww how cute!* **{ctx.author.name}** hugged **{member.name}**"
     )\
-    .set_image(url=lol["image"])
+    .set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
   @hybrid_command()
@@ -1030,14 +1030,14 @@ class Fun(Cog):
     Pat a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/pat"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://api.otakugifs.xyz/gif?reaction=pat&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
       color=self.bot.color, 
       description=f"*Aww how cute!* **{ctx.author.name}** pats **{member.name}**"
     )\
-    .set_image(url=lol["image"])
+    .set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
   @hybrid_command()
@@ -1046,39 +1046,39 @@ class Fun(Cog):
     Slap a member
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/slap"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://api.otakugifs.xyz/gif?reaction=slap&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
     embed = Embed(
       color=self.bot.color, 
       description=f"**{ctx.author.name}** slaps **{member.name}***"
     )\
-    .set_image(url=lol["image"])
+    .set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
-  # @hybrid_command()
-  # async def laugh(self, ctx: PretendContext): 
-    # """
-    # Start laughing
-    # """
-    # try:
-        # lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/laugh"), timeout=2)
-    # except asyncio.TimeoutError:
-        # return await ctx.send_error("There was an error with the API.")
-    # embed = Embed(
-      # color=self.bot.color, 
-      # description=f"**{ctx.author.name}** laughs"
-    # )\
-    # .set_image(url=lol["image"])
-    # return await ctx.reply(embed=embed)
+  @hybrid_command()
+  async def laugh(self, ctx: PretendContext): 
+    """
+    Start laughing
+    """
+    try:
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://api.otakugifs.xyz/gif?reaction=laugh&format=gif"), timeout=2)
+    except asyncio.TimeoutError:
+        return await ctx.send_error("There was an error with the API.")
+    embed = Embed(
+      color=self.bot.color, 
+      description=f"**{ctx.author.name}** laughs"
+    )\
+    .set_image(url=lol["url"])
+    return await ctx.reply(embed=embed)
 
-  # @hybrid_command()
-  # async def cry(self, ctx: PretendContext):
+  @hybrid_command()
+  async def cry(self, ctx: PretendContext):
     """
     Start crying
     """
     try:
-        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://nekos.life/api/v2/img/cry"), timeout=2)
+        lol = await asyncio.wait_for(self.bot.session.get_json(f"https://api.otakugifs.xyz/gif?reaction=cry&format=gif"), timeout=2)
     except asyncio.TimeoutError:
         return await ctx.send_error("There was an error with the API.")
 
@@ -1086,7 +1086,7 @@ class Fun(Cog):
       color=self.bot.color, 
       description=f"**{ctx.author.name}** cries"
     )\
-    .set_image(url=lol["image"])
+    .set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
 
   @hybrid_command()
