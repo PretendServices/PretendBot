@@ -371,6 +371,35 @@ class Emoji(Cog):
       reason=f"sticker created by {ctx.author}"
     )
     return await ctx.send_success(f"Added [**sticker**]({stick.url}) with the name **{name}**")
+  
+  @sticker.command(
+    name="tag"
+  )
+  @has_guild_permissions(manage_expressions=True)
+  @bot_has_guild_permissions(manage_expressions=True)
+  async def sticker_tag(self, ctx: PretendContext):
+    """
+    Add your server's vanity URL to the end of sticker names
+    """
+
+    if not ctx.guild.vanity_url:
+      return await ctx.send_warning(f"There is not **vanity url**")
+    
+    message = await ctx.pretend_send(f"Adding **gg/{ctx.guild.vanity_url_code}** to `{len(ctx.guild.stickers)}` stickers...")
+
+    for sticker in ctx.guild.stickers:
+      if not sticker.name.endswith(f"gg/{ctx.guild.vanity_url_code}"):
+        i = 0
+
+        try:
+          await sticker.edit(name=f"{sticker.name} gg/{ctx.guild.vanity_url_code}")
+          await asyncio.sleep(1.5)
+          i += 1
+        except:
+          pass
+
+    await message.delete()
+    await ctx.send_success(f"Added **gg/{ctx.guild.vanity_url_code}** to `{i}` stickers")
 
 async def setup(bot: Pretend): 
   await bot.add_cog(Emoji(bot))       
