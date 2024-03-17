@@ -59,7 +59,7 @@ async def restricted_command(ctx: PretendContext):
         )
 
       if not role in ctx.author.roles:
-        await ctx.send_warning(f"You can't use `{ctx.command.qualified_name}`")
+        await ctx.send_warning(f"You cannot use `{ctx.command.qualified_name}`")
         return False
       return True
   return True
