@@ -1483,7 +1483,7 @@ class Moderation(Cog):
    
    if ctx.author.id != ctx.guild.owner.id and ctx.author.id != check["moderator_id"]:
     moderator = self.bot.get_user(check["moderator_id"])
-    return await ctx.send_warning(f"Only {moderator.mention}{f'/{ctx.guild.owner.mention}' if ctx.author.id != ctx.guild.owner.id else ''} can unhardban {user.mention}")
+    return await ctx.send_warning(f"Only {moderator.mention}{f'/{ctx.guild.owner.mention}' if moderator.id != ctx.guild.owner.id else ''} can unhardban {user.mention}")
    
    await self.bot.db.execute(
     """
