@@ -244,15 +244,15 @@ class Owner(Cog):
     color=self.bot.color
    ).add_field(
     name="Guild",
-    value=f"{guild.name} `{guild.id}`",
+    value=f"{guild.name}\n`{guild.id}`",
     inline=True
   ).add_field(
    name="Channel",
-   value=f"<#{error_details['channel_id']}>",
+   value=f"<#{error_details['channel_id']}>\n`{error_details['channel_id']}`",
    inline=True
   ).add_field(
    name="User",
-   value=f"<@{error_details['user_id']}> (`{error_details['user_id']}`)",
+   value=f"<@{error_details['user_id']}>\n`{error_details['user_id']}`",
    inline=True
   ).add_field(
    name="Command",
