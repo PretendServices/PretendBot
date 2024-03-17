@@ -847,7 +847,8 @@ class Config(Cog):
     aliases=[
       "restrictcmd",
       "rc"
-    ]
+    ],
+    invoke_without_command=True
   )
   @has_guild_permissions(manage_guild=True)
   async def restrictcommand(self, ctx: PretendContext):
@@ -874,7 +875,7 @@ class Config(Cog):
     if not _command:
       return await ctx.send_warning(f"Command `{command}` does not exist")
     
-    try:
+    if not await self.bot.db.fetchrow("SELECT * FROM restrictcommand WHERE guild_id = $1 AND command = $2 AND role_id = $3", ctx.guild.id, _command.qualified_name, role.id):
       await self.bot.db.execute(
         """
         INSERT INTO restrictcommand
@@ -884,7 +885,7 @@ class Config(Cog):
         _command.qualified_name,
         role.id
       )
-    except:
+    else:
       return await ctx.send_warning(f"`{_command.qualified_name}` is **already** restricted to {role.mention}")
     
     await ctx.send_success(f"Allowing members with {role.mention} to use `{_command.qualified_name}`")
