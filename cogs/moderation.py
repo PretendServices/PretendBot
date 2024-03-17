@@ -1206,7 +1206,7 @@ class Moderation(Cog):
 
    if (
     ctx.channel.overwrites_for(member).add_reactions is True
-    or not ctx.channel.overwrites_for(member).add_reactions
+    or ctx.channel.overwrites_for(member).add_reactions is None
    ):
     return await ctx.send_warning(f"{member.mention} is **not** reaction muted")
    
