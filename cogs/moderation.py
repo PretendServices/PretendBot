@@ -992,7 +992,7 @@ class Moderation(Cog):
 
    if not message:
     if ctx.message.reference:
-     message = ctx.fetch_message(int(ctx.message.reference.message_id))
+     message = await ctx.fetch_message(int(ctx.message.reference.message_id))
     else:
      async for message in ctx.channel.history(limit=1):
       message = message
