@@ -389,17 +389,14 @@ class Emoji(Cog):
 
     for sticker in ctx.guild.stickers:
       if not sticker.name.endswith(f"gg/{ctx.guild.vanity_url_code}"):
-        i = 0
-
         try:
           await sticker.edit(name=f"{sticker.name} gg/{ctx.guild.vanity_url_code}")
           await asyncio.sleep(1.5)
-          i += 1
         except:
           pass
 
     await message.delete()
-    await ctx.send_success(f"Added **gg/{ctx.guild.vanity_url_code}** to `{i}` stickers")
+    await ctx.send_success(f"Added **gg/{ctx.guild.vanity_url_code}** to server stickers")
 
 async def setup(bot: Pretend): 
   await bot.add_cog(Emoji(bot))       
