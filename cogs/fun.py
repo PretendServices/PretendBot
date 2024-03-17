@@ -991,6 +991,18 @@ class Fun(Cog):
     embed = Embed(color=self.bot.color, description=f"*Aww how cute!* **{ctx.author.name}** kissed **{member.name}**")
     embed.set_image(url=lol["url"])
     return await ctx.reply(embed=embed)
+  
+  @hybrid_command()
+  async def pinch(self, ctx: PretendContext, *, member: Member):
+    """
+    Pinch a member
+    """
+
+    response = self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=pinch&format=gif")
+    embed = Embed(color=self.bot.color, description=f"**{ctx.author.name}** pinches **{member.name}**")
+    embed.set_author(url=response["url"])
+
+    return await ctx.reply(embed=embed)
 
   @hybrid_command()
   async def cuddle(self, ctx: PretendContext, *, member: Member):
