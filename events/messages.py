@@ -194,7 +194,7 @@ class Messages(Cog):
     if not message.guild: 
      return
 
-    check = await self.bot.db.fetchrow("SELECT response FROM autoresponder WHERE guild_id = $1 AND trigger = $2", message.guild.id, message.content)
+    check = await self.bot.db.fetchrow("SELECT response FROM autoresponder WHERE guild_id = $1 AND trigger = $2", message.guild.id, message.content.lower())
     if check:
      bucket = await self.get_ratelimit(message)
      
