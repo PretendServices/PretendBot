@@ -198,11 +198,18 @@ class Messages(Cog):
       "SELECT * FROM autoresponder WHERE guild_id = $1",
       message.guild.id
     ):
-      if str(row["trigger"]).lower() == message.content.lower():
-        ctx = await self.bot.get_context(message)
-        x = await self.bot.embed_build.convert(ctx, row["response"])
+      if row["strict"] is True:
+        if str(row["trigger"]).lower() == message.content.lower():
+          ctx = await self.bot.get_context(message)
+          x = await self.bot.embed_build.convert(ctx, row["response"])
 
-        await ctx.send(**x)
+          await ctx.send(**x)
+      else:
+        if str(row["trigger"]).lower() in message.content.lower():
+          ctx = await self.bot.get_context(message)
+          x = await self.bot.embed_build.convert(ctx, row["response"])
+
+          await ctx.send(**x)
   
    @Cog.listener('on_message')
    async def on_autoreact(self, message: Message): 

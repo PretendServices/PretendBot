@@ -108,7 +108,7 @@ class Responders(Cog):
    else: 
      await self.bot.db.execute("INSERT INTO autoresponder VALUES ($1,$2,$3, $4)", ctx.guild.id, trigger, resp, strict)
    
-   return await ctx.send_success(f"Added autoresponder for **{trigger}** - {resp} {'not strict' if strict is False else ''}")
+   return await ctx.send_success(f"Added autoresponder for **{trigger}** - {resp} {'(not strict)' if strict is False else ''}")
   
   @autoresponder.command(name="remove", brief="manage server")
   @has_guild_permissions(manage_guild=True)
