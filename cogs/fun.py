@@ -950,7 +950,7 @@ class Fun(Cog):
     await ctx.send(embed=embed)
 
   @command(name="lick", aliases=["slurp"])
- async def lick(self, ctx: PretendContext, *, member: Member=Author):
+  async def lick(self, ctx: PretendContext, *, member: Member=Author):
    """
    Lick someone!
    """
