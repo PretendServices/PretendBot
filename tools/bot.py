@@ -80,7 +80,7 @@ class Pretend(commands.AutoShardedBot):
     command_prefix=getprefix, 
     intents=intents,
     help_command=PretendHelp(),
-    owner_ids=[863914425445908490, 930383131863842816],
+    owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
     case_insensitive=True, 
     shard_count=3,
     shard_ids=[0,1,2],
@@ -363,6 +363,9 @@ class Pretend(commands.AutoShardedBot):
         return await ctx.send_warning(f"Timed out while getting data from the **API**")
       else:
         return await ctx.send_warning(f"API returned `{error.status}`, try again later")
+      
+    elif isinstance(error, commands.CommandOnCooldown):
+      return await ctx.pretend_send(f"Wait `{error.retry_after:.2f}` seconds before using **{ctx.command.qualified_name}** again")
       
     else:
       code = "".join(

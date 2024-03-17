@@ -472,9 +472,9 @@ class PretendContext(Context):
    """Send a success message to the channel"""
    return await self.send(embed=Embed(color=self.bot.yes_color, description=f"{self.bot.yes} {self.author.mention}: {message}"))
 
-  async def pretend_send(self, message: str) -> Message: 
+  async def pretend_send(self, message: str, **kwargs) -> Message: 
    """Send a regular embed message to the channel"""
-   return await self.send(embed=Embed(color=self.bot.color, description=f"{self.author.mention}: {message}"))
+   return await self.send(embed=Embed(color=self.bot.color, description=f"{self.author.mention}: {message}"), **kwargs)
 
   async def lastfm_send(self, message: str, reference: Message=None) -> Message: 
    """Send a lastfm type message to the channel"""
