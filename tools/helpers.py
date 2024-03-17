@@ -7,7 +7,7 @@ import humanize
 from discord.ext.commands.cog import Cog
 from discord.interactions import Interaction
 
-from typing import Mapping, Coroutine, List, Any, Callable, Optional, Union
+from typing import Mapping, Coroutine, List, Any, Callable, Optional, Union, Dict
 from discord_paginator import Paginator
 
 from .misc.views import ConfirmView
@@ -20,7 +20,8 @@ from discord.ext.commands import (
   MissingPermissions, 
   check, 
   Group,
-  AutoShardedBot as AB
+  AutoShardedBot as AB,
+  FlagConverter
 )
 
 from discord import (
@@ -367,6 +368,8 @@ class PretendHelp(Help):
   await self.context.send(embed=embed) 
 
 class PretendContext(Context): 
+  flags: Dict[str, Any] = {}
+
   def __init__(self, **kwargs): 
    """Custom commands.Context for the bot"""
    self.ec_emoji = "🏦"
@@ -574,3 +577,11 @@ class Invoking():
    if '{member.avatar}' in params: 
      params=params.replace('{member.avatar}', member.display_avatar.url)
    return params    
+
+class PretendFlags(
+ FlagConverter,
+ prefix="--",
+ delimiter=" ",
+ case_insensitive=True
+):
+ pass

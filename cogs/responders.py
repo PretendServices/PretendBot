@@ -1,11 +1,17 @@
 import re 
 import json
 
-from discord.ext.commands import Cog, group, has_guild_permissions 
+from discord.ext.commands import Cog, group, has_guild_permissions, Flag
 
 from tools.bot import Pretend 
-from tools.helpers import PretendContext 
+from tools.helpers import PretendContext
+from tools.helpers import PretendFlags
 
+class AutoresponderFlags(PretendFlags):
+ not_strict: bool = Flag(
+  default=False
+ )
+ 
 class Responders(Cog):
   def __init__(self, bot: Pretend):
    self.bot = bot 
@@ -72,7 +78,7 @@ class Responders(Cog):
   async def autoresponder(self, ctx: PretendContext): 
     await ctx.create_pages()
 
-  @autoresponder.command(name="add", brief="manage server", usage="example: ;autoresponder add hello, hello world")
+  @autoresponder.command(name="add", brief="manage server", usage="example: ;autoresponder add hello, hello world", flags=AutoresponderFlags)
   @has_guild_permissions(manage_guild=True)
   async def ar_add(self, ctx: PretendContext, *, response: str): 
    """add an autoresponder to the server"""
@@ -85,16 +91,26 @@ class Responders(Cog):
    if trigger == "":
     return await ctx.send_warning("No trigger found")
    
-   resp = responses[1].strip() 
+   resp = responses[1].strip()
+
+   if not_strict := ctx.flags.get("not_strict"):
+    if not_strict is False:
+      strict = False
+    else:
+      strict = True
+   else:
+    strict = False
+
+   resp = resp.replace("--not_strict", "").strip()
    
-   check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", ctx.guild.id, trigger)
+   check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", ctx.guild.id, trigger.lower())
    
    if check: 
-    await self.bot.db.execute("UPDATE autoresponder SET response = $1 WHERE guild_id = $2 AND trigger = $3", resp, ctx.guild.id, trigger)
+    return await ctx.send_warning(f"An autoresponder for **{trigger}** already exists")
    else: 
-     await self.bot.db.execute("INSERT INTO autoresponder VALUES ($1,$2,$3)", ctx.guild.id, trigger, resp)
+     await self.bot.db.execute("INSERT INTO autoresponder VALUES ($1,$2,$3, $4)", ctx.guild.id, trigger, resp, strict)
    
-   return await ctx.send_success(f"Added autoresponder for **{trigger}** - {resp}")
+   return await ctx.send_success(f"Added autoresponder for **{trigger}** - {resp} {'not strict' if strict is False else ''}")
   
   @autoresponder.command(name="remove", brief="manage server")
   @has_guild_permissions(manage_guild=True)
