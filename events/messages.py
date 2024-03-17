@@ -194,14 +194,14 @@ class Messages(Cog):
     if not message.guild: 
      return
 
-    async for row in self.bot.db.fetch(
+    for row in await self.bot.db.fetch(
       "SELECT * FROM autoresponder WHERE guild_id = $1",
       message.guild.id
     ):
       if str(row["trigger"]).lower() == message.content.lower():
         ctx = await self.bot.get_context(message)
         x = await self.bot.embed_build.convert(ctx, row["response"])
-        
+
         await ctx.send(**x)
   
    @Cog.listener('on_message')
