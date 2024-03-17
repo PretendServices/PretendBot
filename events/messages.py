@@ -194,7 +194,7 @@ class Messages(Cog):
     if not message.guild: 
      return
 
-    words = message.content.lower().split()
+    words = message.content.lower().split(" ")
     check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", message.guild.id, message.content.lower())
     if check:
       if str(check["trigger"]).lower() in words:
