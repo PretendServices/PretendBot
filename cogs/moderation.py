@@ -1419,12 +1419,10 @@ class Moderation(Cog):
   @has_guild_permissions(administrator=True)
   @bot_has_guild_permissions(ban_members=True)
   @admin_antinuke()
-  async def hardban(self, ctx: PretendContext, member: NoStaff, *, reason: str = "No reason provided"):
+  async def hardban(self, ctx: PretendContext, member: NoStaff | User, *, reason: str = "No reason provided"):
    """
    Keep a member banned from the server
    """
-
-   member: Member = member
 
    async def yes_callback(interaction: Interaction):
     await self.bot.db.execute(
