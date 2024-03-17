@@ -1005,7 +1005,7 @@ class Moderation(Cog):
    try:
     await message.pin(reason=f"Pinned by {ctx.author} ({ctx.author.id})")
    except Exception as e:
-    if " Cannot execute action on a system message" in e:
+    if " Cannot execute action on a system message" in str(e):
      return await ctx.send_warning(f"You can't **pin** system messages")
 
    await ctx.message.add_reaction("✅")
