@@ -165,7 +165,7 @@ class Info(Cog):
     embed = Embed(
       description=f"[**Nick**](<https://discord.com/users/863914425445908490>): Owns the bot, develops"
       + f"\n[**Adam**](<https://discord.com/users/930383131863842816>): Owns the bot, created the website"
-      + f"\n[**Lucky**](<https://discord.com/users/461914901624127489>): Helps with hosting (Large and in charge dick boi)",
+      + f"\n[**Lucky**](<https://discord.com/users/461914901624127489>): Hosting provider",
       color=self.bot.color
     ).set_author(
       name=self.bot.user.name,
