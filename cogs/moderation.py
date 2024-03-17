@@ -628,7 +628,7 @@ class Moderation(Cog):
    
    await ctx.paginate(
     [
-     f"{ctx.guild.get_channel(result["channel_id"]).mention}"
+     f"{ctx.guild.get_channel(result['channel_id']).mention}"
      for result in results
     ],
     title=f"Ignored Unlock Channels ({len(results)})",
