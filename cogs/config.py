@@ -842,5 +842,52 @@ class Config(Cog):
       }
     )
 
+  @group(
+    name="restrictcommand",
+    aliases=[
+      "restrictcmd",
+      "rc"
+    ]
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def restrictcommand(self, ctx: PretendContext):
+    """
+    Restrict people without roles from using commands
+    """
+
+    await ctx.create_pages()
+
+  @restrictcommand.command(
+    name="add",
+    aliases=[
+      "make"
+    ]
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def restrictcommand_add(self, ctx: PretendContext, command: str, *, role: Role):
+    """
+    Restrict a command to the given role
+    """
+
+    command = command.replace(".", "")
+    _command = self.bot.get_command(command)
+    if not _command:
+      return await ctx.send_warning(f"Command `{command}` does not exist")
+    
+    try:
+      await self.bot.db.execute(
+        """
+        INSERT INTO restrictcommand
+        VALUES ($1, $2, $3)
+        """,
+        ctx.guild.id,
+        _command.qualified_name,
+        role.id
+      )
+    except:
+      return await ctx.send_warning(f"`{_command.qualified_name}` is **already** restricted to {role.mention}")
+    
+    await ctx.send_success(f"Allowing members with {role.mention} to use `{_command.qualified_name}`")
+
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))
