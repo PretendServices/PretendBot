@@ -33,37 +33,6 @@ async def disabled_command(ctx: PretendContext):
       return False 
   return True
 
-@bot.check
-async def restricted_command(ctx: PretendContext):
-  if ctx.author.id == ctx.guild.owner.id:
-    return True
-
-  if check := await ctx.bot.db.fetch(
-    """
-    SELECT * FROM restrictcommand
-    WHERE guild_id = $1
-    AND command = $2
-    """,
-    ctx.guild.id,
-    ctx.command.qualified_name
-  ):
-    for row in check:
-      role = ctx.guild.get_role(row["role_id"])
-      if not role:
-        await ctx.bot.db.execute(
-          """
-          DELETE FROM restrictcommand
-          WHERE role_id = $1
-          """,
-          row["role_id"]
-        )
-
-      if not role in ctx.author.roles:
-        await ctx.send_warning(f"You can't use `{ctx.command.qualified_name}`")
-        return False
-      return True
-  return True
-
 @bot.tree.context_menu(name='avatar')
 async def avatar_user(interaction: discord.Interaction, member: discord.Member):
   """
