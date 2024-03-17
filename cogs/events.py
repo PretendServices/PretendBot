@@ -73,7 +73,7 @@ class Events(Cog):
     embeds = [
       Embed(
         color=self.bot.color,
-        title=f"#{ctx.guild.get_channel(result['channel_id'])}",
+        title=f"{ctx.guild.get_channel(result['channel_id']).mention}",
         description=f"```{result['message']}```"
       ).set_footer(text=f"{results.index(result)+1}/{len(results)}")
       for result in results

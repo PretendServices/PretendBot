@@ -530,6 +530,114 @@ class Moderation(Cog):
 
    return await ctx.send_success(f"Locked **all** channels")
   
+  @lock.group(
+    name="ignore",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def lock_ignore(self, ctx: PretendContext):
+   """
+   Ignore channels from being unlocked when using ;unlock all
+   """
+
+   await ctx.create_pages()
+
+  @lock_ignore.command(
+    name="add",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def lock_ignore_add(self, ctx: PretendContext, *, channel: TextChannel):
+   """
+   Add a channel to be ignored when using ;unlock all
+   """
+
+   if await self.bot.db.fetchrow(
+    """
+    SELECT * FROM lockdown_ignore
+    WHERE guild_id = $1
+    AND channel_id = $2
+    """,
+    ctx.guild.id,
+    channel.id
+   ):
+    return await ctx.send_warning(f"{channel.mention} is **already** ignored")
+   
+   await self.bot.db.execute(
+    """
+    INSERT INTO lockdown_ignore
+    VALUES ($1, $2)
+    """,
+    ctx.guild.id,
+    channel.id
+   )
+   await ctx.send_success(f"Now **ignoring** {channel.mention} from `{ctx.clean_prefix}unlock all`")
+
+  @lock_ignore.command(
+    name="remove",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def lock_ignore_remove(self, ctx: PretendContext, *, channel: TextChannel):
+   """
+   No longer ignore a channel from unlock all
+   """
+
+   if not await self.bot.db.fetchrow(
+    """
+    SELECT * FROM lockdown_ignore
+    WHERE guild_id = $1
+    AND channel_id = $2
+    """,
+    ctx.guild.id,
+    channel.id
+   ):
+    return await ctx.send_warning(f"{channel.mention} is **not** ignored")
+   
+   await self.bot.db.execute(
+    """
+    DELETE FROM lockdown_ignore
+    WHERE guild_id = $1
+    AND channel_id = $2
+    """,
+    ctx.guild.id,
+    channel.id
+   )
+   await ctx.send_success(f"No longer **ignoring** {channel.mention} from unlock")
+
+  @lock_ignore.command(
+    name="list",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def lock_ignore_list(self, ctx: PretendContext):
+   """
+   View all ignored unlock channels
+   """
+
+   results = await self.bot.db.fetch(
+    """
+    SELECT * FROM lockdown_ignore
+    WHERE guild_id = $1
+    """,
+    ctx.guild.id
+   )
+   
+   if not results:
+    return await ctx.send_warning(f"There are no ignored unlock channels")
+   
+   await ctx.paginate(
+    [
+     f"{ctx.guild.get_channel(result["channel_id"]).mention}"
+     for result in results
+    ],
+    title=f"Ignored Unlock Channels ({len(results)})",
+    author={
+     "name": ctx.guild.name,
+     "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+    }
+   )
+  
   @hybrid_group(brief="manage channels")
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
