@@ -1463,7 +1463,7 @@ class Moderation(Cog):
   @has_guild_permissions(administrator=True)
   @bot_has_guild_permissions(ban_members=True)
   @admin_antinuke()
-  async def unhardban(self, ctx: PretendContext, user: User, *, reason: str):
+  async def unhardban(self, ctx: PretendContext, user: User, *, reason: str = "No reason provided"):
    """
    Unhardban a hardbanned member
    """
