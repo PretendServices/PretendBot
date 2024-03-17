@@ -195,17 +195,17 @@ class Messages(Cog):
      return
 
     words = message.content.lower().split()
-    results = await self.bot.db.fetch("SELECT response FROM autoresponder WHERE guild_id = $1", message.guild.id)
-    for result in results:
-     if str(result["trigger"]).lower() in words:
-      bucket = await self.get_ratelimit(message)
-      
-      if bucket: 
-        return 
-      
-      ctx = await self.bot.get_context(message)
-      x = await self.bot.embed_build.convert(ctx, result["response"])
-      await ctx.send(**x)
+    check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", message.guild.id, message.content.lower())
+    if check:
+      if str(check["trigger"]).lower() in words:
+        bucket = await self.get_ratelimit(message)
+        
+        if bucket: 
+          return 
+        
+        ctx = await self.bot.get_context(message)
+        x = await self.bot.embed_build.convert(ctx, check["response"])
+        await ctx.send(**x)
   
    @Cog.listener('on_message')
    async def on_autoreact(self, message: Message): 
