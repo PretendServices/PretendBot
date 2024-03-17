@@ -518,11 +518,25 @@ class Moderation(Cog):
       if channel.overwrites_for(ctx.guild.default_role).send_messages is False: 
         continue
 
-      overwrites = channel.overwrites_for(ctx.guild.default_role)
+      if check := await self.bot.db.fetchrow(
+       """
+       SELECT role_id FROM lock_role
+       WHERE guild_id = $1
+       """,
+       ctx.guild.id
+      ):
+       if await ctx.guild.get_role(check["role_id"]):
+        role = await ctx.guild.get_role(check["role_id"])
+       else:
+        role = ctx.guild.default_role
+      else:
+       role = ctx.guild.default_role
+
+      overwrites = channel.overwrites_for(role)
       overwrites.send_messages = False
 
       await channel.set_permissions(
-        ctx.guild.default_role,
+        role,
         overwrite=overwrites,
         reason=f"{ctx.author} ({ctx.author.id}) locked all channels: {reason}"
       )
@@ -637,6 +651,26 @@ class Moderation(Cog):
      "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
     }
    )
+
+  @lock.command(
+    name="role",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_server=True)
+  async def lock_role(self, ctx: PretendContext, role: Role):
+   """
+   Set the default role for lockdown
+   """
+
+   if await self.bot.db.execute("SELECT * FROM lock_role WHERE guild_id = $1", ctx.guild.id):
+    args = ["UPDATE lock_role SET role_id = $1 WHERE guild_id = $2", role.id, ctx.guild.id]
+    message = f"Updated the **lock role** to {role.mention}"
+   else:
+    args = ["INSERT INTO lock_role VALUES ($1, $2)", ctx.guild.id, role.id]
+    message = f"Set the **lock role** to {role.mention}"
+
+   await self.bot.db.execute(*args)
+   await ctx.send_success(message)
   
   @hybrid_group(brief="manage channels")
   @has_guild_permissions(manage_channels=True)
@@ -678,9 +712,23 @@ class Moderation(Cog):
       if channel.overwrites_for(ctx.guild.default_role).send_messages is True or channel.id in ignored_channels:
         continue
 
-      overwrite = channel.overwrites_for(ctx.guild.default_role)
+      if check := await self.bot.db.fetchrow(
+       """
+       SELECT role_id FROM lock_role
+       WHERE guild_id = $1
+       """,
+       ctx.guild.id
+      ):
+       if await ctx.guild.get_role(check["role_id"]):
+        role = await ctx.guild.get_role(check["role_id"])
+       else:
+        role = ctx.guild.default_role
+      else:
+       role = ctx.guild.default_role
+
+      overwrite = channel.overwrites_for(role)
       overwrite.send_messages = True
-      await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite, reason=f"{ctx.author} ({ctx.author.id}) unlocked all channels: {reason}")
+      await channel.set_permissions(role, overwrite=overwrite, reason=f"{ctx.author} ({ctx.author.id}) unlocked all channels: {reason}")
 
    await ctx.send_success(f"Unlocked all channels")
   
