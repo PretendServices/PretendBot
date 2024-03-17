@@ -555,26 +555,28 @@ class Moderation(Cog):
   )
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
-  async def unlock_all(self, ctx: PretendContext):
+  async def unlock_all(self, ctx: PretendContext, *, reason: str = "No reason provided"):
    """
    Unlock all locked channels
    """
 
-   loadingmsg = await ctx.pretend_send(f"Unlocking `{len(ctx.guild.channels)}` channels...")
+   ignored_channels = await self.bot.db.fetch(
+    """
+    SELECT channel_id FROM lockdown_ignore
+    WHERE guild_id = $1
+    """,
+    ctx.guild.id
+   )
 
-   async with self.locks[ctx.guild.id]:
-    for channel in ctx.guild.channels:
-      if (
-       channel.overwrites_for(ctx.guild.default_role).send_messages is True
-       or not channel.overwrites_for(ctx.guild.default_role).send_messages
-      ):
+   async with ctx.channel.typing():
+    for channel in ctx.guild.text_channels:
+      if channel.overwrites_for(ctx.guild.default_role).send_messages is True or channel.id in ignored_channels:
         continue
 
-      overwrites = channel.overwrites_for(ctx.guild.default_role)
-      overwrites.send_messages = None 
-      await channel.set_permissions(ctx.guild.default_role, overwrite=overwrites, reason=f"All channels unlocked by {ctx.author} ({ctx.author.id})")
+      overwrite = channel.overwrites_for(ctx.guild.default_role)
+      overwrite.send_messages = True
+      await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite, reason=f"{ctx.author} ({ctx.author.id}) unlocked all channels: {reason}")
 
-   await loadingmsg.delete()
    await ctx.send_success(f"Unlocked all channels")
   
   @hybrid_command(brief="manage channels")
@@ -1171,12 +1173,6 @@ class Moderation(Cog):
 
    if ctx.channel.overwrites_for(member).add_reactions is False:
     return await ctx.send_warning(f"{member.mention} is **already** reaction muted")
-
-   async with self.locks[ctx.guild.id]:
-    for role in member.roles:
-     if role.id != ctx.guild.id:
-      if role.permissions.add_reactions:
-        await member.remove_roles(role, reason=f"Reaction muted by {ctx.author} ({ctx.author.id})")
 
    overwrites = ctx.channel.overwrites_for(member)
    overwrites.add_reactions = False
