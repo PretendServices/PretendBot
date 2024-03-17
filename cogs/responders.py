@@ -78,7 +78,7 @@ class Responders(Cog):
   async def autoresponder(self, ctx: PretendContext): 
     await ctx.create_pages()
 
-  @autoresponder.command(name="add", brief="manage server", usage="example: ;autoresponder add hello, hello world", flags=AutoresponderFlags)
+  @autoresponder.command(name="add", brief="manage server", usage="example: ;autoresponder add hello, hello world")
   @has_guild_permissions(manage_guild=True)
   async def ar_add(self, ctx: PretendContext, *, response: str): 
    """add an autoresponder to the server"""
@@ -93,18 +93,16 @@ class Responders(Cog):
    
    resp = responses[1].strip()
 
-   if not_strict := ctx.flags.get("not_strict"):
-    if not_strict is False:
-      strict = False
-    else:
-      strict = True
-   else:
+   if resp.endswith(" --not_strict"):
     strict = False
+   else:
+    strict = True
 
-   resp = resp.replace("--not_strict", "").strip()
+   resp = resp.replace(" --not_strict", "")
+   if not response:
+    return await ctx.send_warning("Response not found! Please use `,` to split the trigger and the response") 
    
    check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", ctx.guild.id, trigger.lower())
-   
    if check: 
     return await ctx.send_warning(f"An autoresponder for **{trigger}** already exists")
    else: 
