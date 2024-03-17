@@ -122,7 +122,9 @@ class Moderation(Cog):
     
     roles = [ctx.guild.get_role(r) for r in json.loads(check[0]) if ctx.guild.get_role(r)]
     await member.edit(
-      roles=[r for r in roles if r.is_assignable() and not r.position > member.top_role.position if member.top_role],
+      roles=[
+       r for r in roles if r.is_assignable() and not r.position > ctx.author.top_role.position if ctx.author.top_role
+      ],
       reason=f"roles restored by {ctx.author}"
     )
 
