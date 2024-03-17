@@ -1000,7 +1000,7 @@ class Fun(Cog):
 
     response = await self.bot.session.get_json("https://api.otakugifs.xyz/gif?reaction=pinch&format=gif")
     embed = Embed(color=self.bot.color, description=f"**{ctx.author.name}** pinches **{member.name}**")
-    embed.set_author(url=response["url"])
+    embed.set_image(url=response["url"])
 
     return await ctx.reply(embed=embed)
 
