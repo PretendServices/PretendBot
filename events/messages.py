@@ -194,17 +194,14 @@ class Messages(Cog):
     if not message.guild: 
      return
 
-    words = message.content.lower().split(" ")
-    check = await self.bot.db.fetchrow("SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2", message.guild.id, message.content.lower())
-    if check:
-      if str(check["trigger"]).lower() in words:
-        bucket = await self.get_ratelimit(message)
-        
-        if bucket: 
-          return 
-        
+    async for row in self.bot.db.fetch(
+      "SELECT * FROM autoresponder WHERE guild_id = $1",
+      message.guild.id
+    ):
+      if str(row["trigger"]).lower() == message.content.lower():
         ctx = await self.bot.get_context(message)
-        x = await self.bot.embed_build.convert(ctx, check["response"])
+        x = await self.bot.embed_build.convert(ctx, row["response"])
+        
         await ctx.send(**x)
   
    @Cog.listener('on_message')
