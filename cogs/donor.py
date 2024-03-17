@@ -9,7 +9,7 @@ from tools.helpers import PretendContext
 from tools.validators import ValidReskinName
 from tools.predicates import has_perks, create_reskin
 
-from discord import User, utils, Embed, Member, AllowedMentions
+from discord import User, utils, Embed, Member, AllowedMentions, Interaction
 from discord.ext import commands
 from discord.ext.commands import Cog, command, group, has_guild_permissions, bot_has_guild_permissions, Author, cooldown
 
@@ -158,8 +158,25 @@ class Donor(Cog):
   @reskin.command(name="remove", brief="donor", aliases=['delete', 'reset'])
   async def reskin_delete(self, ctx: PretendContext):
    """delete your reskin"""
-   await self.bot.db.execute("DELETE FROM reskin WHERE user_id = $1", ctx.author.id)
-   return await ctx.send_success("Deleted your reskin")
+
+   async def yes_callback(interaction: Interaction):
+    await self.bot.db.execute("DELETE FROM reskin WHERE user_id = $1", ctx.author.id)
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{self.bot.yes} {ctx.author.mention}: Removed your **reskin**",
+      color=self.bot.yes_color
+     )
+    )
+
+   async def no_callback(interaction: Interaction):
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{ctx.author.mention}: Cancelling action...",
+      color=self.bot.color
+     )
+    )
+
+   return await ctx.confirmation_send(f"Are you sure you want to **remove** your reskin?", yes_callback, no_callback)
   
   @command(
    name="chatgpt",
