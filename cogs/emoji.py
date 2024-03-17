@@ -4,7 +4,7 @@ import datetime
 import emoji as emoji_lib
 
 from discord.ext.commands import Cog, BadArgument, group, has_guild_permissions, command, bot_has_guild_permissions
-from discord import PartialEmoji, utils, Embed, Emoji, File
+from discord import PartialEmoji, utils, Embed, Emoji, File, HTTPException
 
 from io import BytesIO
 from collections import defaultdict
@@ -149,12 +149,24 @@ class Emoji(Cog):
 
     if await self.emoji_bucket(ctx, emoji):
       return
+    
+    if len(name) < 2:
+      return await ctx.send_warning(f"Emoji names need a minimum of **2 characters**")
+    elif len(name) > 32:
+      return await ctx.send_warning(f"Emoji names can't be longer than **32 characters**")
+    
+    name = name.replace(" ", "-")
 
-    emoji_created = await ctx.guild.create_custom_emoji(
-      name=name or emoji.name, 
-      image=await emoji.read(), 
-      reason=f"Emoji created by {ctx.author}"
-    )
+    try:
+      emoji_created = await ctx.guild.create_custom_emoji(
+        name=name or emoji.name, 
+        image=await emoji.read(), 
+        reason=f"Emoji created by {ctx.author}"
+      )
+    except HTTPException as e:
+      if e.code == 50035 and " String value did not match validation regex" in str(e):
+        return await ctx.send_warning(f"Invalid characters are in the emoji name")
+      
     return await ctx.send_success(f"Created {emoji_created} as [**{name or emoji_created.name}**]({emoji_created.url})")   
   
   @command(name="addmultiple", aliases=['am'], brief="manage expressions")
@@ -226,7 +238,7 @@ class Emoji(Cog):
         return await ctx.send_warning("This is **not** an emoji")
       
       try: 
-        unic = f"{ord(emoji):x}"
+        unic = f"{ord(emoji[0]):x}"
         return await ctx.reply(
           file=File(
             fp=await self.bot.getbyte(f"https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/{unic}.png"), 
