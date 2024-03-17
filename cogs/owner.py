@@ -252,8 +252,7 @@ class Owner(Cog):
    inline=True
   ).add_field(
    name="User",
-   value=f"<@{error_details['user_id']}>
-   (`{error_details['user_id']}`)",
+   value=f"<@{error_details['user_id']}> (`{error_details['user_id']}`)",
    inline=True
   ).add_field(
    name="Command",
