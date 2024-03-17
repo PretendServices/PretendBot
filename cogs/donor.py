@@ -136,7 +136,7 @@ class Donor(Cog):
    await self.bot.db.execute("UPDATE reskin SET username = $1 WHERE user_id = $2", name, ctx.author.id)
    return await ctx.send_success(f"Updated your reskin name to **{name}**") 
   
-  @reskin.command(name="avatar", brief="donor", aliases=['icon', 'pfp'])
+  @reskin.command(name="avatar", brief="donor", aliases=['icon', 'pfp', 'av'])
   @has_perks()
   @create_reskin()
   async def reskin_avatar(self, ctx: PretendContext, url: str=None):
