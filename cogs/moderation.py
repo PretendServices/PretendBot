@@ -513,8 +513,6 @@ class Moderation(Cog):
    Lock all channels
    """
 
-   loadingmsg = await ctx.pretend_send(f"Locking `{len(ctx.guild.channels)}` channels...")
-
    async with ctx.channel.typing():
     for channel in ctx.guild.text_channels:
       if channel.overwrites_for(ctx.guild.default_role).send_messages is False: 
@@ -530,7 +528,6 @@ class Moderation(Cog):
       )
       await asyncio.sleep(1.5)
 
-   await loadingmsg.delete()
    return await ctx.send_success(f"Locked **all** channels")
   
   @hybrid_group(brief="manage channels")
@@ -817,6 +814,8 @@ class Moderation(Cog):
    async with self.locks[ctx.channel.id]:    
     async def yes_callback(interaction: Interaction) -> None: 
      new_channel = await interaction.channel.clone(name=interaction.channel.name, reason="Nuking channel invoked by the server owner") 
+     message = ""
+
      await new_channel.edit(
       topic=interaction.channel.topic, 
       position=interaction.channel.position, 
@@ -824,9 +823,32 @@ class Moderation(Cog):
       slowmode_delay=interaction.channel.slowmode_delay, 
       type=interaction.channel.type,
       reason="Nuking channel invoked by the server owner")
+
+     for i in ["welcome", "leave", "boost"]:
+      if await self.bot.db.fetchrow(
+       f"""
+       SELECT * FROM {i}
+       WHERE guild_id = $1
+       AND channel_id = $2
+       """,
+       interaction.guild.id,
+       interaction.channel.id
+      ):
+       await self.bot.db.execute(
+        f"""
+        UPDATE {i}
+        SET channel_id = $1
+        WHERE guild_id = $2
+        AND channel_id = $3
+        """,
+        new_channel.id,
+        interaction.guild.id,
+        interaction.channel.id
+       )
+       message += f"- restored a {i} setup to {new_channel.mention}"
      
      await interaction.channel.delete(reason="Channel nuked by the server owner")
-     await new_channel.send("💣") 
+     await new_channel.send("💣" + message) 
    
     async def no_callback(interaction: Interaction) -> None: 
      await interaction.response.edit_message(embed=Embed(color=self.bot.color, description="Cancelling action..."), view=None)
