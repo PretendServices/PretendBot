@@ -117,25 +117,26 @@ class Auth(commands.Cog):
 
   @commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild):
-   check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
-   if not check:
-    if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-      await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
-      await guild.leave()
-   else:
-    embed = discord.Embed(
-      color=self.bot.color, 
-      description=f"joined **{guild.name}** (`{guild.id}`)"
-    )\
-    .add_field(
-      name="owner", 
-      value=guild.owner
-    )\
-    .add_field(
-      name="member count", 
-      value=f"{guild.member_count} members"
-    )
-    await self.bot.get_channel(self.channel_id).send(embed=embed)
+   if guild.member_count < 5000:
+    check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
+    if not check:
+      if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+        await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
+        await guild.leave()
+    else:
+      embed = discord.Embed(
+        color=self.bot.color, 
+        description=f"joined **{guild.name}** (`{guild.id}`)"
+      )\
+      .add_field(
+        name="owner", 
+        value=guild.owner
+      )\
+      .add_field(
+        name="member count", 
+        value=f"{guild.member_count} members"
+      )
+      await self.bot.get_channel(self.channel_id).send(embed=embed)
 
   @commands.group(invoke_without_command=True)
   @auth_perms()
