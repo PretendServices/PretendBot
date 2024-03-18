@@ -6,7 +6,8 @@ import datetime
 import humanize
 import humanfriendly
 import dateutil.parser
-
+import validators
+import pyppeteer
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
@@ -497,7 +498,33 @@ class Utility(commands.Cog):
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}** [**here**]({message.jump_url})")
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
-     
+  @commands.command(aliases=['ss', 'screenie'])
+  async def screenshot(self, ctx: PretendContext, *, url: str):
+      try:
+        # URL validation
+        if not validators.url(url):
+            await ctx.send("Invalid URL. Please provide a valid URL.")
+            return
+
+        # Launch Pyppeteer browser
+        browser = await pyppeteer.launch()
+        page = await browser.newPage()
+
+        # Navigate to the specified URL
+        await page.goto(url)
+
+        # Take screenshot
+        await page.screenshot({'path': 'screenshot.png'})
+
+        # Close browser
+        await browser.close()
+
+        # Send the screenshot file
+        await ctx.send(file=discord.File('screenshot.png'))
+
+      except Exception as e:
+        await ctx.send(f"Error: {e}")
+   
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
