@@ -34,9 +34,13 @@ class Lastfm(Cog):
     params = params.replace(
       '{track.name}', a['recenttracks']['track'][0]['name']
       ).replace(
+        '{lower(track.name)}', a['recenttracks']['track'][0]['name'].lower()
+      ).replace(
       '{track.url}', self.bot.url_encode(a['recenttracks']['track'][0]['url'])
       ).replace(
        '{artist.name}', a['recenttracks']['track'][0]['artist']['#text']
+      ).replace(
+        '{lower(artist.name)}', a['recenttracks']['track'][0]['artist']['#text'].lower()
       ).replace(
        '{artist.url}', self.bot.url_encode(f"https://last.fm/music/{artist.replace(' ', '+')}")
       ).replace(
@@ -49,6 +53,8 @@ class Lastfm(Cog):
        '{track.plays}', str(trackplays)
       ).replace(
        '{album.name}', a['recenttracks']['track'][0]['album']['#text'] or "N/A"
+      ).replace(
+        '{lower(album.name)}', a['recenttracks']['track'][0]['album']['#text'].lower() if a['recenttracks']['track'][0]['album']['#text'] else "N/A"
       ).replace(
        '{album.url}', self.bot.url_encode(f"https://www.last.fm/music/{artist.replace(' ', '+')}/{album.replace(' ', '+')}") or "https://none.none"
       ).replace(
