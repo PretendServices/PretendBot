@@ -1505,7 +1505,7 @@ class Moderation(Cog):
    brief="manage messages"
   )
   @has_guild_permissions(manage_messages=True)
-  async def revokefiles(self, ctx: PretendContext, state: str, member: Member, *, reason: str = "No reason provided"):
+  async def revokefiles(self, ctx: PretendContext, state: str, member: NoStaff, *, reason: str = "No reason provided"):
    """
    Remove file attachment permissions from a member
    """

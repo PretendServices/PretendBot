@@ -21,6 +21,11 @@ class Donor(Cog):
     api_key="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"
    )
 
+  def shorten(value: str, length: int = 32):
+    if len(value) > length:
+        value = value[:length-2] + ("..." if len(value) > length else "").strip()
+    return value
+
   @Cog.listener()
   async def on_user_update(self, before: User, after: User): 
    if before.discriminator == "0": 
@@ -215,6 +220,7 @@ class Donor(Cog):
      .replace(" but as an AI language model, ", "")
     )
 
+    message = self.shorten(message, 1024)
     await ctx.send(message, allowed_mentions=AllowedMentions.none())
 
 async def setup(bot: Pretend) -> None: 
