@@ -319,7 +319,8 @@ class Leveling(Cog):
           SET message = $1
           WHERE guild_id = $2
           """,
-          "none"
+          "none",
+          ctx.guild.id
         )
         return await ctx.send_success(f"Removed the **level up** message")
 
