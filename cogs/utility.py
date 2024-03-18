@@ -10,7 +10,6 @@ import validators
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
-from webdriver_manager.chrome import ChromeDriverManager
 from io import BytesIO
 from typing import Union, Optional, Any
 from selenium import webdriver
@@ -507,16 +506,18 @@ class Utility(commands.Cog):
         if not validators.url(url):
             url = "https://" + url
         
-        # Validate the URL
+        # Validate the URL again after appending 'https://'
         if not validators.url(url):
             await ctx.send("Invalid URL. Please provide a valid URL.")
             return
 
-        # Initialize Selenium Chrome driver using WebDriverManager
+        # Initialize Selenium Chrome driver
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # To run Chrome in headless mode
         options.add_argument("--window-size=1920,1080")  # Set window size to desktop viewport
-        driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+        service = Service('/root/chromedriver')  # Update 'path_to_chromedriver' with your chromedriver path
+        service.start()
+        driver = webdriver.Remote(service.service_url, options=options)
         
         # Navigate to the specified URL
         driver.get(url)
