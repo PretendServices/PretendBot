@@ -6,6 +6,52 @@ from discord.ext import commands
 from typing import Union 
 from tools.helpers import PretendContext 
 from tools.predicates import auth_perms
+
+class TrialView(discord.ui.View):
+  def __init__(self, bot: commands.AutoShardedBot):
+    self.bot = bot
+    self.timeout = 2
+
+  @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
+  async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
+    day = datetime.timedelta(days=1)
+    expiration_date = datetime.datetime.now() + day
+    expiration_timestamp = int(expiration_date.timestamp())
+
+    await self.bot.db.execute(
+      """
+      INSERT INTO trials
+      VALUES ($1, $2)
+      """,
+      interaction.guild.id,
+      expiration_timestamp
+    )
+
+    await interaction.response.edit_message(
+     embed=discord.Embed(
+      description=f"{self.bot.yes} {interaction.user.mention}: Started the **trial**! This will expire <t:{expiration_timestamp}:R>",
+      color=self.bot.yes_color
+     ),
+     view=None
+    )
+
+  @discord.ui.button(label="Decline", style=discord.ButtonStyle.red)
+  async def decline(self, interaction: discord.Interaction, button: discord.ui.Button):
+   await interaction.response.edit_message(
+    embed=discord.Embed(
+     description=f"{self.bot.yes} {interaction.user.mention}: You rejected the free trial. Invite the bot again to use it!",
+     color=self.bot.yes_color
+    ),
+    view=None
+   )
+   await interaction.guild.leave()
+
+  async def interaction_check(self, interaction: discord.Interaction):
+   if not interaction.user.guild_permissions.administrator:
+    await interaction.warn(f"You need the `administrator` permission to interact with this!")
+    return False
+   return True
+
 class Auth(commands.Cog): 
   def __init__(self, bot: commands.AutoShardedBot): 
     self.bot = bot 
@@ -43,12 +89,35 @@ class Auth(commands.Cog):
   @commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild): 
    if guild.member_count < 5000:
-    check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
-    if not check: 
-      if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-        await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
-     
-      return await guild.leave() 
+      check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
+      if not check:
+        if await self.bot.db.fetchrow(
+         """
+         SELECT * FROM trials
+         WHERE guild_id = $1
+         """,
+         guild.id
+        ):
+          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+            await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
+        
+          return await guild.leave() 
+        else:
+         embed = discord.Embed(
+          description=f"Looks like you haven't used pretend before."
+          + "\npretend is a **paid bot**, but we offer a free trial!\n\n"
+          + "If you claim this trial, you will have the bot for **24 hours**."
+          + "\nOnce that time is up, the bot will leave. Use the buttons below to decide."
+         ).set_author(
+          name="pretend",
+          icon_url=self.bot.user.avatar.url
+         ).set_footer(
+          text="This prompt will expire in 2 minutes."
+         )
+
+         view = TrialView()
+         if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+            await channels[0].send(embed=embed, view=view)
     
    embed = discord.Embed(
     color=self.bot.color, 
