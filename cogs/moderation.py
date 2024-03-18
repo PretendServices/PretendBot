@@ -1500,5 +1500,26 @@ class Moderation(Cog):
 
    await ctx.send_success(f"Unhardbanned {user.mention}")
 
+  @command(
+   name="revokefiles",
+   brief="manage messages"
+  )
+  @has_guild_permissions(manage_messages=True)
+  async def revokefiles(self, ctx: PretendContext, member: Member, *, reason: str = "No reason provided"):
+   """
+   Remove file attachment permissions from a member
+   """
+
+   overwrite = ctx.channel.overwrites_for(member)
+   overwrite.attach_files = False
+
+   await ctx.channel.set_permissions(
+    member,
+    overwrite=overwrite,
+    reason=f"{ctx.author} ({ctx.author.id}) removed file attachment permissions: {reason}"
+  )
+
+   await ctx.message.add_reaction("✅")
+
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))
