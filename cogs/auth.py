@@ -122,20 +122,20 @@ class Auth(commands.Cog):
     if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
       await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
       await guild.leave()
-    
-   embed = discord.Embed(
-    color=self.bot.color, 
-    description=f"joined **{guild.name}** (`{guild.id}`)"
-   )\
-   .add_field(
-    name="owner", 
-    value=guild.owner
-   )\
-   .add_field(
-    name="member count", 
-    value=f"{guild.member_count} members"
-   )
-   await self.bot.get_channel(self.channel_id).send(embed=embed)
+   else:
+    embed = discord.Embed(
+      color=self.bot.color, 
+      description=f"joined **{guild.name}** (`{guild.id}`)"
+    )\
+    .add_field(
+      name="owner", 
+      value=guild.owner
+    )\
+    .add_field(
+      name="member count", 
+      value=f"{guild.member_count} members"
+    )
+    await self.bot.get_channel(self.channel_id).send(embed=embed)
 
   @commands.group(invoke_without_command=True)
   @auth_perms()
