@@ -10,7 +10,6 @@ from tools.predicates import auth_perms
 class TrialView(discord.ui.View):
   def __init__(self, bot: commands.AutoShardedBot):
     self.bot = bot
-    self.timeout = 2
 
   @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
   async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
