@@ -15,6 +15,7 @@ from typing import Union, Optional, Any
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 from shazamio import Shazam
 from ttapi import TikTokApi
 from tools.redis import PretendRedis
@@ -501,40 +502,37 @@ class Utility(commands.Cog):
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
   async def screenshot(self, ctx: PretendContext, url: str):
-    try:
-        # Append 'https://' to the URL if it doesn't contain any protocol
-        if not validators.url(url):
-            url = "https://" + url
-        
-        # Validate the URL again after appending 'https://'
-        if not validators.url(url):
-            await ctx.send("Invalid URL. Please provide a valid URL.")
-            return
+    """
+    Take a screenshot of a webpage
+    """
+    # Validate the URL
+    if not validators.url(url):
+        await ctx.send("Invalid URL. Please provide a valid URL.")
+        return
 
-        # Initialize Selenium Chrome driver
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")  # To run Chrome in headless mode
-        options.add_argument("--window-size=1920,1080")  # Set window size to desktop viewport
-        service = Service('/root/chromedriver')  # Update 'path_to_chromedriver' with your chromedriver path
-        service.start()
-        driver = webdriver.Remote(service.service_url, options=options)
-        
-        # Navigate to the specified URL
+    # Set up headless browser with custom window size
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--window-size=1920,1080')  # Set window size to 1920x1080
+    driver = webdriver.Chrome(options=chrome_options)
+
+    try:
+        # Navigate to the webpage
         driver.get(url)
-        
-        # Take screenshot
+
+        # Take a screenshot
         screenshot_path = 'screenshot.png'
         driver.save_screenshot(screenshot_path)
 
+        # Send the screenshot to the Discord channel
+        with open(screenshot_path, 'rb') as file:
+            screenshot_file = discord.File(file, filename='screenshot.png')
+            await ctx.send(file=screenshot_file)
+
+    finally:
         # Close the browser
         driver.quit()
 
-        # Send the screenshot file
-        await ctx.send(file=discord.File(screenshot_path))
-
-    except Exception as e:
-        await ctx.send(f"Error: {e}")
-   
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
