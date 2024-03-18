@@ -150,17 +150,17 @@ class Lastfm(Cog):
     Embed(
     color=self.bot.color, 
     title="Track Variables", 
-    description=">>> {track.name} - shows track name\n{track.url} - shows the track lastfm url\n{track.image} - shows the track image\n{track.plays} - shows the track's plays on your account"
+    description=">>> {track.name} - shows track name\n{lower(track.name)} - track name in lowercase\n{track.url} - shows the track lastfm url\n{track.image} - shows the track image\n{track.plays} - shows the track's plays on your account"
     ),
     Embed(
      color=self.bot.color,
      title="Artist Variables",
-     description=">>> {artist.name} - shows the artist's name\n{artist.url} - shows the artist's lastfm url\n{artist.plays} -shows the artist's plays on your account"
+     description=">>> {artist.name} - shows the artist's name\n{lower(artist.name)} - artist name in lowercase\n{artist.url} - shows the artist's lastfm url\n{artist.plays} -shows the artist's plays on your account"
     ),
     Embed(
      color=self.bot.color, 
      title="Album Variables",
-     description=">>> {album.name} - shows the album's name\n{album.url} - shows the album's lastfm url\n{album.plays} - shows the album's plays on your account"
+     description=">>> {album.name} - shows the album's name\n{lower(album.name)} - album name in lowercase\n{album.url} - shows the album's lastfm url\n{album.plays} - shows the album's plays on your account"
     ),
     Embed(
      color=self.bot.color,
