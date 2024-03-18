@@ -8,16 +8,13 @@ from tools.helpers import PretendContext
 from tools.predicates import auth_perms
 
 class TrialView(discord.ui.View):
-  def __init__(self, bot: commands.AutoShardedBot):
-    self.bot = bot
-
   @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
   async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
     day = datetime.timedelta(days=1)
     expiration_date = datetime.datetime.now() + day
     expiration_timestamp = int(expiration_date.timestamp())
 
-    await self.bot.db.execute(
+    await interaction.client.db.execute(
       """
       INSERT INTO trials
       VALUES ($1, $2)
@@ -114,7 +111,7 @@ class Auth(commands.Cog):
           text="This prompt will expire in 2 minutes."
          )
 
-         view = TrialView(self.bot)
+         view = TrialView()
          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
             await channels[0].send(embed=embed, view=view)
     
