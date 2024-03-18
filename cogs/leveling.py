@@ -133,6 +133,9 @@ class Leveling(Cog):
 
                 channel = message.guild.get_channel(res['channel_id']) or message.channel 
                 mes = res['message']  
+
+                if mes == "none":
+                  return
                 
                 x = await self.bot.embed_build.alt_convert(
                   message.author,
@@ -308,6 +311,17 @@ class Leveling(Cog):
       """
       set a custom level up message
       """
+
+      if message.lower().strip() == "none":
+        await self.bot.db.execute(
+          """
+          UPDATE leveling
+          SET message = $1
+          WHERE guild_id = $2
+          """,
+          "none"
+        )
+        return await ctx.send_success(f"Removed the **level up** message")
 
       await self.bot.db.execute(
         """
