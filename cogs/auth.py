@@ -82,7 +82,7 @@ class Auth(commands.Cog):
       )
       await self.bot.get_channel(self.channel_id).send(embed=embed)
 
-  @commands.Cog.listener()
+  #@commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild): 
    if guild.member_count < 5000:
       check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
@@ -114,6 +114,14 @@ class Auth(commands.Cog):
          view = TrialView()
          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
             await channels[0].send(embed=embed, view=view)
+
+  @commands.Cog.listener()
+  async def on_guild_join(self, guild: discord.Guild):
+   check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
+   if not check:
+    if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+      await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
+      await guild.leave()
     
    embed = discord.Embed(
     color=self.bot.color, 
