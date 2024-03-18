@@ -21,7 +21,7 @@ class Donor(Cog):
     api_key="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"
    )
 
-  def shorten(value: str, length: int = 32):
+  def shorten(self, value: str, length: int = 32):
     if len(value) > length:
         value = value[:length-2] + ("..." if len(value) > length else "").strip()
     return value
