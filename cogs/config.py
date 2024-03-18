@@ -848,6 +848,7 @@ class Config(Cog):
       "restrictcmd",
       "rc"
     ],
+    brief="manage sever",
     invoke_without_command=True
   )
   @has_guild_permissions(manage_guild=True)
@@ -862,7 +863,8 @@ class Config(Cog):
     name="add",
     aliases=[
       "make"
-    ]
+    ],
+    brief="manage sever"
   )
   @has_guild_permissions(manage_guild=True)
   async def restrictcommand_add(self, ctx: PretendContext, command: str, *, role: Role):
@@ -889,6 +891,75 @@ class Config(Cog):
       return await ctx.send_warning(f"`{_command.qualified_name}` is **already** restricted to {role.mention}")
     
     await ctx.send_success(f"Allowing members with {role.mention} to use `{_command.qualified_name}`")
+
+  @restrictcommand.command(
+    name="remove",
+    aliases=[
+      "delete",
+      "del"
+    ],
+    brief="manage sever"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def restrictcommand_remove(self, ctx: PretendContext, command: str, *, role: Role):
+    """
+    Stop allowing a role to use a command
+    """
+
+    command = command.replace(".", "")
+    _command = self.bot.get_command(command)
+    if not _command:
+      return await ctx.send_warning(f"Command `{command}` does not exist")
+    
+    if await self.bot.db.fetchrow("SELECT * FROM restrictcommand WHERE guild_id = $1 AND command = $2 AND role_id = $3", ctx.guild.id, _command.qualified_name, role.id):
+      await self.bot.db.execute(
+        """
+        DELETE FROM restrictcommand
+        WHERE guild_id = $1
+        AND command = $2
+        AND role_id = $3
+        """,
+        ctx.guild.id,
+        _command.qualified_name,
+        role.id
+      )
+    else:
+      return await ctx.send_warning(f"`{_command.qualified_name}` is **not** restricted to {role.mention}")
+    
+    await ctx.send_success(f"No longer allowing members with {role.mention} to use `{_command.qualified_name}`")
+
+  @restrictcommand.command(
+    name="list",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def restrictcommand_list(self, ctx: PretendContext):
+    """
+    Get a list of all restricted commands
+    """
+
+    results = await self.bot.db.fetch(
+      """
+      SELECT * FROM restrictcommand
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    )
+
+    if not results:
+      return await ctx.send_warning(f"There are **no** restricted commands")
+    
+    await ctx.paginate(
+      [
+        f"**{result["command"]}**: {ctx.guild.get_role(result["role_id"]).mention}"
+        for result in results
+      ],
+      title=f"Restricted Commands ({len(results)})",
+      author={
+        "name": ctx.guild.name,
+        "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+      }
+    )
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))
