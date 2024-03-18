@@ -115,7 +115,7 @@ class Auth(commands.Cog):
           text="This prompt will expire in 2 minutes."
          )
 
-         view = TrialView()
+         view = TrialView(self.bot)
          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
             await channels[0].send(embed=embed, view=view)
     
