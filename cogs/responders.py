@@ -126,6 +126,10 @@ class Responders(Cog):
   async def ar_list(self, ctx: PretendContext): 
    """returns a list of all autoresponders in the server"""
    results = await self.bot.db.fetch("SELECT * FROM autoresponder WHERE guild_id = $1", ctx.guild.id)
+   
+   if not results:
+    return await ctx.send_warning(f"No **autoresponders** are set!")
+
    return await ctx.paginate(
      [f"{result['trigger']} - {result['response']}" for result in results],
      f"Autoresponders ({len(results)})",
