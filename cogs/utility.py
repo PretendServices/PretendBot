@@ -501,7 +501,7 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(self, ctx: PretendContext, *, url: str):
+  async def screenshot(self, ctx: PretendContext, url: str):
     try:
         # Append 'https://' to the URL if it doesn't contain any protocol
         if not validators.url(url):
