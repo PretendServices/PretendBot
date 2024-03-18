@@ -877,6 +877,9 @@ class Config(Cog):
     if not _command:
       return await ctx.send_warning(f"Command `{command}` does not exist")
     
+    if _command.name in ("help", "restrictcommand", "disablecmd", "enablecmd"):
+      return await ctx.send("no lol")
+    
     if not await self.bot.db.fetchrow("SELECT * FROM restrictcommand WHERE guild_id = $1 AND command = $2 AND role_id = $3", ctx.guild.id, _command.qualified_name, role.id):
       await self.bot.db.execute(
         """
@@ -951,7 +954,7 @@ class Config(Cog):
     
     await ctx.paginate(
       [
-        f"**{result["command"]}**: {ctx.guild.get_role(result["role_id"]).mention}"
+        f"**{result['command']}**: {ctx.guild.get_role(result['role_id']).mention}"
         for result in results
       ],
       title=f"Restricted Commands ({len(results)})",
