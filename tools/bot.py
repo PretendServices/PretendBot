@@ -102,9 +102,9 @@ class Pretend(commands.AutoShardedBot):
 
    self.db = db
    self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
-   self.color = 0x808080
+   self.color = 0xC294CA
    self.warning = "<:warn:1189134620718018600>"  
-   self.warning_color = 0xc1b800
+   self.warning_color = 0xefbc1b
    self.no = "❌"
    self.no_color = 0xfc341b
    self.yes = "<:check:1188943556895838249>"
