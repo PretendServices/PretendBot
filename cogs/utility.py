@@ -10,6 +10,7 @@ import validators
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
+from pyppeteer import launch
 from io import BytesIO
 from typing import Union, Optional, Any
 from selenium import webdriver
@@ -501,38 +502,33 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(self, ctx: PretendContext, url: str):
-    """
-    Take a screenshot of a webpage
-    """
-    # Validate the URL
-    if not validators.url(url):
-        await ctx.send("Invalid URL. Please provide a valid URL.")
+  async def screenshot(ctx, url):
+    # Ensure URL is provided
+    if not url:
+        await ctx.send("Please provide a URL.")
         return
 
-    # Set up headless browser with custom window size
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--window-size=1920,1080')  # Set window size to 1920x1080
-    driver = webdriver.Chrome(options=chrome_options)
+    # Ensure the URL starts with http:// or https://
+    if not (url.startswith("http://") or url.startswith("https://")):
+        await ctx.send("URL must start with http:// or https://")
+        return
 
-    try:
-        # Navigate to the webpage
-        driver.get(url)
+    # Launch headless browser
+    browser = await launch()
+    page = await browser.newPage()
 
-        # Take a screenshot
-        screenshot_path = 'screenshot.png'
-        driver.save_screenshot(screenshot_path)
+    # Navigate to URL
+    await page.goto(url)
 
-        # Send the screenshot to the Discord channel
-        with open(screenshot_path, 'rb') as file:
-            screenshot_file = discord.File(file, filename='screenshot.png')
-            await ctx.send(file=screenshot_file)
+    # Take screenshot
+    screenshot_path = "screenshot.png"
+    await page.screenshot({'path': screenshot_path})
 
-    finally:
-        # Close the browser
-        driver.quit()
+    # Send the screenshot
+    await ctx.send(file=discord.File(screenshot_path))
 
+    # Close the browser
+    await browser.close()
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
