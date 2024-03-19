@@ -124,6 +124,20 @@ class Auth(commands.Cog):
              await channel.send(embed=embed, view=view)
             except:
              await guild.leave()
+        else:
+         embed = discord.Embed(
+         color=self.bot.color, 
+         description=f"joined **{guild.name}** (`{guild.id}`)"
+        )\
+        .add_field(
+          name="owner", 
+          value=guild.owner
+        )\
+        .add_field(
+          name="member count", 
+          value=f"{guild.member_count} members"
+        )
+        await self.bot.get_channel(self.channel_id).send(embed=embed)
    except Exception as e:
     await self.bot.get_channel(1218519366610456629).send(e)
 
