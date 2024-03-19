@@ -203,7 +203,7 @@ async def trial_checker(bot: AB):
             row["guild_id"]
           )
         
-        if not await bot.db.execute(
+        if not await bot.db.fetchrow(
           """
           SELECT * FROM authorize
           WHERE guild_id = $1
