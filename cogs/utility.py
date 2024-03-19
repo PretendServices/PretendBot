@@ -505,6 +505,9 @@ class Utility(commands.Cog):
   @commands.command(aliases=['ss', 'screenie'])
   async def screenshot(self, ctx, url: str):
     async with async_playwright() as p:
+        if not validators.url(url):
+         await ctx.send("Invalid URL provided.")
+         return
         browser = await p.chromium.launch()
         page = await browser.new_page()
 
