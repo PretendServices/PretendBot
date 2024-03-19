@@ -502,33 +502,22 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(self, ctx, url):
-    # Ensure URL is provided
-    if not url:
-        await ctx.send("Please provide a URL.")
-        return
+  async def screenshot(self, ctx: PretendContext, url: str):
+    """
+    Get a screenshot of a website
+    """
 
-    # Ensure the URL starts with http:// or https://
-    if not (url.startswith("http://") or url.startswith("https://")):
-        await ctx.send("URL must start with http:// or https://")
-        return
-
-    # Launch headless browser
-    browser = await launch()
-    page = await browser.newPage()
-
-    # Navigate to URL
-    await page.goto(url)
-
-    # Take screenshot
-    screenshot_path = "screenshot.png"
-    await page.screenshot({'path': screenshot_path})
-
-    # Send the screenshot
-    await ctx.send(file=discord.File(screenshot_path))
-
-    # Close the browser
-    await browser.close()
+    if not validators.url(url): 
+      return await ctx.send_warning("Invalid url")
+    
+    async with ctx.typing():
+     browser = await launch()
+     page = await browser.newPage()
+     await page.goto(url)
+     screenshot = await page.screenshot()
+     await browser.close()
+     file = discord.File(BytesIO(screenshot), filename="screenshot.png")
+     return await ctx.send(file=file)
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
