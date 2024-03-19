@@ -1,5 +1,6 @@
 import uwuify
 import discord 
+import datetime
 
 from tools.bot import Pretend 
 from tools.helpers import PretendContext
@@ -71,10 +72,11 @@ async def trial_check(ctx: PretendContext):
   check = await ctx.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", ctx.guild.id)
   res = await ctx.bot.db.fetchrow("SELECT * FROM trials WHERE guild_id = $1", ctx.guild.id)
 
-  if ctx.guild.member_count < 5000 and not check and not res:
-    await ctx.send_warning(f"Please interact with the trial options")
-    return False
-  return True
+  if int(ctx.guild.me.joined_at.timestamp()) < 1710875231:
+    if ctx.guild.member_count < 5000 and not check and not res:
+      await ctx.send_warning(f"Please interact with the trial options")
+      return False
+    return True
 
 @bot.tree.context_menu(name='avatar')
 async def avatar_user(interaction: discord.Interaction, member: discord.Member):
