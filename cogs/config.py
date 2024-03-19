@@ -1021,7 +1021,7 @@ class Config(Cog):
       return await ctx.send_error("The image provided is not an url")
     
     icon = await self.bot.getbyte(url)
-    _icon = await icon.read()
+    _icon = icon.read()
 
     await ctx.guild.edit(icon=_icon)
     await ctx.send_success(f"Set the server icon to [`Attachment`]({url})")
