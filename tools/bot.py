@@ -28,7 +28,7 @@ from .persistent.giveaway import GiveawayView
 from .helpers import PretendContext, identify, PretendHelp, guild_perms, CustomInteraction, AntinukeMeasures, Cache
 
 from .misc.session import Session
-from .misc.tasks import pomelo_task, snipe_delete, shit_loop, bump_remind, check_monthly_guilds, gw_loop, reminder_task, counter_update, trial_checker
+from .misc.tasks import pomelo_task, snipe_delete, shit_loop, bump_remind, check_monthly_guilds, gw_loop, reminder_task, counter_update
 
 from .handlers.embedbuilder import EmbedScript
 from .exceptions import RenameRateLimit, LastFmException, WrongMessageLink
@@ -232,7 +232,6 @@ class Pretend(commands.AutoShardedBot):
    check_monthly_guilds.start(self)
    reminder_task.start(self)
    counter_update.start(self)
-   trial_checker.start(self)
   
   def url_encode(self, url: str):
    """
