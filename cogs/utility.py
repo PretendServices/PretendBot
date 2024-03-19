@@ -10,7 +10,7 @@ import validators
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
-from pyppeteer import launch
+from playwright.sync_api import sync_playwright
 from io import BytesIO
 from typing import Union, Optional, Any
 from selenium import webdriver
@@ -502,22 +502,27 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(self, ctx: PretendContext, url: str):
-    """
-    Get a screenshot of a website
-    """
+  async def screenshot(ctx, url: str):
+    # Launch Playwright
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
 
-    if not validators.url(url): 
-      return await ctx.send_warning("Invalid url")
-    
-    async with ctx.typing():
-     browser = await launch()
-     page = await browser.newPage()
-     await page.goto(url)
-     screenshot = await page.screenshot()
-     file = discord.File(BytesIO(screenshot), filename="screenshot.png")
-    await browser.close()
-    return await ctx.send(file=file)
+        # Navigate to the specified URL
+        await ctx.send(f"Taking screenshot of {url}...")
+        await page.goto(url)
+
+        # Capture screenshot
+        screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
+        await page.screenshot(path=screenshot_file)
+
+        # Send the screenshot back to Discord
+        with open(screenshot_file, "rb") as file:
+            screenshot = discord.File(file)
+            await ctx.send(file=screenshot)
+
+        # Close Playwright browser
+        await browser.close()
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
