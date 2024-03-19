@@ -103,21 +103,21 @@ class Auth(commands.Cog):
           
             return await guild.leave() 
           else:
-          embed = discord.Embed(
-            description=f"Looks like you haven't used pretend before."
-            + "\npretend is a **paid bot**, but we offer a free trial!\n\n"
-            + "If you claim this trial, you will have the bot for **24 hours**."
-            + "\nOnce that time is up, the bot will leave. Use the buttons below to decide."
-          ).set_author(
-            name="pretend",
-            icon_url=self.bot.user.avatar.url
-          ).set_footer(
-            text="This prompt will expire in 2 minutes."
-          )
+            embed = discord.Embed(
+              description=f"Looks like you haven't used pretend before."
+              + "\npretend is a **paid bot**, but we offer a free trial!\n\n"
+              + "If you claim this trial, you will have the bot for **24 hours**."
+              + "\nOnce that time is up, the bot will leave. Use the buttons below to decide."
+            ).set_author(
+              name="pretend",
+              icon_url=self.bot.user.avatar.url
+            ).set_footer(
+              text="This prompt will expire in 2 minutes."
+            )
 
-          view = TrialView()
-          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-              await channels[0].send(embed=embed, view=view)
+            view = TrialView()
+            if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+                await channels[0].send(embed=embed, view=view)
    except Exception as e:
     await self.bot.get_channel(1218519366610456629).send(e)
 
