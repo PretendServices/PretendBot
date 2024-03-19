@@ -77,6 +77,7 @@ async def trial_check(ctx: PretendContext):
       await ctx.send_warning(f"Please interact with the trial options")
       return False
     return True
+  return True
 
 @bot.tree.context_menu(name='avatar')
 async def avatar_user(interaction: discord.Interaction, member: discord.Member):
