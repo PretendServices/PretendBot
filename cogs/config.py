@@ -1,4 +1,5 @@
 import json
+import re
 
 from discord import ( 
   Embed, 
@@ -963,6 +964,67 @@ class Config(Cog):
         "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
       }
     )
+
+  @group(
+    name="set",
+    brief="manage server",
+    invoke_without_command=True
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def set(self, ctx: PretendContext):
+    """
+    Modify your server with pretend
+    """
+
+    await ctx.create_pages()
+
+  @set.command(
+    name="name",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def set_name(self, ctx: PretendContext, *, name: str):
+    """
+    Change your server's name
+    """
+
+    if len(name) > 200:
+      return await ctx.send_warning(f"Server names can't be over **200 characters**")
+    
+    _name = ctx.guild.name
+    await ctx.guild.edit(name=name)
+    await ctx.send_success(f"Changed **{_name}**'s name")
+
+  @set.command(
+    name="icon",
+    aliases=[
+      "picture",
+      "pic"
+    ],
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def set_icon(self, ctx: PretendContext, url: str = None):
+    """
+    Change your server's icon
+    """
+
+    if not url:
+      url = await ctx.get_attachment()
+      if not url:
+        return await ctx.send_help(ctx.command)
+      
+      url = url.url
+
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  
+    if not re.findall(regex, url):
+      return await ctx.send_error("The image provided is not an url")
+    
+    icon = await self.bot.getbyte(url)
+    _icon = await icon.read()
+
+    await ctx.guild.edit(icon=_icon)
+    await ctx.send_success(f"Set the server icon to [`Attachment`]({url})")
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))
