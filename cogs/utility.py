@@ -8,6 +8,7 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
+import nsfw_model
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
@@ -37,8 +38,7 @@ from tools.handlers.socials.weather import WeatherLocation
 
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
-
-
+nsfw_detector = nsfw_model.load_model()
 class Utility(commands.Cog):
   def __init__(self, bot: Pretend): 
     self.bot = bot 
@@ -504,10 +504,12 @@ class Utility(commands.Cog):
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
   async def screenshot(self, ctx, url: str):
+    # Check if the URL is valid
+    if not validators.url(url):
+        await ctx.send("Invalid URL provided.")
+        return
+
     async with async_playwright() as p:
-        if not validators.url(url):
-         await ctx.send("Invalid URL provided.")
-         return
         browser = await p.chromium.launch()
         page = await browser.new_page()
 
@@ -519,6 +521,16 @@ class Utility(commands.Cog):
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
 
+        # Classify the screenshot
+        nsfw_score = nsfw_detector.get_score(screenshot_file)
+
+        # Check if the image is NSFW
+        if nsfw_score >= 0.5:  # You can adjust this threshold as needed
+            await ctx.send("The screenshot contains NSFW content. I cannot share it.")
+            os.remove(screenshot_file)  # Remove the screenshot file
+            await browser.close()
+            return
+
         # Send the screenshot back to Discord
         with open(screenshot_file, "rb") as file:
             screenshot = discord.File(file)
@@ -528,7 +540,6 @@ class Utility(commands.Cog):
         await browser.close()
 
         # Remove the screenshot file
-        await asyncio.sleep(5)  # Wait for a few seconds to ensure the file is not being used
         os.remove(screenshot_file)
 
   @commands.command(aliases=['es'])
