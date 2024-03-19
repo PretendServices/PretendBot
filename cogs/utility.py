@@ -7,10 +7,11 @@ import humanize
 import humanfriendly
 import dateutil.parser
 import validators
+import os
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 from io import BytesIO
 from typing import Union, Optional, Any
 from selenium import webdriver
@@ -503,10 +504,9 @@ class Utility(commands.Cog):
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
   async def screenshot(ctx, url: str):
-    # Launch Playwright
-    with sync_playwright() as p:
-        browser = p.chromium.launch()
-        page = browser.new_page()
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
 
         # Navigate to the specified URL
         await ctx.send(f"Taking screenshot of {url}...")
@@ -523,6 +523,11 @@ class Utility(commands.Cog):
 
         # Close Playwright browser
         await browser.close()
+
+        # Remove the screenshot file
+        await asyncio.sleep(5)  # Wait for a few seconds to ensure the file is not being used
+        os.remove(screenshot_file)
+
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
