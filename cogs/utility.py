@@ -515,9 +515,9 @@ class Utility(commands.Cog):
      page = await browser.newPage()
      await page.goto(url)
      screenshot = await page.screenshot()
-     await browser.close()
      file = discord.File(BytesIO(screenshot), filename="screenshot.png")
-     return await ctx.send(file=file)
+    await browser.close()
+    return await ctx.send(file=file)
   @commands.command(aliases=['es'])
   async def editsnipe(self, ctx: PretendContext, index: int=1):
     """
