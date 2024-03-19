@@ -503,7 +503,7 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(ctx, url: str):
+  async def screenshot(self, ctx, url: str):
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
