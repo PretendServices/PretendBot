@@ -16,9 +16,11 @@ async def disabled_command(ctx: PretendContext):
    """,
    ctx.guild.id,
    str(ctx.command)
-  ): 
-    await ctx.send_error(f"The command **{str(ctx.command)}** is **disabled** in this server")   
-    return False 
+  ):
+    if not ctx.author.guild_permissions.administrator:
+      await ctx.send_error(f"The command **{str(ctx.command)}** is **disabled** in this server")   
+      return False
+    return True
 
   global_disabled = await ctx.bot.db.fetchrow(
    """
