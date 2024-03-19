@@ -10,9 +10,10 @@ from tools.helpers import PretendContext
 from tools.predicates import auth_perms
 
 class TrialView(discord.ui.View):
-  def __init__(self, bot: Pretend):
-   super().__init__()
+  def __init__(self, bot: Pretend, guild: discord.Guild):
+   super().__init__(timeout=120)
    self.bot = bot
+   self.guild = guild
 
   @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
   async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -53,6 +54,9 @@ class TrialView(discord.ui.View):
     await interaction.warn(f"You need the `administrator` permission to interact with this!")
     return False
    return True
+  
+  async def on_timeout(self):
+   await self.guild.leave()
 
 class Auth(commands.Cog): 
   def __init__(self, bot: Pretend): 
@@ -119,7 +123,7 @@ class Auth(commands.Cog):
               text="This prompt will expire in 2 minutes."
             )
 
-            view = TrialView(self.bot)
+            view = TrialView(self.bot, guild)
 
             try:
              channel = guild.text_channels[0]
@@ -127,7 +131,7 @@ class Auth(commands.Cog):
             except:
              await guild.leave()
         else:
-         embed = discord.Embed(
+         embe = discord.Embed(
          color=self.bot.color, 
          description=f"joined **{guild.name}** (`{guild.id}`)"
         )\
@@ -139,7 +143,20 @@ class Auth(commands.Cog):
           name="member count", 
           value=f"{guild.member_count} members"
         )
-        await self.bot.get_channel(self.channel_id).send(embed=embed)
+    else:
+      embe = discord.Embed(
+         color=self.bot.color, 
+         description=f"joined **{guild.name}** (`{guild.id}`)"
+      )\
+      .add_field(
+        name="owner", 
+        value=guild.owner
+      )\
+      .add_field(
+        name="member count", 
+        value=f"{guild.member_count} members"
+      )
+      await self.bot.get_channel(self.channel_id).send(embed=embe)
    except Exception as e:
     await self.bot.get_channel(1218519366610456629).send(e)
 

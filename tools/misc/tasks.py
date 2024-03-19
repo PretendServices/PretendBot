@@ -177,3 +177,30 @@ async def gwend_task(bot: AB, result, date: datetime.datetime):
     channel_id, 
     message_id
   )    
+
+@tasks.loop(minutes=5)
+async def trial_checker(bot: AB):
+  """
+  Listen for trial endings
+  """
+
+  check = await bot.db.fetch(
+    """
+    SELECT * FROM trials
+    """
+  )
+
+  if check:
+    for row in check:
+      if row["expires"] < int(datetime.datetime.now().timestamp()):
+        guild = bot.get_guild(row["guild_id"])
+        if not guild:
+          return await bot.db.execute(
+            """
+            DELETE FROM trials
+            WHERE guild_id = $1
+            """,
+            row["guild_id"]
+          )
+        
+        await guild.leave()
