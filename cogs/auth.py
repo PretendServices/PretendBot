@@ -119,8 +119,11 @@ class Auth(commands.Cog):
             )
 
             view = TrialView(self.bot)
-            if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-                await channels[0].send(embed=embed, view=view)
+            try:
+             channel = guild.text_channels[0]
+             await channel.send(embed=embed, view=view)
+            except:
+             await guild.leave()
    except Exception as e:
     await self.bot.get_channel(1218519366610456629).send(e)
 
