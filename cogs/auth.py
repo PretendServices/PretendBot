@@ -4,12 +4,15 @@ import datetime
 from discord.ext import commands
 
 from typing import Union 
+
+from tools.bot import Pretend
 from tools.helpers import PretendContext 
 from tools.predicates import auth_perms
 
 class TrialView(discord.ui.View):
-  def __init__(self):
+  def __init__(self, bot: Pretend):
    super().__init__()
+   self.bot = bot
 
   @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
   async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -52,7 +55,7 @@ class TrialView(discord.ui.View):
    return True
 
 class Auth(commands.Cog): 
-  def __init__(self, bot: commands.AutoShardedBot): 
+  def __init__(self, bot: Pretend): 
     self.bot = bot 
     self.channel_id = 1183429820105900093
   
@@ -92,11 +95,11 @@ class Auth(commands.Cog):
         check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
         if not check:
           if await self.bot.db.fetchrow(
-          """
-          SELECT * FROM trials
-          WHERE guild_id = $1
-          """,
-          guild.id
+            """
+            SELECT * FROM trials
+            WHERE guild_id = $1
+            """,
+            guild.id
           ):
             if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
               await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
@@ -115,7 +118,7 @@ class Auth(commands.Cog):
               text="This prompt will expire in 2 minutes."
             )
 
-            view = TrialView()
+            view = TrialView(self.bot)
             if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
                 await channels[0].send(embed=embed, view=view)
    except Exception as e:
