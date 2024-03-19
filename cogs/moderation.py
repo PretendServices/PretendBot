@@ -1236,6 +1236,104 @@ class Moderation(Cog):
    
    await ctx.send_success(f"Changed {channel.mention}'s topic to `{topic}`")
 
+  @group(
+    name="category",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def category(self, ctx: PretendContext):
+   """
+   Manage categories in your server
+   """
+
+   await ctx.create_pages()
+
+  @category.command(
+    name="create",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def category_create(self, ctx: PretendContext, *, name: str):
+   """
+   Create a category in your server
+   """
+
+   category = await ctx.guild.create_category(
+    name=name
+   )
+
+   await ctx.send_success(f"Created category {category.mention}")
+
+  @category.command(
+    name="delete",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def category_delete(self, ctx: PretendContext, *, category: CategoryChannel):
+   """
+   Delete a category in your server
+   """
+
+   async def yes_func(interaction: Interaction):
+    await category.delete(reason=f"Deleted by {ctx.author} {ctx.author.id}")
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{self.bot.yes} {interaction.user.mention}: Deleted category `#{category.name}`",
+      color=self.bot.yes_color
+     )
+    )
+
+   async def no_func(interaction: Interaction):
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{interaction.user.mention}: Cancelling action...",
+      color=self.bot.color
+     )
+    )
+
+   await ctx.confirmation_send(
+    f"Are you sure you want to **delete** the category `#{category.name}`?",
+    yes_func,
+    no_func
+  )
+   
+  @category.command(
+    name="rename",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def category_rename(self, ctx: PretendContext, category: CategoryChannel, *, name: str):
+   """
+   Rename a category in your server
+   """
+
+   _name = category.name
+   await category.edit(
+    name=name,
+    reason=f"Edited by {ctx.author} ({ctx.author.id})"
+   )
+   await ctx.send_success(f"Renamed **{_name}** to `{name}`")
+
+  @category.command(
+    name="duplicate",
+    aliases=[
+     "clone",
+     "remake"
+    ]
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def category_duplicate(self, ctx: PretendContext, *, category: CategoryChannel):
+   """
+   Clone an already existing category in your server
+   """
+
+   _category = await category.clone(
+    name=category.name,
+    reason=f"Cloned by {ctx.author} ({ctx.author.id})"
+   )
+
+   await ctx.send_success(f"Cloned {category.mention} to {_category.mention}")
+
   @command(
    name="pin",
    brief="manage messages"

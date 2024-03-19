@@ -1020,11 +1020,46 @@ class Config(Cog):
     if not re.findall(regex, url):
       return await ctx.send_error("The image provided is not an url")
     
+    if not url.endswith(("png", "jpeg", "jpg", "gif")):
+      return await ctx.send_warning(f"Invalid **media type**")
+    
     icon = await self.bot.getbyte(url)
     _icon = icon.read()
 
     await ctx.guild.edit(icon=_icon)
     await ctx.send_success(f"Set the server icon to [`Attachment`]({url})")
+
+  @set.command(
+    name="banner",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def set_banner(self, ctx: PretendContext, url: str = None):
+    """
+    Change your server's banner
+    """
+
+    if ctx.guild.premium_tier < 2:
+      return await ctx.send_warning(f"You haven't **unlocked** banners")
+
+    if not url:
+      url = await ctx.get_attachment()
+      if not url:
+        return await ctx.send_help(ctx.command)
+      
+      url = url.url
+
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  
+    if not re.findall(regex, url):
+      return await ctx.send_error("The image provided is not an url")
+    
+    if not url.endswith(("png", "jpeg", "jpg", "gif")):
+      return await ctx.send_warning(f"Invalid **media type**")
+    
+    banner = await self.bot.getbyte(url)
+    _banner = banner.read()
+
+    await ctx.guild.edit(banner=_banner)
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))

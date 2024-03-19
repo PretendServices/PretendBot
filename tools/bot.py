@@ -366,7 +366,7 @@ class Pretend(commands.AutoShardedBot):
         return await ctx.send_warning(f"API returned `{error.status}`, try again later")
       
     elif isinstance(error, commands.CommandOnCooldown):
-      return await ctx.pretend_send(f"Wait `{error.retry_after:.2f}` seconds before using **{ctx.command.qualified_name}** again")
+      return await ctx.pretend_send(f"Wait **{error.retry_after:.2f} seconds** before using **{ctx.command.qualified_name}** again")
       
     else:
       code = "".join(
