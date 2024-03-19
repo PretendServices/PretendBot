@@ -110,7 +110,8 @@ class Auth(commands.Cog):
               description=f"Looks like you haven't used pretend before."
               + "\npretend is a **paid bot**, but we offer a free trial!\n\n"
               + "If you claim this trial, you will have the bot for **24 hours**."
-              + "\nOnce that time is up, the bot will leave. Use the buttons below to decide."
+              + "\nOnce that time is up, the bot will leave. Use the buttons below to decide.",
+              color=self.bot.color
             ).set_author(
               name="pretend",
               icon_url=self.bot.user.avatar.url
