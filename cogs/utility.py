@@ -502,7 +502,7 @@ class Utility(commands.Cog):
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(ctx, url):
+  async def screenshot(self, ctx, url):
     # Ensure URL is provided
     if not url:
         await ctx.send("Please provide a URL.")
