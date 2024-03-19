@@ -125,11 +125,11 @@ class Auth(commands.Cog):
 
             view = TrialView(self.bot, guild)
 
-            try:
-             channel = guild.text_channels[0]
-             await channel.send(embed=embed, view=view)
-            except:
+            channel = guild.text_channels[0]
+            if not channel:
              await guild.leave()
+            else:
+             channel.send(embed=embed,view=view)
         else:
          embe = discord.Embed(
          color=self.bot.color, 
@@ -144,18 +144,6 @@ class Auth(commands.Cog):
           value=f"{guild.member_count} members"
         )
     else:
-      embe = discord.Embed(
-         color=self.bot.color, 
-         description=f"joined **{guild.name}** (`{guild.id}`)"
-      )\
-      .add_field(
-        name="owner", 
-        value=guild.owner
-      )\
-      .add_field(
-        name="member count", 
-        value=f"{guild.member_count} members"
-      )
       await self.bot.get_channel(self.channel_id).send(embed=embe)
    except Exception as e:
     await self.bot.get_channel(1218519366610456629).send(e)
