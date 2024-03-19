@@ -203,4 +203,11 @@ async def trial_checker(bot: AB):
             row["guild_id"]
           )
         
-        await guild.leave()
+        if not await bot.db.execute(
+          """
+          SELECT * FROM authorize
+          WHERE guild_id = $1
+          """,
+          guild.id
+        ):
+          await guild.leave()
