@@ -8,6 +8,9 @@ from tools.helpers import PretendContext
 from tools.predicates import auth_perms
 
 class TrialView(discord.ui.View):
+  def __init__(self):
+   super().__init__()
+
   @discord.ui.button(label="Approve", style=discord.ButtonStyle.green)
   async def approve(self, interaction: discord.Interaction, button: discord.ui.Button):
     day = datetime.timedelta(days=1)
@@ -82,7 +85,7 @@ class Auth(commands.Cog):
       )
       await self.bot.get_channel(self.channel_id).send(embed=embed)
 
-  #@commands.Cog.listener()
+  @commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild): 
    if guild.member_count < 5000:
       check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
@@ -115,7 +118,7 @@ class Auth(commands.Cog):
          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
             await channels[0].send(embed=embed, view=view)
 
-  @commands.Cog.listener()
+  #@commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild):
    if guild.member_count < 5000:
     check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
