@@ -524,6 +524,7 @@ class Utility(commands.Cog):
         await page.screenshot(path=screenshot_file)
         detections = nude_detector.detect(screenshot_file)
         for prediction in detections:
+          ctx.send(prediction["class"])
           if prediction["class"] == "FEMALE_BREAST_EXPOSED" or prediction["class"] == "ANUS_EXPOSED" or prediction["class"] == "FEMALE_GENITALIA_EXPOSED" or prediction["class"] == "MALE_GENITALIA_EXPOSED":
             await ctx.send_error("This website contains explicit content. I cannot send the screenshot.")
             return
