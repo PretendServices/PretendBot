@@ -522,7 +522,7 @@ class Utility(commands.Cog):
         # Capture screenshot
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
-        detections = await nude_detector.detect(screenshot_file)
+        detections = nude_detector.detect(screenshot_file)
         ctx.reply(detections)
         print(detections)
         for prediction in detections:
