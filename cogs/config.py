@@ -1020,13 +1020,13 @@ class Config(Cog):
     if not re.findall(regex, url):
       return await ctx.send_error("The image provided is not an url")
     
-    if not url.endswith(("png", "jpeg", "jpg", "gif")):
-      return await ctx.send_warning(f"Invalid **media type**")
-    
     icon = await self.bot.getbyte(url)
     _icon = icon.read()
 
-    await ctx.guild.edit(icon=_icon)
+    try:
+      await ctx.guild.edit(icon=_icon)
+    except ValueError:
+      return await ctx.send_warning(f"Invalid **media type**")
     await ctx.send_success(f"Set the server icon to [`Attachment`]({url})")
 
   @set.command(
