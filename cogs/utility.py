@@ -523,7 +523,7 @@ class Utility(commands.Cog):
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
         detections = nude_detector.detect(screenshot_file)
-        ctx.reply(detections)
+        await ctx.reply(detections)
         print(detections)
         for prediction in detections:
           if prediction["class"] == "FEMALE_BREAST_EXPOSED" or prediction["class"] == "ANUS_EXPOSED" or prediction["class"] == "FEMALE_GENITALIA_EXPOSED" or prediction["class"] == "MALE_GENITALIA_EXPOSED":
