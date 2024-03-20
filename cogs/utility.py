@@ -504,6 +504,9 @@ class Utility(commands.Cog):
   @commands.command(aliases=['ss', 'screenie'])
   async def screenshot(self, ctx: PretendContext, url: str):
     # Check if the URL is valid
+    if not url.startswith(("https://", "http://")):
+      url = f"https://{url}"
+
     if not validators.url(url):
       return await ctx.send_error("That is not a **URL**")
 
