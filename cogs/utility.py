@@ -8,7 +8,6 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
-import nsfw_model
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
