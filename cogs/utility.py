@@ -520,7 +520,9 @@ class Utility(commands.Cog):
         await page.goto(url)
 
         # Capture screenshot
+        
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
+        await page.screenshot(path=screenshot_file)
         # Check if the page contains explicit keywords
         keywords = ["porn", "hentai", "pussy", "tits"]
         page_content = await page.content()
