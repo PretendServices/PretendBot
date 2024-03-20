@@ -521,15 +521,10 @@ class Utility(commands.Cog):
 
         # Capture screenshot
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
-        await page.screenshot(path=screenshot_file)
-        detections = nude_detector.detect(screenshot_file)
-        await ctx.reply(detections)
-        print(detections)
-        for prediction in detections:
-          await ctx.reply(".")
-
-          if prediction["class"] == "FEMALE_BREAST_EXPOSED" or prediction["class"] == "ANUS_EXPOSED" or prediction["class"] == "FEMALE_GENITALIA_EXPOSED" or prediction["class"] == "MALE_GENITALIA_EXPOSED" or prediction["class"] == "BUTTOCKS_EXPOSED":
-
+        # Check if the page contains explicit keywords
+        keywords = ["porn", "hentai", "pussy", "tits"]
+        page_content = await page.content()
+        if any(keyword in page_content for keyword in keywords):
             await ctx.send_error("This website contains explicit content. I cannot send the screenshot.")
             return
         # Send the screenshot back to Discord
