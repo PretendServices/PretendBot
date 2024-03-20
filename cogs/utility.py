@@ -521,15 +521,6 @@ class Utility(commands.Cog):
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
 
-        # Classify the screenshot
-        nsfw_score = nsfw_detector.get_score(screenshot_file)
-
-        # Check if the image is NSFW
-        if nsfw_score >= 0.5:  # You can adjust this threshold as needed
-            await ctx.send("The screenshot contains NSFW content. I cannot share it.")
-            os.remove(screenshot_file)  # Remove the screenshot file
-            await browser.close()
-            return
 
         # Send the screenshot back to Discord
         with open(screenshot_file, "rb") as file:
