@@ -37,7 +37,6 @@ from tools.handlers.socials.weather import WeatherLocation
 
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
-nsfw_detector = nsfw_model.load_model()
 class Utility(commands.Cog):
   def __init__(self, bot: Pretend): 
     self.bot = bot 
