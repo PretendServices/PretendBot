@@ -526,8 +526,10 @@ class Utility(commands.Cog):
         await ctx.reply(detections)
         print(detections)
         for prediction in detections:
-          await ctx.reply(prediction)
+          await ctx.reply(".")
+
           if prediction["class"] == "FEMALE_BREAST_EXPOSED" or prediction["class"] == "ANUS_EXPOSED" or prediction["class"] == "FEMALE_GENITALIA_EXPOSED" or prediction["class"] == "MALE_GENITALIA_EXPOSED" or prediction["class"] == "BUTTOCKS_EXPOSED":
+
             await ctx.send_error("This website contains explicit content. I cannot send the screenshot.")
             return
         # Send the screenshot back to Discord
