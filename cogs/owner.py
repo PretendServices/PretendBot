@@ -5,6 +5,8 @@ import asyncio
 import datetime
 import discord
 import json
+import importlib
+
 from discord import User, Member, Guild
 from discord.ext.commands import Cog, command, is_owner, group
 from discord.ext import tasks
@@ -323,6 +325,44 @@ class Owner(Cog):
     except: 
       await self.bot.db.execute("DELETE FROM blacklist WHERE id = $1", server_id)
       return await ctx.send_success(f"Unblacklisted server {server_id} from pretend")
+    
+  @command(
+    name="reload",
+    aliases=["rl"]
+  )
+  @is_owner()
+  async def reload(self, ctx: PretendContext, *, module: str):
+    """
+    Reload a module
+    """
+
+    reloaded = []
+
+    if module == "~":
+      for module in list(self.bot.extensions):
+        try:
+          await self.bot.reload_extension(module)
+        except Exception as e:
+          return await ctx.send_warning(f"Couldn't reload **{module}**\n```{e}```")
+        reloaded.append(module)
+
+        return await ctx.send_success(f"Reloaded **{len(reloaded)}** modules") 
+    else:
+        module = module.replace("%", "cogs").replace("!", "tools").strip()
+        if module.startswith("cogs"):
+          try:
+            await self.bot.reload_extension(module)
+          except Exception as e:
+            return await ctx.send_warning(f"Couldn't reload **{module}**\n```{e}```")
+        else:
+          try:
+            _module = importlib.import_module(module)
+            importlib.reload(_module)
+          except Exception as e:
+            return await ctx.send_warning(f"Couldn't reload **{module}**\n```{e}```")
+        reloaded.append(module)
+
+    await ctx.send_success(f"Reloaded **{reloaded[0]}**" if len(reloaded) == 1 else f"Reloaded **{len(reloaded)}** modules")
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Owner(bot))     
