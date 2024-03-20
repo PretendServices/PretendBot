@@ -690,7 +690,7 @@ class Utility(commands.Cog):
         value=f">>> **Icon:** {f'[**here**]({ctx.guild.icon})' if ctx.guild.icon else 'N/A'}\n**Banner:**  {f'[**here**]({ctx.guild.banner})' if ctx.guild.banner else 'N/A'}\n**Splash:**  {f'[**here**]({ctx.guild.splash})' if ctx.guild.splash else 'N/A'}"
       )\
       .set_footer(
-        text=f"ID {ctx.guild.id}"
+        text=f"Guild ID: {ctx.guild.id} • Shard: {ctx.guild.shard_id}/{len(self.bot.shards)}"
       )
     
     await ctx.send(embed=embed)
