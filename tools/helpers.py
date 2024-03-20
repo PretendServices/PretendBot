@@ -347,12 +347,6 @@ class PretendHelp(Help):
    await self.context.send(f"{self.context.author.mention} check <https://pretend.best/commands> for the list of all commands")
  
  async def send_group_help(self, group: Group):
-   if (
-     group.cog_name.lower() in ("auth", "owner", "jishaku")
-     or group.hidden
-   ):
-     return await self.context.send(f'No command called "{group}" found.')
-
    embeds = []
    bot = self.context.bot
    i=0
@@ -363,12 +357,6 @@ class PretendHelp(Help):
    await self.context.paginator(embeds)
 
  async def send_command_help(self, command: Command):
-  if (
-     command.cog_name.lower() in ("auth", "owner", "jishaku")
-     or command.hidden
-   ):
-     return await self.context.send(f'No command called "{command}" found.')
-
   embed = Embed(color=self.context.bot.color, title=f"Command: {command.qualified_name}", description=command.help.capitalize()) 
   embed.set_author(name=self.context.bot.user.name, icon_url=self.context.bot.user.display_avatar.url)
   embed.add_field(name="category", value=command.cog_name.lower())
