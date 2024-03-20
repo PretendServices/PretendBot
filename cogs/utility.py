@@ -8,6 +8,7 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
+from nsfw_detector import predict
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
@@ -34,7 +35,7 @@ from tools.handlers.socials.roblox import RobloxUser
 from tools.handlers.socials.tiktok import TikTokUser
 from tools.handlers.socials.cashapp import CashappUser
 from tools.handlers.socials.weather import WeatherLocation
-
+model = predict.load_model('./nsfw_mobilenet2.224x224.h5')
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
 class Utility(commands.Cog):
@@ -521,7 +522,11 @@ class Utility(commands.Cog):
         # Capture screenshot
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
-
+        prediction = predict.predict(model, screenshot_file)
+        if prediction.porn > 0.5:
+          return await ctx.send_error("This website contains **NSFW** content")
+        if prediction.hentai > 0.5:
+          return await ctx.send_error("This website contains **NSFW** content")
         # Send the screenshot back to Discord
         with open(screenshot_file, "rb") as file:
             screenshot = discord.File(file)
