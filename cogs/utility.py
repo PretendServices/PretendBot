@@ -500,25 +500,24 @@ class Utility(commands.Cog):
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}** [**here**]({message.jump_url})")
     except: 
       return await ctx.pretend_send(f"**{result['user']}** reacted with {result['reaction']} **{self.bot.humanize_date(datetime.datetime.fromtimestamp(int(result['created_at'])))}**")
+    
   @commands.command(aliases=['ss', 'screenie'])
-  async def screenshot(self, ctx, url: str):
+  async def screenshot(self, ctx: PretendContext, url: str):
     # Check if the URL is valid
     if not validators.url(url):
-        await ctx.send("Invalid URL provided.")
-        return
+      return await ctx.send_error("That is not a **URL**")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
         page = await browser.new_page()
 
         # Navigate to the specified URL
-        await ctx.send(f"Taking screenshot of {url}...")
+        await ctx.channel.typing()
         await page.goto(url)
 
         # Capture screenshot
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
-
 
         # Send the screenshot back to Discord
         with open(screenshot_file, "rb") as file:
