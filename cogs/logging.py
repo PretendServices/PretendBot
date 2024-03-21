@@ -56,6 +56,9 @@ class Logging(commands.Cog):
                     check["messages"]
                 )
             
+            if before.embeds:
+                return
+
             embed = discord.Embed(
                 title="Message Edited",
                 description=before.content,
