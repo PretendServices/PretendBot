@@ -49,7 +49,7 @@ class Utility(commands.Cog):
     self.description = "Utility commands"
     self.tiktok = TikTokApi(debug=True)
     self.afk_cd = commands.CooldownMapping.from_cooldown(3, 3, commands.BucketType.channel)
-  async def upload_image(image_url, type):
+  async def upload_image(self, image_url, type):
     url = "https://pileshare.com/api/files/upload"
 
     try:
