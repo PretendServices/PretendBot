@@ -8,6 +8,9 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
+import aiohttp
+import secrets
+import json
 from nudenet import NudeDetector
 nude_detector = NudeDetector()
 from discord.ext import commands
@@ -46,7 +49,28 @@ class Utility(commands.Cog):
     self.description = "Utility commands"
     self.tiktok = TikTokApi(debug=True)
     self.afk_cd = commands.CooldownMapping.from_cooldown(3, 3, commands.BucketType.channel)
-  
+  async def upload_image(self, image: str) -> str:
+    """
+    Upload an image to PileShare
+    """
+    url = "https://pileshare.com/api/files/upload"
+    payload = aiohttp.FormData()
+    payload.add_field('file', open(image, 'rb'))
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, data=payload) as response:
+                if response.status != 200:
+                    return f"Something went wrong uploading your file. Status: {response.status}"
+
+                json_data = await response.json()
+                redirect_url = json_data['data']['redirect_url']
+                randomid = secrets.token_hex(10)
+                await self.bot.db.execute("INSERT INTO images VALUES ($1, $2)", randomid, redirect_url)
+                return f"https://api.pretend.best/images/{randomid}"
+    except aiohttp.ClientError as e:
+        return f"Something went wrong uploading your file. Error: {e}"
+
   def human_format(self, number: int) -> str:
     """
     Humanize a number, if the case
@@ -167,6 +191,16 @@ class Utility(commands.Cog):
   @commands.Cog.listener()
   async def on_user_update(self, before: discord.User, after: discord.User): 
     if (before.avatar != after.avatar) or (before.banner != after.banner):
+     if before.avatar != after.avatar:
+       await self.upload_image(before.display_avatar.url)
+       check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", before.id)
+       if not check:
+          await self.bot.db.execute("INSERT INTO avatar_history VALUES ($1, $2, $3)", before.id, after.name, f"[{before.display_avatar.url}]")
+       else:
+          new = json.loads(check['avatars']).append(before.display_avatar.url)
+          await self.bot.db.execute("UPDATE avatar_history SET avatars = $1 WHERE user_id = $2", json.dumps(new), before.id)
+        
+          
      cache = self.bot.cache.get(f"profile-{before.id}")
      if cache: 
       await self.cache_profile(after)
