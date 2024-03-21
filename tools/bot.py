@@ -81,7 +81,6 @@ class Pretend(commands.AutoShardedBot):
     intents=intents,
     help_command=PretendHelp(),
     owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
-    avqueue = [],
     case_insensitive=True, 
     shard_count=3,
     shard_ids=[0,1,2],
@@ -102,6 +101,7 @@ class Pretend(commands.AutoShardedBot):
    )
 
    self.db = db
+   self.avqueue = []
    self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
    self.color = 0xC294CA
    self.warning = "<:warn:1189134620718018600>"  
