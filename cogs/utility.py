@@ -8,6 +8,9 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
+import aiohttp
+import secrets
+import json
 from nudenet import NudeDetector
 nude_detector = NudeDetector()
 from discord.ext import commands
@@ -46,7 +49,7 @@ class Utility(commands.Cog):
     self.description = "Utility commands"
     self.tiktok = TikTokApi(debug=True)
     self.afk_cd = commands.CooldownMapping.from_cooldown(3, 3, commands.BucketType.channel)
-  
+
   def human_format(self, number: int) -> str:
     """
     Humanize a number, if the case
@@ -167,6 +170,20 @@ class Utility(commands.Cog):
   @commands.Cog.listener()
   async def on_user_update(self, before: discord.User, after: discord.User): 
     if (before.avatar != after.avatar) or (before.banner != after.banner):
+     if before.avatar != after.avatar:
+       imgtype = 'gif' if before.display_avatar.is_animated() else 'png'
+       self.bot.avqueue.append([before.display_avatar.url, imgtype])
+       """
+       newuri = await self.upload_image(before.display_avatar.url, imgtype)
+       check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", before.id)
+       if not check:
+          await self.bot.db.execute("INSERT INTO avatar_history VALUES ($1, $2, $3)", before.id, after.name, f"[{before.display_avatar.url}]")
+       else:
+          new = check['avatars'].split(',').append(f"[{before.display_avatar.url}]")
+          await self.bot.db.execute("UPDATE avatar_history SET avatars = $1 WHERE user_id = $2", str(new), before.id)
+        """
+        
+          
      cache = self.bot.cache.get(f"profile-{before.id}")
      if cache: 
       await self.cache_profile(after)
