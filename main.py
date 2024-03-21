@@ -38,6 +38,7 @@ async def process_avqueue():
     if len(bot.avqueue) == 0:
       continue
     else:
+      print("Processing avqueue")
       obj = bot.avqueue[0]
       await upload_image(obj[0], obj[1])
       bot.avqueue.pop(0)
@@ -140,4 +141,4 @@ async def banner_user(interaction: discord.Interaction, member: discord.Member):
 
 if __name__ == "__main__":
   bot.run()
-  asyncio.create_task(process_avqueue())
+  asyncio.run(process_avqueue())
