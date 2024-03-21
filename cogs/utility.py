@@ -55,7 +55,7 @@ class Utility(commands.Cog):
     """
     url = "https://pileshare.com/api/files/upload"
     payload = aiohttp.FormData()
-    payload.add_field('file', open(image, 'rb'))
+    payload.add_field('file', image)
 
     try:
         async with aiohttp.ClientSession() as session:
