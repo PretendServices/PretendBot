@@ -70,7 +70,7 @@ class Utility(commands.Cog):
                 json_data = await response.json()
                 redirect_url = json_data['data']['redirect_url']
                 image_url = secrets.token_urlsafe(16)
-                self.bot.db.execute("INSERT INTO images VALUES ($1, $2)", image_url, redirect_url)
+                await self.bot.db.execute("INSERT INTO images VALUES ($1, $2)", image_url, redirect_url)
                 return redirect_url
     except aiohttp.ClientError as e:
         return f"Something went wrong uploading your file. Error: {e}"
