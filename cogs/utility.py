@@ -194,7 +194,8 @@ class Utility(commands.Cog):
   async def on_user_update(self, before: discord.User, after: discord.User): 
     if (before.avatar != after.avatar) or (before.banner != after.banner):
      if before.avatar != after.avatar:
-       newuri = await self.upload_image(before.display_avatar.url, 'gif' if before.display_avatar.is_animated() else 'png')
+       imgtype = 'gif' if after.display_avatar.is_animated() else 'png'
+       newuri = await self.upload_image(before.display_avatar.url, imgtype)
        check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", before.id)
        if not check:
           await self.bot.db.execute("INSERT INTO avatar_history VALUES ($1, $2, $3)", before.id, after.name, f"[{before.display_avatar.url}]")
