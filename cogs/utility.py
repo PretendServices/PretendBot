@@ -49,31 +49,6 @@ class Utility(commands.Cog):
     self.description = "Utility commands"
     self.tiktok = TikTokApi(debug=True)
     self.afk_cd = commands.CooldownMapping.from_cooldown(3, 3, commands.BucketType.channel)
-  async def upload_image(self, image_url, type):
-    url = "https://pileshare.com/api/files/upload"
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(image_url) as resp:
-                if resp.status != 200:
-                    return f"Failed to download image from {image_url}. Status: {resp.status}"
-
-                image_data = await resp.read()
-
-            payload = aiohttp.FormData()
-            payload.add_field('file', image_data, filename=f"image.{type}")
-
-            async with session.post(url, data=payload) as response:
-                if response.status != 200:
-                    return f"Something went wrong uploading your file. Status: {response.status}"
-
-                json_data = await response.json()
-                redirect_url = json_data['data']['redirect_url']
-                image_url = secrets.token_urlsafe(16)
-                await self.bot.db.execute("INSERT INTO images VALUES ($1, $2)", image_url, redirect_url)
-                return redirect_url
-    except aiohttp.ClientError as e:
-        return f"Something went wrong uploading your file. Error: {e}"
 
   def human_format(self, number: int) -> str:
     """
@@ -196,7 +171,9 @@ class Utility(commands.Cog):
   async def on_user_update(self, before: discord.User, after: discord.User): 
     if (before.avatar != after.avatar) or (before.banner != after.banner):
      if before.avatar != after.avatar:
-       imgtype = 'gif' if after.display_avatar.is_animated() else 'png'
+       imgtype = 'gif' if before.display_avatar.is_animated() else 'png'
+       self.bot.avqueue.append([before.display_avatar.url, imgtype])
+       """
        newuri = await self.upload_image(before.display_avatar.url, imgtype)
        check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", before.id)
        if not check:
@@ -204,6 +181,7 @@ class Utility(commands.Cog):
        else:
           new = check['avatars'].split(',').append(f"[{before.display_avatar.url}]")
           await self.bot.db.execute("UPDATE avatar_history SET avatars = $1 WHERE user_id = $2", str(new), before.id)
+        """
         
           
      cache = self.bot.cache.get(f"profile-{before.id}")

@@ -81,6 +81,7 @@ class Pretend(commands.AutoShardedBot):
     intents=intents,
     help_command=PretendHelp(),
     owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
+    avqueue = [],
     case_insensitive=True, 
     shard_count=3,
     shard_ids=[0,1,2],
