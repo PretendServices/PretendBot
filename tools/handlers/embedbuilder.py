@@ -104,6 +104,10 @@ class EmbedBuilder():
         x['title']=part[len("title:"):] 
         self.validator(part[len("title:"):], 256, "Embed title too long")
 
+      if part.startswith("url:"):
+        x["url"]=part[len("url"):]
+        self.is_url(part[len("url:"):], "URL")
+
       if part.startswith("description:"):
         x['description']=part[len("description:"):] 
         self.validator(part[len("description:"):], 2048, "Embed description too long") 
