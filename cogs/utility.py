@@ -8,6 +8,8 @@ import humanfriendly
 import dateutil.parser
 import validators
 import os
+from nudenet import NudeDetector
+nude_detector = NudeDetector()
 from discord.ext import commands
 from discord.ext.commands import has_guild_permissions
 from discord import TextChannel
@@ -34,9 +36,9 @@ from tools.handlers.socials.roblox import RobloxUser
 from tools.handlers.socials.tiktok import TikTokUser
 from tools.handlers.socials.cashapp import CashappUser
 from tools.handlers.socials.weather import WeatherLocation
-
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
+import re
 class Utility(commands.Cog):
   def __init__(self, bot: Pretend): 
     self.bot = bot 
@@ -517,11 +519,28 @@ class Utility(commands.Cog):
         # Navigate to the specified URL
         await ctx.channel.typing()
         await page.goto(url)
-
         # Capture screenshot
         screenshot_file = f"{url.replace('https://', '').replace('/', '_')}.png"
         await page.screenshot(path=screenshot_file)
 
+
+        # Define the keywords to detect
+        keywords = ['pussy', 'tits', 'porn']
+
+        # Read the page content
+        page_content = await page.content()
+
+        # Check if any of the keywords are present in the page content
+        if any(re.search(r'\b{}\b'.format(keyword), page_content, re.IGNORECASE) for keyword in keywords):
+          await ctx.send_error("This website contains explicit content. I cannot send the screenshot.")
+          return
+        detections = nude_detector.detect(screenshot_file)
+        for prediction in detections:
+
+          if prediction["class"] == "FEMALE_BREAST_EXPOSED" or prediction["class"] == "ANUS_EXPOSED" or prediction["class"] == "FEMALE_GENITALIA_EXPOSED" or prediction["class"] == "MALE_GENITALIA_EXPOSED" or prediction["class"] == "BUTTOCKS_EXPOSED":
+
+            await ctx.send_error("This website contains explicit content. I cannot send the screenshot.")
+            return
         # Send the screenshot back to Discord
         with open(screenshot_file, "rb") as file:
             screenshot = discord.File(file)

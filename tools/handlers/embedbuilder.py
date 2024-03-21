@@ -61,9 +61,9 @@ class EmbedBuilder():
     if '{guild.vanity}' in params: 
         params=params.replace('{guild.vanity}', "/" + user.guild.vanity_url_code or "none")         
     if '{invisible}' in params: 
-        params=params.replace('{invisible}', '2f3136') 
+        params=params.replace('{invisible}', '2b2d31') 
     if '{botcolor}' in params: 
-        params=params.replace('{botcolor}', '808080')       
+        params=params.replace('{botcolor}', "C294CA")       
     if '{guild.icon}' in params:
       if user.guild.icon:
         params=params.replace('{guild.icon}', user.guild.icon.url)

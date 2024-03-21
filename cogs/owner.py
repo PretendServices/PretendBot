@@ -337,6 +337,9 @@ class Owner(Cog):
     """
 
     reloaded = []
+    if module.endswith(" --pull"):
+      os.system("git pull")
+    module = module.replace(" --pull", "")
 
     if module == "~":
       for module in list(self.bot.extensions):

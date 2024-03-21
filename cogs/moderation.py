@@ -1019,9 +1019,13 @@ class Moderation(Cog):
         interaction.guild.id,
         interaction.channel.id
        )
-       message += f"- restored a {i} setup to {new_channel.mention}"
+       message += f" - restored a {i} setup to {new_channel.mention}"
      
-     await interaction.channel.delete(reason="Channel nuked by the server owner")
+     try:
+      await interaction.channel.delete(reason="Channel nuked by the server owner")
+     except Exception as e:
+      if "community servers" in str(e):
+       return await ctx.send_warning(f"Can't delete channels **required** by community servers")
      await new_channel.send("💣" + message) 
    
     async def no_callback(interaction: Interaction) -> None: 
