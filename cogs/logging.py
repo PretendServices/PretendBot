@@ -93,7 +93,7 @@ class Logging(commands.Cog):
                     """
                     DELETE FROM logging
                     WHERE guild_id = $1
-                    AND messages = $2
+                    AND guild = $2
                     """,
                     before.id,
                     check["guild"]
@@ -138,7 +138,7 @@ class Logging(commands.Cog):
 
             embed = discord.Embed(
                 title="Role Created",
-                description=f"{role.mention} ({role.id})",
+                description=f"{role.mention} (`{role.id}`)",
                 color=self.bot.color
             ).set_author(
                 name=self.bot.user.name,
@@ -164,11 +164,45 @@ class Logging(commands.Cog):
 
             embed = discord.Embed(
                 title="Role Deleted",
-                description=f"{role.mention} ({role.id})",
+                description=f"{role.mention} (`{role.id}`)",
                 color=self.bot.color
             ).set_author(
                 name=self.bot.user.name,
                 icon_url=self.bot.user.avatar.url
+            )
+
+            await channel.send(embed=embed)
+
+    @commands.Cog.listener("on_guild_role_update")
+    async def role_update_logger(self, before: discord.Role, after: discord.Role):
+        if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", before.id):
+            channel = await self.bot.fetch_channel(check["roles"])
+            if not channel:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND roles = $2
+                    """,
+                    before.id,
+                    check["roles"]
+                )
+
+            actions = []
+
+            if before.name != after.name:
+                actions.append(f"**Old Name**: {before.name}\n**New Name**: {after.name}")
+
+            if before.icon != after.icon:
+                actions.append(f"**Old Icon**: {f'[Here]({before.icon.url})' if before.icon else 'N/A'}\n**New Icon**: {f'[Here]({after.icon.url})' if after.icon else 'Removed'}")
+
+            if before.position != after.position:
+                actions.append(f"**Old Position**: `{int(before.position+1)}`\n**New Position**: `{int(after.position+1)}`")
+
+            embed = discord.Embed(
+                title="Role Edited",
+                description="\n".join(actions),
+                color=self.bot.color
             )
 
             await channel.send(embed=embed)
