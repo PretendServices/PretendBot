@@ -36,6 +36,7 @@ async def upload_image(image_url, type):
 async def process_avqueue():
   while 1 == 1:
     if len(bot.avqueue) == 0:
+      print("No avqueue to process")
       continue
     else:
       print("Processing avqueue")
