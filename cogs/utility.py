@@ -508,7 +508,7 @@ class Utility(commands.Cog):
       url = f"https://{url}"
 
     if not validators.url(url):
-      return await ctx.send_error("That is not a **URL**")
+      return await ctx.send_warning("That is not a **URL**")
 
     async with async_playwright() as p:
         browser = await p.chromium.launch()
