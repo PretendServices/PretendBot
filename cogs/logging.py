@@ -15,7 +15,7 @@ class Logging(commands.Cog):
         if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", message.guild.id):
             channel = await self.bot.fetch_channel(check["messages"])
             if not channel:
-                await self.bot.db.execute(
+                return await self.bot.db.execute(
                     """
                     DELETE FROM logging
                     WHERE guild_id = $1
@@ -43,42 +43,46 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener("on_message_edit")
     async def message_edit_logger(self, before: discord.Message, after: discord.Message):
-        if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
-            channel = await self.bot.fetch_channel(check["messages"])
-            if not channel:
-                await self.bot.db.execute(
-                    """
-                    DELETE FROM logging
-                    WHERE guild_id = $1
-                    AND messages = $2
-                    """,
-                    before.guild.id,
-                    check["messages"]
+        if after.content != before.content:
+            if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
+                channel = await self.bot.fetch_channel(check["messages"])
+                if not channel:
+                    return await self.bot.db.execute(
+                        """
+                        DELETE FROM logging
+                        WHERE guild_id = $1
+                        AND messages = $2
+                        """,
+                        before.guild.id,
+                        check["messages"]
+                    )
+                
+                if before.embeds:
+                    return
+                
+                if before.author.bot:
+                    return
+
+                embed = discord.Embed(
+                    title="Message Edited",
+                    description=before.content,
+                    color=self.bot.color
+                ).add_field(
+                    name="After edit",
+                    value=after.content,
+                    inline=False
+                ).add_field(
+                    name="Info",
+                    value=f"**Author**: {after.author.id}"
+                    + f"\n**Message**: {after.id}"
+                    + f"\n**Link**: [Jump]({after.jump_url})",
+                    inline=False
+                ).set_author(
+                    name=after.author.name,
+                    icon_url=after.author.display_avatar.url
                 )
-            
-            if before.embeds:
-                return
 
-            embed = discord.Embed(
-                title="Message Edited",
-                description=before.content,
-                color=self.bot.color
-            ).add_field(
-                name="After edit",
-                value=after.content,
-                inline=False
-            ).add_field(
-                name="Info",
-                value=f"**Author**: {after.author.id}"
-                + f"\n**Message**: {after.id}"
-                + f"\n**Link**: [Jump]({after.jump_url})",
-                inline=False
-            ).set_author(
-                name=after.author.name,
-                icon_url=after.author.display_avatar.url
-            )
-
-            await channel.send(embed=embed)
+                await channel.send(embed=embed)
 
     @commands.Cog.listener("on_guild_update")
     async def guild_update_logger(self, before: discord.Guild, after: discord.Guild):
@@ -117,6 +121,58 @@ class Logging(commands.Cog):
 
             await channel.send(embed=embed)
 
+    @commands.Cog.listener("on_guild_role_create")
+    async def role_create_logger(self, role: discord.Role):
+        if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", role.guild.id):
+            channel = await self.bot.fetch_channel(check["roles"])
+            if not channel:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND messages = $2
+                    """,
+                    role.guild.id,
+                    check["roles"]
+                )
+
+            embed = discord.Embed(
+                title="Role Created",
+                description=f"{role.mention} ({role.id})",
+                color=self.bot.color
+            ).set_author(
+                name=self.bot.user.name,
+                icon_url=self.bot.user.avatar.url
+            )
+
+            await channel.send(embed=embed)
+
+    @commands.Cog.listener("on_guild_role_delete")
+    async def role_delete_logger(self, role: discord.Role):
+        if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", role.guild.id):
+            channel = await self.bot.fetch_channel(check["roles"])
+            if not channel:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND messages = $2
+                    """,
+                    role.guild.id,
+                    check["roles"]
+                )
+
+            embed = discord.Embed(
+                title="Role Deleted",
+                description=f"{role.mention} ({role.id})",
+                color=self.bot.color
+            ).set_author(
+                name=self.bot.user.name,
+                icon_url=self.bot.user.avatar.url
+            )
+
+            await channel.send(embed=embed)
+
     @group(
         name="logs",
         aliases=["logging"],
@@ -139,7 +195,7 @@ class Logging(commands.Cog):
     @has_guild_permissions(manage_guild=True)
     async def logs_messages(self, ctx: PretendContext, *, channel: discord.TextChannel):
         """
-        Log message-related events
+        Log message related events
         """
 
         if str(channel).lower().strip() in ("none", "remove"):
@@ -221,6 +277,52 @@ class Logging(commands.Cog):
 
         await self.bot.db.execute(*args)
         await ctx.send_success(f"Now sending **guild logs** to {channel.mention}")
+
+    @logs.command(
+        name="roles",
+        aliases=["role"],
+        brief="manage server"
+    )
+    @has_guild_permissions(manage_guild=True)
+    async def logs_roles(self, ctx: PretendContext, *, channel: discord.TextChannel):
+        """
+        Log role related events
+        """
+
+        if str(channel).lower().strip() in ("none", "remove"):
+            if check := await self.bot.db.fetchrow(
+                """
+                SELECT roles FROM logging
+                WHERE guild_id = $1
+                """,
+                ctx.guild.id
+            ) is None:
+                return await ctx.send_warning(f"Role logging is **not** enabled")
+            else:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND roles = $2
+                    """,
+                    ctx.guild.id,
+                    check["roles"]
+                )
+                return await ctx.send_success(f"No longer logging **role changes**")
+            
+        if await self.bot.db.fetchrow(
+            """
+            SELECT roles FROM logging
+            WHERE guild_id = $1
+            """,
+            ctx.guild.id
+        ):
+            args = ["UPDATE logging SET roles = $1 WHERE guild_id = $2", channel.id, ctx.guild.id]
+        else:
+            args = ["INSERT INTO logging (guild_id, roles) VALUES ($1, $2)", ctx.guild.id, channel.id]
+
+        await self.bot.db.execute(*args)
+        await ctx.send_success(f"Now sending **roles logs** to {channel.mention}")
 
 async def setup(bot: Pretend):
     await bot.add_cog(Logging(bot))
