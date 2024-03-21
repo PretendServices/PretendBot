@@ -182,16 +182,6 @@ class Pretend(commands.AutoShardedBot):
     return f"{(precisedelta(date, format='%0.0f').replace('and', ',')).split(', ')[0]} ago"
    else: 
     return f"in {(precisedelta(date, format='%0.0f').replace('and', ',')).split(', ')[0]}"
-   
-  def get_command(self, *args, **kwargs):
-    if command := super().get_command(*args, **kwargs):
-      if (
-        (cog := command.cog_name)
-        and cog.lower() in ["jishaku", "owner", "auth"]
-        or command.hidden
-      ):
-        return None
-    return command
 
   async def dominant_color(self, url: Union[discord.Asset, str]) -> int:
     """
