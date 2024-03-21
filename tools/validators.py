@@ -126,9 +126,8 @@ class ValidReskinName(commands.Converter):
             open("./texts/reskin_blacklist.txt", "r").read().splitlines()
         )
     )
-    
-    for arg in argument.split(" "):
-      if arg.lower() in texts: 
-        raise commands.BadArgument("This name cannot be used for reskin")
+  
+    if texts in argument.lower(): 
+      raise commands.BadArgument("This name cannot be used for reskin")
 
     return argument
