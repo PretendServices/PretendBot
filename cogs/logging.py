@@ -53,28 +53,15 @@ class Logging(commands.Cog):
 
         await ctx.create_pages()
 
-    @logs.group(
+    @logs.command(
         name="messages",
         aliases=["msgs", "msg"],
         brief="manage server"
     )
     @has_guild_permissions(manage_guild=True)
-    async def logs_messages(self, ctx: PretendContext):
+    async def logs_messages(self, ctx: PretendContext, *, channel: discord.TextChannel):
         """
         Log message-related events
-        """
-
-        await ctx.create_pages()
-
-    @logs_messages.command(
-        name="deleted",
-        aliases=["delete"],
-        brief="manage server"
-    )
-    @has_guild_permissions(manage_guild=True)
-    async def logs_messages_deleted(self, ctx: PretendContext, *, channel: discord.TextChannel):
-        """
-        Log deleted messages
         """
 
         if str(channel).lower().strip() in ("none", "remove"):
