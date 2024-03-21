@@ -42,7 +42,7 @@ async def process_avqueue():
       await upload_image(obj[0], obj[1])
       bot.avqueue.pop(0)
 
-asyncio.create_task(process_avqueue())
+
 @bot.check 
 async def disabled_command(ctx: PretendContext): 
   if await ctx.bot.db.fetchrow(
@@ -140,3 +140,4 @@ async def banner_user(interaction: discord.Interaction, member: discord.Member):
 
 if __name__ == "__main__":
   bot.run()
+  asyncio.create_task(process_avqueue())
