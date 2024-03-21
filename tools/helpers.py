@@ -352,7 +352,7 @@ class PretendHelp(Help):
    i=0
    for command in group.commands: 
     i+=1 
-    embeds.append(Embed(color=bot.color, title=f"Command: {command.qualified_name}", description=command.help.capitalize()).set_author(name=bot.user.name, icon_url=bot.user.display_avatar.url).add_field(name="usage", value=f"```{command.qualified_name} {' '.join([f'[{a}]' for a in command.clean_params]) if command.clean_params != {} else ''}\n{command.usage or ''}```", inline=False).set_footer(text=f"aliases: {', '.join(a for a in command.aliases) if len(command.aliases) > 0 else 'none'} ・ {i}/{len(group.commands)}"))
+    embeds.append(Embed(color=bot.color, title=f"Command: {command.qualified_name}", description=command.help.capitalize() if command.help else None).set_author(name=bot.user.name, icon_url=bot.user.display_avatar.url).add_field(name="usage", value=f"```{command.qualified_name} {' '.join([f'[{a}]' for a in command.clean_params]) if command.clean_params != {} else ''}\n{command.usage or ''}```", inline=False).set_footer(text=f"aliases: {', '.join(a for a in command.aliases) if len(command.aliases) > 0 else 'none'} ・ {i}/{len(group.commands)}"))
     
    await self.context.paginator(embeds)
 
