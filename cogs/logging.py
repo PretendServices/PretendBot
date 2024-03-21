@@ -27,15 +27,21 @@ class Logging(commands.Cog):
             
             embed = discord.Embed(
                 title="Message Edited",
-                description=before.content
+                description=before.content,
+                color=self.bot.color
             ).add_field(
                 name="After edit",
-                value=before.content
+                value=after.content,
+                inline=False
             ).add_field(
                 name="Info",
                 value=f"**Author**: {after.author.id}"
                 + f"\n**Message**: {after.id}"
-                + f"\n**Link**: [Jump]({after.jump_url})"
+                + f"\n**Link**: [Jump]({after.jump_url})",
+                inline=False
+            ).set_author(
+                name=after.author.name,
+                icon_url=after.author.display_avatar.url
             )
 
             await channel.send(embed=embed)
@@ -43,7 +49,8 @@ class Logging(commands.Cog):
     @group(
         name="logs",
         aliases=["logging"],
-        brief="manage server"
+        brief="manage server",
+        invoke_without_command=True
     )
     @has_guild_permissions(manage_guild=True)
     async def logs(self, ctx: PretendContext):
