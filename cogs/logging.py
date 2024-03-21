@@ -10,6 +10,37 @@ class Logging(commands.Cog):
     def __init__(self, bot: Pretend) -> None:
         self.bot = bot
 
+    @commands.Cog.listener("on_message_delete")
+    async def message_delete_logger(self, message: discord.Message):
+        if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", message.guild.id):
+            channel = await self.bot.fetch_channel(check["messages"])
+            if not channel:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND messages = $2
+                    """,
+                    message.guild.id,
+                    check["messages"]
+                )
+
+            embed = discord.Embed(
+                title="Message Deleted",
+                description=message.content,
+                color=self.bot.color
+            ).add_field(
+                name="Info",
+                value=f"**Author**: {message.author.id}"
+                + f"\n**Message**: {message.id}"
+                + f"\n**Link**: [Jump]({message.jump_url})"
+            ).set_author(
+                name=message.author.name,
+                icon_url=message.author.display_avatar.url
+            )
+
+            await channel.send(embed=embed)
+
     @commands.Cog.listener("on_message_edit")
     async def message_edit_logger(self, before: discord.Message, after: discord.Message):
         if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
