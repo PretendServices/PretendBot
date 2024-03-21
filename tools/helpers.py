@@ -357,7 +357,7 @@ class PretendHelp(Help):
    await self.context.paginator(embeds)
 
  async def send_command_help(self, command: Command):
-  embed = Embed(color=self.context.bot.color, title=f"Command: {command.qualified_name}", description=command.help.capitalize()) 
+  embed = Embed(color=self.context.bot.color, title=f"Command: {command.qualified_name}", description=command.help.capitalize() if command.help else None) 
   embed.set_author(name=self.context.bot.user.name, icon_url=self.context.bot.user.display_avatar.url)
   embed.add_field(name="category", value=command.cog_name.lower())
   embed.add_field(name="permissions", value=f"{command.brief} {self.context.bot.warning}" if command.brief else "any")
