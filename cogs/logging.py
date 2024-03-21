@@ -80,6 +80,43 @@ class Logging(commands.Cog):
 
             await channel.send(embed=embed)
 
+    @commands.Cog.listener("on_guild_update")
+    async def guild_update_logger(self, before: discord.Guild, after: discord.Guild):
+        if check := await self.bot.db.fetchrow("SELECT guild FROM logging WHERE guild_id = $1", before.id):
+            channel = await self.bot.fetch_channel(check["guild"])
+            if not channel:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND messages = $2
+                    """,
+                    before.id,
+                    check["guild"]
+                )
+
+            actions = []
+
+            if before.name != after.name:
+                actions.append(f"**Old Name**: {before.name}\n**New Name**: {after.name}")
+
+            if before.afk_channel != after.afk_channel:
+                actions.append(f"**Old AFK Channel**: {before.afk_channel.mention}\n**New AFK Channel**: {after.afk_channel.mention}")
+
+            if before.icon != after.icon:
+                actions.append(f"**Old Icon**: {before.icon.url if before.icon else 'N/A'}\n**New Icon** {after.icon.url if after.icon else 'Removed'}")
+
+            if before.banner != after.banner:
+                actions.append(f"**Old Banner**: {before.banner.url}\n**New Banner** {after.banner.url if after.banner else 'Removed'}")
+
+            embed = discord.Embed(
+                title="Guild Edited",
+                description="\n".join(actions),
+                color=self.bot.color
+            )
+
+            await channel.send(embed=embed)
+
     @group(
         name="logs",
         aliases=["logging"],
@@ -113,7 +150,7 @@ class Logging(commands.Cog):
                 """,
                 ctx.guild.id
             ) is None:
-                return await ctx.send_warning(f"Logging is **not** enabled")
+                return await ctx.send_warning(f"Message logging is **not** enabled")
             else:
                 await self.bot.db.execute(
                     """
@@ -139,6 +176,51 @@ class Logging(commands.Cog):
 
         await self.bot.db.execute(*args)
         await ctx.send_success(f"Now sending **message logs** to {channel.mention}")
+
+    @logs.command(
+        name="guild",
+        brief="manage server"
+    )
+    @has_guild_permissions(manage_guild=True)
+    async def logs_guild(self, ctx: PretendContext, *, channel: discord.TextChannel):
+        """
+        Log guild edit events
+        """
+
+        if str(channel).lower().strip() in ("none", "remove"):
+            if check := await self.bot.db.fetchrow(
+                """
+                SELECT guild FROM logging
+                WHERE guild_id = $1
+                """,
+                ctx.guild.id
+            ) is None:
+                return await ctx.send_warning(f"Guild logging is **not** enabled")
+            else:
+                await self.bot.db.execute(
+                    """
+                    DELETE FROM logging
+                    WHERE guild_id = $1
+                    AND guild = $2
+                    """,
+                    ctx.guild.id,
+                    check["guild"]
+                )
+                return await ctx.send_success(f"No longer logging **guild changes**")
+            
+        if await self.bot.db.fetchrow(
+            """
+            SELECT guild FROM logging
+            WHERE guild_id = $1
+            """,
+            ctx.guild.id
+        ):
+            args = ["UPDATE logging SET guild = $1 WHERE guild_id = $2", channel.id, ctx.guild.id]
+        else:
+            args = ["INSERT INTO logging (guild_id, guild) VALUES ($1, $2)", ctx.guild.id, channel.id]
+
+        await self.bot.db.execute(*args)
+        await ctx.send_success(f"Now sending **guild logs** to {channel.mention}")
 
 async def setup(bot: Pretend):
     await bot.add_cog(Logging(bot))
