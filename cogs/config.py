@@ -840,7 +840,7 @@ class Config(Cog):
       title=f"Aliases ({len(results)})",
       author={
         "name": ctx.guild.name,
-        "icon_url": ctx.guild.icon.url or None
+        "icon_url": ctx.guild.icon or None
       }
     )
 
@@ -962,7 +962,7 @@ class Config(Cog):
       title=f"Restricted Commands ({len(results)})",
       author={
         "name": ctx.guild.name,
-        "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+        "icon_url": ctx.guild.icon if ctx.guild.icon else None
       }
     )
 
@@ -1169,14 +1169,15 @@ class Config(Cog):
       title=f"Image Only Channels ({len(results)})",
       author={
         "name": ctx.guild.name,
-        "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+        "icon_url": ctx.guild.icon if ctx.guild.icon else None
       }
     )
 
   @group(
     name="disablemodule",
     aliases=["dm", "disablem"],
-    brief="manage server"
+    brief="manage server",
+    invoke_without_command=True
   )
   @has_guild_permissions(manage_guild=True)
   async def disablemodule(self, ctx: PretendContext):
