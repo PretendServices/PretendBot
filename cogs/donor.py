@@ -200,7 +200,7 @@ class Donor(Cog):
 
    async with ctx.channel.typing():
     genai.configure(api_key="AIzaSyCDSm6b1aI84TJtzWKzdb6oVozeWe3etD8")
-    model = genai.GenerativeModel("gemeni-pro")
+    model = genai.GenerativeModel("gemini-pro")
     
     response = model.generate_content(query)
     await ctx.send(response.text, allowed_mentions=AllowedMentions.none())
