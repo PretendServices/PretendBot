@@ -1064,7 +1064,8 @@ class Config(Cog):
   @group(
     name="imageonly",
     aliases=["imgonly", "gallery"],
-    brief="manage channels"
+    brief="manage channels",
+    invoke_without_command=True
   )
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_messages=True)
@@ -1088,7 +1089,7 @@ class Config(Cog):
 
     if await self.bot.db.fetchrow(
       """
-      SELECT * FROM imageonly
+      SELECT * FROM imgonly
       WHERE guild_id = $1
       AND channel_id = $2
       """,
@@ -1099,7 +1100,7 @@ class Config(Cog):
     
     await self.bot.db.execute(
       """
-      INSERT INTO imageonly
+      INSERT INTO imgonly
       VALUES ($1, $2)
       """,
       ctx.guild.id,
@@ -1119,7 +1120,7 @@ class Config(Cog):
 
     if not await self.bot.db.fetchrow(
       """
-      SELECT * FROM imageonly
+      SELECT * FROM imgonly
       WHERE guild_id = $1
       AND channel_id = $2
       """,
@@ -1130,7 +1131,7 @@ class Config(Cog):
     
     await self.bot.db.execute(
       """
-      DELETE FROM imageonly
+      DELETE FROM imgonly
       WHERE guild_id = $1
       AND channel_id = $2
       """,
@@ -1151,7 +1152,7 @@ class Config(Cog):
 
     results = await self.bot.db.fetch(
       """
-      SELECT * FROM imageonly
+      SELECT * FROM imgonly
       WHERE guild_id = $1
       """,
       ctx.guild.id
