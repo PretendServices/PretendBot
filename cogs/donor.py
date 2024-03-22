@@ -1,7 +1,7 @@
 import re
 import json
 import datetime
-import openai
+import google.generativeai as genai
 
 from tools.bot import Pretend
 from tools.converters import NoStaff
@@ -17,9 +17,6 @@ class Donor(Cog):
   def __init__(self, bot: Pretend): 
    self.bot = bot
    self.description = "Premium commands"
-   self.openai_client = openai.AsyncOpenAI(
-    api_key="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"
-   )
 
   def shorten(self, value: str, length: int = 32):
     if len(value) > length:
@@ -198,30 +195,15 @@ class Donor(Cog):
   @cooldown(1, 45, commands.BucketType.user)
   async def chatgpt(self, ctx: PretendContext, *, query: str):
    """
-   Talk to the ChatGPT AI
+   Talk to AI
    """
 
    async with ctx.channel.typing():
-    response = await self.openai_client.chat.completions.create(
-     model="gpt-3.5-turbo",
-     max_tokens=300,
-     messages=[
-      {
-       "role": "user",
-       "content": query
-      }
-     ]
-    )
-
-    message = (
-     str(response.choices[0].message.content)
-     .replace(" As an AI language model, ", "")
-     .replace("As an AI language model, ", "")
-     .replace(" but as an AI language model, ", "")
-    )
-
-    message = self.shorten(message, 1024)
-    await ctx.send(message, allowed_mentions=AllowedMentions.none())
+    genai.configure(api_key="AIzaSyCDSm6b1aI84TJtzWKzdb6oVozeWe3etD8")
+    model = genai.GenerativeModel("gemeni-1.0-pro-001")
+    
+    response = model.generate_content(query)
+    await ctx.send(response.text, allowed_mentions=AllowedMentions.none())
 
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Donor(bot))     
