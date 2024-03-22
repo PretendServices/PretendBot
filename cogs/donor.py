@@ -192,7 +192,7 @@ class Donor(Cog):
    brief="donor"
   )
   @has_perks()
-  @cooldown(1, 45, commands.BucketType.user)
+  @cooldown(1, 5, commands.BucketType.user)
   async def chatgpt(self, ctx: PretendContext, *, query: str):
    """
    Talk to AI
