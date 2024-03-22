@@ -1161,7 +1161,7 @@ class Config(Cog):
     
     await ctx.paginate(
       [
-        f"{self.bot.get_channel(result["channel_id"]).mention}"
+        f"{self.bot.get_channel(result['channel_id']).mention}"
         for result in results
       ],
       title=f"Image Only Channels ({len(results)})",
