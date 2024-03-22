@@ -57,7 +57,7 @@ class OpenTicket(discord.ui.Button):
 To close the ticket please press 🗑️}$v{author: name: {bot.name} && icon: {bot.avatar}}$v{content: {user.mention}}""".replace('{title}', title or "Ticket opened").replace("{bot.name}", interaction.client.user.name).replace("{bot.avatar}", interaction.client.user.display_avatar.url)
    x = await self.bot.embed_build.alt_convert(interaction.user, embed.replace("{topic}", topic or 'none'))
    x['view'] = view
-   mes = await channel.send(**x)
+   mes = await channel.send(**x, allowed_mentions=discord.AllowedMentions.all())
    await mes.pin(reason="pinned the ticket message")
    return channel 
 
