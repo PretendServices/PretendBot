@@ -173,11 +173,16 @@ class Utility(commands.Cog):
      if before.avatar != after.avatar:
        imgtype = 'gif' if before.display_avatar.is_animated() else 'png'
        try:
+        
         async with aiohttp.ClientSession() as session:
-            async with session.request("POST", "http://127.0.0.1:3030/upload", data={'url': before.display_avatar.url, 'type': imgtype, 'userid': after.id}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN'}) as r:
+            async with session.request("POST", "http://127.0.0.1:3030/upload", json={'url': before.display_avatar.url, 'type': imgtype, 'userid': after.id}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN', 'Content-Type': 'application/json' }) as r:
                 if r.status != 200:
+                    session.close()
                     return
+                if(r.status == 200):
+                   session.close()
        except Exception as e:
+             session.close()
              return
        """
        newuri = await self.upload_image(before.display_avatar.url, imgtype)
