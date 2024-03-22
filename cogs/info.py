@@ -28,7 +28,7 @@ class Info(Cog):
    return view
 
   @hybrid_command(name="commands", aliases=['h', 'cmds'])
-  async def _help(self, ctx: PretendContext, *, command: ValidCommand=None):
+  async def _help(self, ctx: PretendContext, *, command: str=None):
     """
     The help command menu
     """
@@ -36,7 +36,16 @@ class Info(Cog):
     if not command: 
       return await ctx.send_help()
     else:
-      return await ctx.send_help(command)
+      _command = self.bot.get_command(command)
+      if (
+        _command is None
+        or (cog := _command.cog_name)
+        and cog.lower() in ["jishaku", "owner", "auth"]
+        or _command.hidden
+      ):
+        return await ctx.send(f'No command called "{command}" found.')
+      
+      return await ctx.send_help(_command)
 
   @command()
   async def getbotinvite(self, ctx: PretendContext, *, member: User): 
