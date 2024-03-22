@@ -125,4 +125,3 @@ async def banner_user(interaction: discord.Interaction, member: discord.Member):
 
 if __name__ == "__main__":
   bot.run()
-  asyncio.run(process_avqueue())
