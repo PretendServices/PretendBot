@@ -299,7 +299,7 @@ class Owner(Cog):
   @is_owner()
   async def blacklist_user(self, ctx: PretendContext, *, user: User): 
     """blacklist or unblacklist a member"""
-    if user.id in [930383131863842816, 863914425445908490]: 
+    if user.id in self.bot.owner_ids: 
       return await ctx.send_error("Do not blacklist a bot owner, retard")  
     
     try: 
