@@ -367,6 +367,9 @@ class Pretend(commands.AutoShardedBot):
       
     elif isinstance(error, commands.CommandOnCooldown):
       return await ctx.pretend_send(f"Wait **{error.retry_after:.2f} seconds** before using **{ctx.command.qualified_name}** again")
+    
+    elif isinstance(error, commands.CommandRegistrationError): # this should never be used anywhere besides ValidCog
+      return await ctx.send(error)
       
     else:
       code = "".join(

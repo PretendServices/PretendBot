@@ -30,6 +30,7 @@ from tools.validators import (
   ValidPermission,
   ValidMessage,
   ValidCommand,
+  ValidCog
 )
 
 from tools.converters import NewRoleConverter, HexColor
@@ -609,7 +610,7 @@ class Config(Cog):
     if check:
       return await ctx.send_error("The bump reminder is **already** enabled")
 
-    await self.bot.db.execute("INSERT INTO bumpreminder (guild_id, thankyou, reminder) VALUES ($1,$2,$3)", ctx.guild.id, "{embed}{color: #181a14}$v{description: <:heheboithumb_up:1103320215439290419> Thank you for bumping the server! I will remind you **in 2 hours** to do it again}$v{content: {user.mention}}", "{embed}{color: #181a14}$v{description: 🕰️ Bump the server using `/bump`}$v{content: {user.mention}}")  
+    await self.bot.db.execute("INSERT INTO bumpreminder (guild_id, thankyou, reminder) VALUES ($1,$2,$3)", ctx.guild.id, "{embed}{color: #181a14}$v{description: <:heheboithumb_up:1188962953014300703> Thank you for bumping the server! I will remind you **in 2 hours** to do it again}$v{content: {user.mention}}", "{embed}{color: #181a14}$v{description: 🕰️ Bump the server using `/bump`}$v{content: {user.mention}}")  
     return await ctx.send_success("Bump Reminder is now enabled")
   
   @bumpreminder.command(name="disable", brief="manage server")
@@ -623,7 +624,7 @@ class Config(Cog):
   @bumpreminder.command(name="thankyou", aliases=['ty'], brief="manage server")
   @has_guild_permissions(manage_guild=True) 
   @bump_enabled()
-  async def bumpreminder_thankyou(self, ctx: PretendContext, *, code: str="{embed}{color: #181a14}$v{description: <:heheboithumb_up:1103320215439290419> Thank you for bumping the server! I will remind you **in 2 hours** to do it again}$v{content: {user.mention}}"):  
+  async def bumpreminder_thankyou(self, ctx: PretendContext, *, code: str="{embed}{color: #181a14}$v{description: <:heheboithumb_up:1188962953014300703> Thank you for bumping the server! I will remind you **in 2 hours** to do it again}$v{content: {user.mention}}"):  
     """set the message that will be sent after a person bumps the server"""
     await self.bot.db.execute("UPDATE bumpreminder SET thankyou = $1 WHERE guild_id = $2", code, ctx.guild.id)
     return await ctx.send_success(f"Bump reminder thankyou message updated to\n```\n{code}```")
@@ -1169,6 +1170,115 @@ class Config(Cog):
       author={
         "name": ctx.guild.name,
         "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+      }
+    )
+
+  @group(
+    name="disablemodule",
+    aliases=["dm", "disablem"],
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def disablemodule(self, ctx: PretendContext):
+    """
+    disable modules of the bot
+    """
+
+    await ctx.create_pages()
+
+  @disablemodule.command(
+    name="add",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def disablemodule_add(self, ctx: PretendContext, *, module: ValidCog):
+    """
+    add a disabled module
+    """
+
+    if await self.bot.db.fetchrow(
+      """
+      SELECT * FROM disablemodule
+      WHERE guild_id = $1
+      AND module = $2
+      """,
+      ctx.guild.id,
+      module
+    ):
+      return await ctx.send_warning(f"The `{module}` module is **already** disabled")
+    
+    await self.bot.db.execute(
+      """
+      INSERT INTO disablemodule
+      VALUES ($1, $2)
+      """,
+      ctx.guild.id,
+      module
+    )
+    await ctx.send_success(f"Successfully disabled **{module}**")
+
+  @disablemodule.command(
+    name="remove",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def disablemodule_remove(self, ctx: PretendContext, *, module: ValidCog):
+    """
+    remove a disabled module
+    """
+
+    if not await self.bot.db.fetchrow(
+      """
+      SELECT * FROM disablemodule
+      WHERE guild_id = $1
+      AND module = $2
+      """,
+      ctx.guild.id,
+      module
+    ):
+      return await ctx.send_warning(f"The `{module}` module is **not** disabled")
+    
+    await self.bot.db.execute(
+      """
+      DELETE FROM disablemodule
+      WHERE guild_id = $1
+      AND module = $2
+      """,
+      ctx.guild.id,
+      module
+    )
+    await ctx.send_success(f"Successfully enabled **{module}**")
+
+  @disablemodule.command(
+    name="list",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def disablemodule_list(self, ctx: PretendContext):
+    """
+    returns a list of all disabled modules
+    """
+
+    results = await self.bot.db.fetch(
+      """
+      SELECT * FROM disablemodule
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    )
+
+    if not results:
+      return await ctx.send_warning(f"There are **no** disabled modules")
+    
+    await ctx.paginate(
+      [
+        f"**{result['module']}**"
+        for result in results
+      ],
+      title=f"Disabled Modules ({len(results)})",
+      author={
+        "name": ctx.guild.name,
+        "icon_url": ctx.guild.icon
       }
     )
 

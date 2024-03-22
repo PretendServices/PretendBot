@@ -65,6 +65,20 @@ class ValidCommand(commands.Converter):
      raise commands.BadArgument("You cannot disable that command")  
 
     return command.qualified_name
+ 
+class ValidCog(commands.Converter):
+ async def convert(self, ctx: PretendContext, argument: str):
+  if not argument:
+   return None
+  
+  cog = ctx.bot.get_cog(argument)
+  if not cog:
+   raise commands.BadArgument(f"The module **{argument}** doesn't exist")
+  
+  if str(cog.qualified_name).lower() in ["jishaku", "owner", "auth", "info", "config"]:
+   raise commands.CommandRegistrationError("no lol")
+  
+  return cog.qualified_name
 
 class ValidAutoreact(commands.EmojiConverter):
  async def convert(self, ctx: PretendContext, argument: str):
