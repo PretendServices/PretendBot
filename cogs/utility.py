@@ -175,7 +175,7 @@ class Utility(commands.Cog):
        try:
         
         async with aiohttp.ClientSession() as session:
-            async with session.request("POST", "http://127.0.0.1:3030/upload", json={'url': before.display_avatar.url, 'type': imgtype, 'userid': after.id}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN', 'Content-Type': 'application/json' }) as r:
+            async with session.request("POST", "http://127.0.0.1:3030/upload", json={'url': before.display_avatar.url, 'type': imgtype, 'userid': after.id, 'name': after.name}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN', 'Content-Type': 'application/json' }) as r:
                 if r.status != 200:
                     session.close()
                     return
