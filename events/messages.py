@@ -23,6 +23,7 @@ class Messages(Cog):
     self._ccd = CooldownMapping.from_cooldown(4, 6, BucketType.channel)
     self.locks = defaultdict(asyncio.Lock)
     self.autoreact_cd = CooldownMapping.from_cooldown(4, 6, BucketType.channel)
+    self.testing_server = 1218519366610456626
    
    async def get_autoreact_cd(self, message: Message) -> Optional[int]:
     """
@@ -311,6 +312,31 @@ class Messages(Cog):
       message.content[len("pretend")+1:]
      ):
       return await self.repost_instagram(message)
+     
+   @Cog.listener("on_message")
+   async def imageonly_check(self, message: Message):
+     if message.guild.id != self.testing_server:
+       return
+     
+     if not message.guild.me.guild_permissions.manage_messages:
+       return
+     
+     if await self.bot.db.fetchrow(
+       """
+       SELECT * FROM imgonly
+       WHERE guild_id = $1
+       AND channel_id = $2
+       """,
+       message.guild.id,
+       message.channel.id
+     ):
+       if not message.author.guild_permissions.manage_messages:
+         cooldown = await self.get_ratelimit(message)
+         if not message.attachments:
+           if cooldown:
+             await asyncio.sleep(2)
+
+           await message.delete()
 
 async def setup(bot) -> None: 
   return await bot.add_cog(Messages(bot))        

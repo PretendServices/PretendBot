@@ -1109,7 +1109,7 @@ class Config(Cog):
     await ctx.send_success(f"{channel.mention} is now an **image only** channel")
 
   @imageonly.command(
-    name="remvove",
+    name="remove",
     brief="manage channels"
   )
   @has_guild_permissions(manage_channels=True)
