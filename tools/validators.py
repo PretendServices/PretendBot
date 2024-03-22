@@ -71,7 +71,7 @@ class ValidCog(commands.Converter):
   if not argument:
    return None
   
-  cog = ctx.bot.get_cog(argument)
+  cog = ctx.bot.get_cog(argument.capitalize())
   if not cog:
    raise commands.BadArgument(f"The module **{argument}** doesn't exist")
   

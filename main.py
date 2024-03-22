@@ -39,25 +39,6 @@ async def disabled_command(ctx: PretendContext):
   return True
 
 @bot.check
-async def disabled_module(ctx: PretendContext):
-  if ctx.guild.id != 1218519366610456626:
-    return True
-  else:
-    if await ctx.bot.db.fetchrow(
-      """
-      SELECT * FROM disablemodule
-      WHERE guild_id = $1
-      AND module = $2
-      """,
-      ctx.guild.id,
-      ctx.command.cog_name.lower()
-    ):
-      if not ctx.author.guild_permissions.administrator:
-        await ctx.send_error(f"The module **{ctx.command.cog_name}** is **disabled** in this server")   
-        return False
-      return True
-
-@bot.check
 async def restricted_command(ctx: PretendContext):
   if ctx.author.id == ctx.guild.owner.id:
     return True
