@@ -1061,5 +1061,115 @@ class Config(Cog):
 
     await ctx.guild.edit(banner=_banner)
 
+  @group(
+    name="imageonly",
+    aliases=["imgonly", "gallery"],
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_messages=True)
+  async def imageonly(self, ctx: PretendContext):
+    """
+    let members only send images in channels
+    """
+
+    await ctx.create_pages()
+
+  @imageonly.command(
+    name="add",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  @bot_has_guild_permissions(manage_messages=True)
+  async def imageonly_add(self, ctx: PretendContext, *, channel: TextChannel):
+    """
+    add an image only channel
+    """
+
+    if await self.bot.db.fetchrow(
+      """
+      SELECT * FROM imageonly
+      WHERE guild_id = $1
+      AND channel_id = $2
+      """,
+      ctx.guild.id,
+      channel.id
+    ):
+      return await ctx.send_warning(f"{channel.mention} is **already** an image only channel")
+    
+    await self.bot.db.execute(
+      """
+      INSERT INTO imageonly
+      VALUES ($1, $2)
+      """,
+      ctx.guild.id,
+      channel.id
+    )
+    await ctx.send_success(f"{channel.mention} is now an **image only** channel")
+
+  @imageonly.command(
+    name="remvove",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def imageonly_remove(self, ctx: PretendContext, *, channel: TextChannel):
+    """
+    remove an image only channel
+    """
+
+    if not await self.bot.db.fetchrow(
+      """
+      SELECT * FROM imageonly
+      WHERE guild_id = $1
+      AND channel_id = $2
+      """,
+      ctx.guild.id,
+      channel.id
+    ):
+      return await ctx.send_warning(f"{channel.mention} is **not** an image only channel")
+    
+    await self.bot.db.execute(
+      """
+      DELETE FROM imageonly
+      WHERE guild_id = $1
+      AND channel_id = $2
+      """,
+      ctx.guild.id,
+      channel.id
+    )
+    await ctx.send_success(f"{channel.mention} is no longer an **image only** channel")
+
+  @imageonly.command(
+    name="list",
+    brief="manage channels"
+  )
+  @has_guild_permissions(manage_channels=True)
+  async def imageonly_list(self, ctx: PretendContext):
+    """
+    returns a list of all image only channels
+    """
+
+    results = await self.bot.db.fetch(
+      """
+      SELECT * FROM imageonly
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    )
+    if not results:
+      return await ctx.send_warning(f"There are **no** image only channels")
+    
+    await ctx.paginate(
+      [
+        f"{self.bot.get_channel(result["channel_id"]).mention}"
+        for result in results
+      ],
+      title=f"Image Only Channels ({len(results)})",
+      author={
+        "name": ctx.guild.name,
+        "icon_url": ctx.guild.icon.url if ctx.guild.icon else None
+      }
+    )
+
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Config(bot))
