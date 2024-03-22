@@ -1052,15 +1052,48 @@ class Config(Cog):
 
     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  
     if not re.findall(regex, url):
-      return await ctx.send_error("The image provided is not an url")
-    
-    if not url.endswith(("png", "jpeg", "jpg", "gif")):
-      return await ctx.send_warning(f"Invalid **media type**")
+      return await ctx.send_error("The attachment provided is not an url")
     
     banner = await self.bot.getbyte(url)
     _banner = banner.read()
+ 
+    try:
+      await ctx.guild.edit(banner=_banner)
+    except ValueError:
+      return await ctx.send_warning(f"Invalid **media type**")
+    
+  @set.command(
+    name="splash",
+    brief="manage server"
+  )
+  @has_guild_permissions(manage_guild=True)
+  async def set_splash(self, ctx: PretendContext, url: str = None):
+    """
+    Change your server's splash
+    """
 
-    await ctx.guild.edit(banner=_banner)
+    if ctx.guild.premium_tier < 1:
+      return await ctx.send_warning(f"You haven't **unlocked** splash")
+
+    if not url:
+      url = await ctx.get_attachment()
+      if not url:
+        return await ctx.send_help(ctx.command)
+      
+      url = url.url
+
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  
+    if not re.findall(regex, url):
+      return await ctx.send_error("The image provided is not an url")
+    
+    icon = await self.bot.getbyte(url)
+    _icon = icon.read()
+
+    try:
+      await ctx.guild.edit(splash=_icon)
+    except ValueError:
+      return await ctx.send_warning(f"Invalid **media type**")
+    await ctx.send_success(f"Set the server icon to [`Attachment`]({url})")
 
   @group(
     name="imageonly",
