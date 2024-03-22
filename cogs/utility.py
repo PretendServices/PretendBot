@@ -236,7 +236,20 @@ class Utility(commands.Cog):
       )
 
       await ctx.reply(embed=embed, file=discord.File(fp=bytes_io, filename="pretendTikTok.mp4"))
-
+  @commands.command(aliases=['avh'])
+  async def avatarhistory(self, ctx: PretendContext, *, member: discord.User=commands.Author):
+    """
+    Check a member's avatar history
+    """
+    results = await self.bot.db.fetch("SELECT * FROM avatar_history WHERE user_id = $1", member.id)
+    if len(results) == 0: 
+      return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} {"don't" if member == ctx.author else "doesn't"} have **avatar history**")
+    embed = discord.Embed(
+      color=self.bot.color,
+      url=f"https://images.pretend.best/avatarhistory/{member.id}",
+      title=f"{member.name}'s avatar history ({len(results)})"
+    )
+    return await ctx.reply()
   @commands.command(aliases=['clearavs', 'clearavh', 'clearavatarhistory'])
   async def clearavatars(self, ctx: PretendContext):
     """

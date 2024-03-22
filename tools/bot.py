@@ -99,7 +99,6 @@ class Pretend(commands.AutoShardedBot):
       name="/pretendbot"
     )
    )
-
    self.db = db
    self.avqueue = []
    self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
