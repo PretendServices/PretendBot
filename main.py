@@ -8,42 +8,6 @@ from tools.bot import Pretend
 from tools.helpers import PretendContext
 
 bot = Pretend()
-async def upload_image(image_url, type):
-    url = "https://pileshare.com/api/files/upload"
-
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(image_url) as resp:
-                if resp.status != 200:
-                    return f"Failed to download image from {image_url}. Status: {resp.status}"
-
-                image_data = await resp.read()
-
-            payload = aiohttp.FormData()
-            payload.add_field('file', image_data, filename=f"image.{type}")
-
-            async with session.post(url, data=payload) as response:
-                if response.status != 200:
-                    return f"Something went wrong uploading your file. Status: {response.status}"
-
-                json_data = await response.json()
-                redirect_url = json_data['data']['redirect_url']
-                image_url = secrets.token_urlsafe(16)
-                await bot.db.execute("INSERT INTO images VALUES ($1, $2)", image_url, redirect_url)
-                return redirect_url
-    except aiohttp.ClientError as e:
-        return f"Something went wrong uploading your file. Error: {e}"
-async def process_avqueue():
-  while 1 == 1:
-    if len(bot.avqueue) == 0:
-      print("No avqueue to process")
-      continue
-    else:
-      print("Processing avqueue")
-      obj = bot.avqueue[0]
-      await upload_image(obj[0], obj[1])
-      bot.avqueue.pop(0)
-
 
 @bot.check 
 async def disabled_command(ctx: PretendContext): 
