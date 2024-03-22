@@ -333,9 +333,6 @@ class Messages(Cog):
        if not message.author.guild_permissions.manage_messages:
          cooldown = await self.get_ratelimit(message)
          if not message.attachments:
-           if cooldown:
-             await asyncio.sleep(2)
-
            await message.delete()
 
 async def setup(bot) -> None: 
