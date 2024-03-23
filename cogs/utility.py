@@ -1883,7 +1883,7 @@ class Utility(commands.Cog):
     returns a random tag from the guild
     """
 
-    result = await self.bot.db.fetch(
+    result = await self.bot.db.fetchrow(
       """
       SELECT * FROM tags
       WHERE guild_id = $1
