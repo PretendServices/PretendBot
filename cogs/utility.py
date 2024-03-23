@@ -1872,7 +1872,12 @@ class Utility(commands.Cog):
       [
         f"{result['name']} - {result['response']}"
         for result in results
-      ]
+      ],
+      title=f"Tags {len(results)}",
+      author={
+        "name": ctx.guild.name,
+        "icon_url": ctx.guild.icon or None
+      }
     )
 
   @tag.command(
@@ -1972,6 +1977,34 @@ class Utility(commands.Cog):
     
     user = self.bot.get_user(check["author_id"])
     return await ctx.pretend_send(f"The author of this tag is **{user}**")
+  
+  @tag.command(
+    name="search"
+  )
+  async def tag_search(self, ctx: PretendContext, *, query: str):
+    """
+    search for a tag
+    """
+
+    results = await self.bot.db.fetch(
+      f"""
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name LIKE '%{query}%'
+      """,
+      ctx.guild.id
+    )
+
+    if not results:
+      return await ctx.send_warning(f"No **tags** found")
+
+    await ctx.paginate(
+      [
+        f"**{result['name']}**"
+        for result in results
+      ],
+      title=f"Tags like {query}"
+    )
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Utility(bot))    
