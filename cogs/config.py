@@ -514,22 +514,25 @@ class Config(Cog):
   @has_guild_permissions(manage_guild=True)
   async def prefix(self, ctx: PretendContext, prefix: str): 
    """set a guild prefix"""
+
    if prefix in ['none', 'remove']: 
      check = await self.bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild_id = $1",ctx.guild.id)
      if not check: 
        return await ctx.send_warning("This server does **not** have any prefix")
+     
      await self.bot.db.execute("DELETE FROM prefixes WHERE guild_id = $1", ctx.guild.id)
      return await ctx.send_success("Guild prefix removed")
    
    if len(prefix) > 7: 
     raise BadArgument("Prefix is too long!")
    
-   try: 
-    await self.bot.db.execute("INSERT INTO prefixes VALUES ($1,$2)", ctx.guild.id, prefix)
-   except: 
-    await self.bot.db.execute("UPDATE prefixes SET prefix = $1 WHERE guild_id = $2", prefix, ctx.guild.id)   
-   finally:
-    return await ctx.send_success(f"Guild prefix now **configured** as `{prefix}`") 
+   if check:
+    args = ["INSERT INTO prefixes VALUES ($1,$2)", ctx.guild.id, prefix]
+   else:
+    args = ["UPDATE prefixes SET prefix = $1 WHERE guild_id = $2", prefix, ctx.guild.id]
+    
+   await self.bot.db.execute(*args)
+   return await ctx.send_success(f"Guild prefix now **configured** as `{prefix}`") 
   
   @command()
   async def variables(self, ctx: PretendContext):
