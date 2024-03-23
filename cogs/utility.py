@@ -244,7 +244,7 @@ class Utility(commands.Cog):
     results = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", member.id)
 
     if not results: 
-      return await ctx.send_error(f"{'You don\'t' if member == ctx.author else f'{member.mention} doesn\'t'} have **avatar history**")
+      return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} doesn't have **avatar history**")
     embed = discord.Embed(
       color=self.bot.color,
       url=f"https://images.pretend.best/avatarhistory/{member.id}",
