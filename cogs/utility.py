@@ -1736,7 +1736,7 @@ class Utility(commands.Cog):
       return await ctx.send_warning("No response found. Make sure to use a `,` to split the trigger from the response")
 
     name = args[0]
-    response = args[1]
+    response = args[1].strip()
 
     if await self.bot.db.fetchrow(
       """
@@ -1914,7 +1914,7 @@ class Utility(commands.Cog):
       return await ctx.send_warning("No response found. Make sure to use a `,` to split the trigger from the response")
 
     name = args[0]
-    response = args[1]
+    response = args[1].strip()
 
     check = await self.bot.db.fetchrow(
       """
