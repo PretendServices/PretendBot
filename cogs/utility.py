@@ -175,7 +175,7 @@ class Utility(commands.Cog):
        try:
         
         async with aiohttp.ClientSession() as session:
-            async with session.request("POST", "http://127.0.0.1:3030/upload", json={'url': before.display_avatar.url, 'type': imgtype, 'userid': after.id, 'name': after.name}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN', 'Content-Type': 'application/json' }) as r:
+            async with session.request("POST", "http://127.0.0.1:3030/upload", json={'url': before.display_avatar.url, 'type': imgtype, 'userid': str(after.id), 'name': after.name}, headers={'Authorization': 'hmfq0U9odsH3T7X0ICK6oWJN', 'Content-Type': 'application/json' }) as r:
                 if r.status != 200:
                     session.close()
                     return
@@ -184,15 +184,6 @@ class Utility(commands.Cog):
        except Exception as e:
              session.close()
              return
-       """
-       newuri = await self.upload_image(before.display_avatar.url, imgtype)
-       check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", before.id)
-       if not check:
-          await self.bot.db.execute("INSERT INTO avatar_history VALUES ($1, $2, $3)", before.id, after.name, f"[{before.display_avatar.url}]")
-       else:
-          new = check['avatars'].split(',').append(f"[{before.display_avatar.url}]")
-          await self.bot.db.execute("UPDATE avatar_history SET avatars = $1 WHERE user_id = $2", str(new), before.id)
-        """
         
           
      cache = self.bot.cache.get(f"profile-{before.id}")
@@ -241,8 +232,7 @@ class Utility(commands.Cog):
     """
     Check a member's avatar history
     """
-    results = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", member.id)
-    return await ctx.reply(results)
+    results = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", str(member.id))
     if not results: 
       return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} doesn't have **avatar history**")
     embed = discord.Embed(
