@@ -1902,7 +1902,8 @@ class Utility(commands.Cog):
       return await ctx.send_warning(f"There are **no** tags set")
     
     x = await self.bot.embed_build.convert(ctx, result["response"])
-    await ctx.send(f"({result['name']}) {x}")
+    x["content"] = f"({result["name"]}) {x["content"]}"
+    await ctx.send(**x)
 
   @tag.command(
     name="edit",
