@@ -1221,7 +1221,8 @@ class Fun(Cog):
     )\
     .add_field(
       name="Artists",
-      value=self.shorten(info["artist_names"], 33)
+      value=self.shorten(info["artist_names"], 33),
+      inline=False
     )\
     .add_field(
       name="Release Date",
