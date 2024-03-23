@@ -615,6 +615,11 @@ class Fun(Cog):
 
     return await ctx.reply(embed=embed)    
   
+  def shorten(self, value: str, length: int = 32):
+    if len(value) > length:
+        value = value[:length-2] + ("..." if len(value) > length else "").strip()
+    return value
+  
   @hybrid_command()
   async def quran(self, ctx: PretendContext):
     """
@@ -1193,7 +1198,11 @@ class Fun(Cog):
       return await ctx.send_warning(f"No results found for **{title}**")
     
     info = response["hits"][0]["result"]
-    thumbnail = info["song_art_image_url"]
+
+    try:
+      thumbnail = info["song_art_image_url"]
+    except KeyError:
+      thumbnail = None
 
     if thumbnail:
       color = await self.bot.dominant_color(str(thumbnail))
@@ -1212,7 +1221,7 @@ class Fun(Cog):
     )\
     .add_field(
       name="Artists",
-      value=info["artist_names"]
+      value=self.shorten(info["artist_names"], 33)
     )\
     .add_field(
       name="Release Date",
@@ -1231,6 +1240,9 @@ class Fun(Cog):
     )\
     .set_footer(
       text=f"{int(info['stats']['pageviews']):,} views"
+    )\
+    .set_thumbnail(
+      url=thumbnail or None
     )
     
     if rows := info["featured_artists"]:
