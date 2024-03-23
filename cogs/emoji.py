@@ -150,10 +150,11 @@ class Emoji(Cog):
     if await self.emoji_bucket(ctx, emoji):
       return
     
-    if len(name) < 2:
-      return await ctx.send_warning(f"Emoji names need a minimum of **2 characters**")
-    elif len(name) > 32:
-      return await ctx.send_warning(f"Emoji names can't be longer than **32 characters**")
+    if name:
+      if len(name) < 2:
+        return await ctx.send_warning(f"Emoji names need a minimum of **2 characters**")
+      elif len(name) > 32:
+        return await ctx.send_warning(f"Emoji names can't be longer than **32 characters**")
     
     name = name.replace(" ", "-")
 
