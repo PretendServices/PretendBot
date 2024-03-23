@@ -63,7 +63,9 @@ class EmbedBuilder():
     if '{invisible}' in params: 
         params=params.replace('{invisible}', '2b2d31') 
     if '{botcolor}' in params: 
-        params=params.replace('{botcolor}', "C294CA")       
+        params=params.replace('{botcolor}', "C294CA")
+    if '{botavatar}' in params:
+        params=params.replace ('{botavatar}', 'https://images-ext-1.discordapp.net/external/gQinzaMi-EYOvq-VudfO8fWk21PD2NLefrk6QZyVyDs/%3Fsize%3D1024/https/cdn.discordapp.com/icons/1177424668328726548/a_229e85dbdae4f77c4accdf92ced9d822.gif')
     if '{guild.icon}' in params:
       if user.guild.icon:
         params=params.replace('{guild.icon}', user.guild.icon.url)
