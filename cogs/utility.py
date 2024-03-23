@@ -1873,7 +1873,7 @@ class Utility(commands.Cog):
         f"{result['name']} - {result['response']}"
         for result in results
       ],
-      title=f"Tags {len(results)}",
+      title=f"Tags ({len(results)})",
       author={
         "name": ctx.guild.name,
         "icon_url": ctx.guild.icon or None
@@ -1902,7 +1902,7 @@ class Utility(commands.Cog):
       return await ctx.send_warning(f"There are **no** tags set")
     
     x = await self.bot.embed_build.convert(ctx, result["response"])
-    await ctx.send(**x)
+    await ctx.send(f"({result['name']}) {x}")
 
   @tag.command(
     name="edit",
