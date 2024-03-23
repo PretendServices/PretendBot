@@ -489,6 +489,56 @@ class Utility(commands.Cog):
     )
     await ctx.send(embed=embed)
 
+  @commands.hybrid_command(
+    name="channelinfo",
+    aliases=["ci"]
+  )
+  async def channelinfo(self, ctx: PretendContext, *, channel: Optional[TextChannel]=None):
+    """
+    view information about a channel
+    """
+
+    channel = channel or ctx.channel
+
+    embed = discord.Embed(
+      color=self.bot.color,
+      title=channel.name
+    )\
+    .set_author(
+      name=ctx.author.name,
+      icon_url=ctx.author.display_avatar
+    )\
+    .add_field(
+      name="Channel ID",
+      value=f"`{channel.id}`",
+      inline=True
+    )\
+    .add_field(
+      name="Type",
+      value=str(channel.type),
+      inline=True
+    )\
+    .add_field(
+      name="Guild",
+      value=f"{channel.guild.name} (`{channel.guild.id}`)",
+      inline=True
+    )\
+    .add_field(
+      name="Category",
+      value=f"{channel.category.name} (`{channel.category.id}`)",
+      inline=False
+    )\
+    .add_field(
+      name="Topic",
+      value=channel.topic or "N/A"
+    )\
+    .add_field(
+      name="Created At",
+      value=f"{discord.utils.format_dt(channel.created_at, style="F")} ({discord.utils.format_dt(channel.created_at, style="R")})"
+    )
+
+    await ctx.send(embed=embed)
+
   @commands.command()
   async def donators(self, ctx: PretendContext): 
     """
