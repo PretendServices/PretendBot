@@ -1692,6 +1692,286 @@ class Utility(commands.Cog):
       await ctx.send(f"🕰️ {ctx.author.mention}: I'm going to remind you in {humanfriendly.format_timespan(time)} about **{task}**")
      except: 
       return await ctx.send_warning(f"You already have a reminder set in this channel. Use `{ctx.clean_prefix}reminder stop` to cancel the reminder")
+     
+  @commands.group(
+    name="tag",
+    aliases=["tags", "t"],
+    invoke_without_command=True
+  )
+  async def tag(self, ctx: PretendContext, *, tag: str):
+    """
+    view a tag
+    """
+
+    check = await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      tag
+    )
+    
+    if not check:
+      return await ctx.send_warning(f"No tag found for **{tag}**")
+    
+    x = await self.bot.embed_build.convert(ctx, check["response"])
+    await ctx.send(**x)
+
+  @tag.command(
+    name="create",
+    aliases=["make"],
+    brief="manage server"
+  )
+  @commands.has_guild_permissions(manage_guild=True)
+  async def tag_create(self, ctx: PretendContext, *, args: str):
+    """
+    create a tag
+    """
+
+    args = args.split(",", maxsplit=1)
+
+    if len(args) == 1:
+      return await ctx.send_warning("No response found. Make sure to use a `,` to split the trigger from the response")
+
+    name = args[0]
+    response = args[1]
+
+    if await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      name
+    ):
+      return await ctx.send_warning(f"A tag for **{name}** already exists!")
+
+    await self.bot.db.execute(
+      """
+      INSERT INTO tags
+      VALUES ($1, $2, $3, $4)
+      """,
+      ctx.guild.id,
+      ctx.author.id,
+      name,
+      response
+    )
+    await ctx.send_success(
+      f"Added tag for **{name}**"
+      + f"\n```{response}```"
+    )
+
+  @tag.command(
+    name="remove",
+    aliases=["delete", "del"],
+    brief="manage server"
+  )
+  @commands.has_guild_permissions(manage_guild=True)
+  async def tag_remove(self, ctx: PretendContext, *, tag: str):
+    """
+    delete a tag
+    """
+
+    if not await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      tag
+    ):
+      return await ctx.send_warning(f"That is **not** an existing tag")
+    
+    await self.bot.db.execute(
+      """
+      DELETE FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      tag
+    )
+    await ctx.send_success(f"Deleted the tag **{tag}**")
+
+  @tag.command(
+    name="reset",
+    brief="manage server"
+  )
+  @commands.has_guild_permissions(manage_guild=True)
+  async def tag_reset(self, ctx: PretendContext):
+    """
+    delete all tags in the guild
+    """
+
+    if not await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    ):
+      return await ctx.send_warning(f"There are **no** tags set")
+    
+    async def yes_func(interaction: discord.Interaction):
+      await self.bot.db.execute(
+        """
+        DELETE FROM tags
+        WHERE guild_id = $1
+        """,
+        interaction.guild.id
+      )
+      await interaction.response.edit_message(
+        embed=discord.Embed(
+          description=f"{self.bot.yes} {interaction.user.mention}: Removed all **tags**",
+          color=self.bot.yes_color
+        ),
+        view=None
+      )
+    
+    async def no_func(interaction: discord.Interaction):
+      await interaction.response.edit_message(
+        embed=discord.Embed(
+          description=f"{interaction.user.mention}: Cancelling action...",
+          color=self.bot.color
+        ),
+        view=None
+      )
+
+    await ctx.confirmation_send(
+      f"Are you sure you want to **delete** all tags?",
+      yes_func,
+      no_func
+    )
+
+  @tag.command(
+    name="list",
+    brief="manage server"
+  )
+  @commands.has_guild_permissions(manage_guild=True)
+  async def tag_list(self, ctx: PretendContext):
+    """
+    returns a list of all tags
+    """
+
+    results = await self.bot.db.fetch(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      """,
+      ctx.guild.id
+    )
+
+    if not results:
+      return await ctx.send_warning(f"There are **no** tags set")
+    
+    await ctx.paginate(
+      [
+        f"{result["name"]} - {result["response"]}"
+        for result in results
+      ]
+    )
+
+  @tag.command(
+    name="random"
+  )
+  async def tag_random(self, ctx: PretendContext):
+    """
+    returns a random tag from the guild
+    """
+
+    result = await self.bot.db.fetch(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      ORDER BY RANDOM()
+      LIMIT 1
+      """,
+      ctx.guild.id
+    )
+
+    if not result:
+      return await ctx.send_warning(f"There are **no** tags set")
+    
+    x = await self.bot.embed_build.convert(ctx, result["response"])
+    await ctx.send(**x)
+
+  @tag.command(
+    name="edit",
+    brief="tag owner"
+  )
+  async def tag_edit(self, ctx: PretendContext, *, args: str):
+    """
+    edit a tag
+    """
+
+    args = args.split(",", maxsplit=1)
+
+    if len(args) == 1:
+      return await ctx.send_warning("No response found. Make sure to use a `,` to split the trigger from the response")
+
+    name = args[0]
+    response = args[1]
+
+    check = await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      name
+    )
+
+    if not check:
+      return await ctx.send_warning(f"No tag found for **{name}**")
+    
+    if check["author_id"] != ctx.author.id:
+      return await ctx.send_warning(f"You are not the **author** of this tag")
+    
+    await self.bot.db.execute(
+      """
+      UPDATE tags
+      SET response = $1
+      WHERE guild_id = $2
+      AND name = $3
+      """,
+      response,
+      ctx.guild.id,
+      name
+    )
+    await ctx.send_success(
+      f"Updated tag for **{name}**"
+      + f"\n```{response}```"
+    )
+
+  @tag.command(
+    name="creator",
+    aliases=["author"]
+  )
+  async def tag_creator(self, ctx: PretendContext, *, tag: str):
+    """
+    view the creator of a tag
+    """
+
+    check = await self.bot.db.fetchrow(
+      """
+      SELECT * FROM tags
+      WHERE guild_id = $1
+      AND name = $2
+      """,
+      ctx.guild.id,
+      tag
+    )
+
+    if not check:
+      return await ctx.send_warning(f"No tag found for **{tag}**")
+    
+    user = self.bot.get_user(check["author_id"])
+    return await ctx.pretend_send(f"The author of this tag is **{user}**")
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Utility(bot))    
