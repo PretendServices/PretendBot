@@ -2045,7 +2045,7 @@ class Utility(commands.Cog):
       inline=True
     )
 
-    embed.set_image(url=("https://place-hold.it/250x219/" + str(color).replace("#", "") + "?text=%20"))
+    embed.set_thumbnail(url=("https://place-hold.it/250x219/" + str(color).replace("#", "") + "?text=%20"))
 
     return await ctx.send(embed=embed)
 
