@@ -233,12 +233,13 @@ class Utility(commands.Cog):
     Check a member's avatar history
     """
     results = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", str(member.id))
+    length = len(results['avatars']) if results else 0
     if not results: 
       return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} doesn't have **avatar history**")
     embed = discord.Embed(
       color=self.bot.color,
       url=f"https://images.pretend.best/avatarhistory/{member.id}",
-      title=f"{member.name}'s avatar history ({len(results)})"
+      title=f"{member.name}'s avatar history ({length})"
     )
     return await ctx.reply(embed=embed)
   @commands.command(aliases=['clearavs', 'clearavh', 'clearavatarhistory'])
