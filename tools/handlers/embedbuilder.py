@@ -29,7 +29,7 @@ class EmbedBuilder():
     if '{user.name}' in params:
         params=params.replace('{user.name}', user.name)
     if '{user.id}' in params:
-      params=params.replace('{user.id}', user.id)
+      params=params.replace('{user.id}', str(user.id))
     if '{user.avatar}' in params:
         params=params.replace('{user.avatar}', str(user.display_avatar.url))
     if '{user.joined_at}' in params:
