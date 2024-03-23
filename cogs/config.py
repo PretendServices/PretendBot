@@ -526,8 +526,8 @@ class Config(Cog):
    if len(prefix) > 7: 
     raise BadArgument("Prefix is too long!")
    
-   res = await self.bot.db.fetchrow("SELECT prefix FROM prefixes WHERE guild_id = $1",ctx.guild.id)
-   if res:
+   res = await self.bot.db.fetchrow("SELECT * FROM prefixes WHERE guild_id = $1",ctx.guild.id)
+   if not res:
     args = ["INSERT INTO prefixes VALUES ($1,$2)", ctx.guild.id, prefix]
    else:
     args = ["UPDATE prefixes SET prefix = $1 WHERE guild_id = $2", prefix, ctx.guild.id]
