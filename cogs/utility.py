@@ -534,7 +534,7 @@ class Utility(commands.Cog):
     )\
     .add_field(
       name="Created At",
-      value=f"{discord.utils.format_dt(channel.created_at, style="F")} ({discord.utils.format_dt(channel.created_at, style="R")})"
+      value=f"{discord.utils.format_dt(channel.created_at, style='F')} ({discord.utils.format_dt(channel.created_at, style='R')})"
     )
 
     await ctx.send(embed=embed)
