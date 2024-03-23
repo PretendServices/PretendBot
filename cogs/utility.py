@@ -235,7 +235,8 @@ class Utility(commands.Cog):
     results = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", str(member.id))
     length = len(json.loads(results['avatars'])) if results else 0
     if not results: 
-      return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} doesn't have **avatar history**")
+      does = "does" if member == ctx.author else f"doesn't"
+      return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} {does} have an **avatar history**")
     embed = discord.Embed(
       color=self.bot.color,
       url=f"https://images.pretend.best/avatarhistory/{member.id}",
