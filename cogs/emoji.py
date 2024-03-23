@@ -155,8 +155,7 @@ class Emoji(Cog):
         return await ctx.send_warning(f"Emoji names need a minimum of **2 characters**")
       elif len(name) > 32:
         return await ctx.send_warning(f"Emoji names can't be longer than **32 characters**")
-    
-    name = name.replace(" ", "-")
+      name = name.replace(" ", "-")
 
     try:
       emoji_created = await ctx.guild.create_custom_emoji(
