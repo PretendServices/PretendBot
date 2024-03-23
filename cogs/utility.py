@@ -1870,7 +1870,7 @@ class Utility(commands.Cog):
     
     await ctx.paginate(
       [
-        f"{result["name"]} - {result["response"]}"
+        f"{result['name']} - {result['response']}"
         for result in results
       ]
     )
