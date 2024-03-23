@@ -1230,7 +1230,7 @@ class Fun(Cog):
       inline=True
     )\
     .set_footer(
-      text=f"{int(info["stats"]["pageviews"]):,} views"
+      text=f"{int(info['stats']['pageviews']):,} views"
     )
     
     if rows := info["featured_artists"]:
