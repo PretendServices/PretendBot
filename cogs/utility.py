@@ -31,7 +31,7 @@ from tools.misc.views import Donate
 from tools.validators import ValidTime
 from tools.helpers import PretendContext 
 from tools.predicates import is_afk, is_there_a_reminder, reminder_exists
-from tools.misc.utils import Timezone, BdayDate, BdayMember, TimezoneMember, TimezoneLocation
+from tools.misc.utils import Timezone, BdayDate, BdayMember, TimezoneMember, TimezoneLocation, get_color
 
 from tools.handlers.socials.github import GithubUser
 from tools.handlers.socials.snapchat import SnapUser
@@ -42,6 +42,21 @@ from tools.handlers.socials.weather import WeatherLocation
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
 import re
+
+class Color(commands.Converter):
+    async def convert(self, ctx: PretendContext, argument: str):
+        argument = str(argument)
+
+        if argument.lower() in ("random", "rand", "r"):
+            return discord.Color.random()
+        elif argument.lower() in ("invisible", "invis"):
+            return discord.Color.from_str("#2F3136")
+
+        if color := get_color(argument):
+            return color
+        else:
+            raise commands.CommandError(f"Color **{argument}** not found")
+
 class Utility(commands.Cog):
   def __init__(self, bot: Pretend): 
     self.bot = bot 
@@ -2006,6 +2021,33 @@ class Utility(commands.Cog):
       ],
       title=f"Tags like {query}"
     )
+
+  @commands.command(
+    name="color",
+    aliases=["colour"]
+  )
+  async def color(self, ctx: PretendContext, *, color: Color):
+    """
+    view info about a color
+    """
+
+    embed = discord.Embed(color=color)
+    embed.set_author(name=f"Showing hex code: {color}")
+
+    embed.add_field(
+      name="RGB Value",
+      value=", ".join([str(x) for x in color.to_rgb()]),
+      inline=True
+    )
+    embed.add_field(
+      name="INT",
+      value=color.value,
+      inline=True
+    )
+
+    embed.set_image(url=("https://place-hold.it/250x219/" + str(color).replace("#", "") + "?text=%20"))
+
+    return await ctx.send(embed=embed)
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Utility(bot))    

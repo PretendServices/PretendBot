@@ -370,6 +370,10 @@ class Pretend(commands.AutoShardedBot):
     elif isinstance(error, commands.CommandRegistrationError): # this should never be used anywhere besides ValidCog
       return await ctx.send(error)
       
+    elif isinstance(error, commands.CommandError):
+      if not "Command raised an exception: " in str(error):
+        return await ctx.send_warning(error)
+
     else:
       code = "".join(
         random.choice(string.ascii_letters + string.digits)
