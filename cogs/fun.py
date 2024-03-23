@@ -13,6 +13,7 @@ from discord.ext.commands import BadArgument, Cog, hybrid_command, hybrid_group,
 from typing import List
 from aiogtts import aiogTTS
 
+from tools.bot import Pretend
 from tools.helpers import PretendContext 
 
 from tools.converters import AbleToMarry
@@ -585,11 +586,12 @@ class BlackTea:
       )     
 
 class Fun(Cog): 
-  def __init__(self, bot): 
-    self.bot = bot 
+  def __init__(self, bot: Pretend): 
+    self.bot = bot
     self.wedding = "💒"
     self.marry_color = 0xff819f
     self.description = "Fun commands"
+    self.songkey = "348c90f9d1mshf17b25698213ae5p186e51jsn84ed67bb1fe9"
   
   async def stats_execute(self, ctx: PretendContext, member: User) -> Message:
     """
@@ -1161,6 +1163,88 @@ class Fun(Cog):
       await interaction.response.edit_message(content=None, embed=embe, view=None)
   
     await ctx.confirmation_send(f"{ctx.author.mention} are you sure you want to divorce?", button1_callback, button2_callback)
+
+  @hybrid_command(
+    name="song",
+    aliases=["music", "beat", "songinfo"]
+  )
+  async def song(self, ctx: PretendContext, *, title: str):
+    """
+    get information about a song
+    """
+
+    headers = {
+      "X-RapidAPI-Key": str(self.songkey),
+      "X-RapidAPI-Host": "genius-song-lyrics1.p.rapidapi.com"
+    }
+    query = {
+      "q": title,
+      "per_page": 1,
+      "page": 1
+    }
+
+    response = await self.bot.session.get_json(
+      "https://genius-song-lyrics1.p.rapidapi.com/search/",
+      headers=headers,
+      params=query
+    )
+
+    if not response:
+      return await ctx.send_warning(f"No results found for **{title}**")
+    
+    info = response["hits"][0]["result"]
+    thumbnail = info["song_art_image_url"]
+
+    if thumbnail:
+      color = await self.bot.dominant_color(str(thumbnail))
+    else:
+      color = self.bot.color
+
+    embed = discord.Embed(
+      title=info["title"],
+      url=info["url"],
+      color=color,
+      timestamp=datetime.datetime.now()
+    )\
+    .set_author(
+      name=ctx.author.name,
+      icon_url=ctx.author.display_avatar.url
+    )\
+    .add_field(
+      name="Artists",
+      value=info["artist_names"]
+    )\
+    .add_field(
+      name="Release Date",
+      value=info["release_date_for_display"],
+      inline=True
+    )\
+    .add_field(
+      name="Hot",
+      value=info["stats"]["hot"],
+      inline=True
+    )\
+    .add_field(
+      name="Instrumental",
+      value=info["instrumental"],
+      inline=True
+    )\
+    .set_footer(
+      text=f"{int(info["stats"]["pageviews"]):,} views"
+    )
+    
+    if rows := info["featured_artists"]:
+      artists = []
+
+      for row in rows:
+        artists.append(row["name"])
+      
+      embed.add_field(
+        name="More Artists",
+        value=", ".join(artists)
+      )
+
+    await ctx.send(embed=embed)
 
 async def setup(bot) -> None: 
   await bot.add_cog(Fun(bot))     
