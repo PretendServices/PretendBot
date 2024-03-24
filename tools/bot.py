@@ -36,7 +36,6 @@ from .exceptions import RenameRateLimit, LastFmException, WrongMessageLink
 from io import BytesIO
 
 from cogs.music import Music
-from cogs.fun import BlackTea
 
 from discord.ext import commands
 
@@ -117,7 +116,6 @@ class Pretend(commands.AutoShardedBot):
    self.proxy_url = os.environ.get("proxy_url")
    self.other_bots = {}
    self.pretend_api = os.environ.get("pretend_key")
-   self.tea = BlackTea(self)
    self.an = AntinukeMeasures(self)
    self.embed_build = EmbedScript()
 
