@@ -141,8 +141,8 @@ class ValidReskinName(commands.Converter):
         )
     )
   
-    for arg in texts.split(" "):
-      if arg in argument: 
+    for arg in argument.split(" "):
+      if arg.lower() in texts: 
         raise commands.BadArgument("This name cannot be used for reskin")
 
     return argument
