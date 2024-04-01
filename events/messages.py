@@ -315,8 +315,7 @@ class Messages(Cog):
      
    @Cog.listener("on_message")
    async def imageonly_check(self, message: Message):
-     if message.guild.id != self.testing_server:
-       return
+
      
      if not message.guild.me.guild_permissions.manage_messages:
        return
