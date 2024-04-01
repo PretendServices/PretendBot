@@ -252,8 +252,8 @@ class Pretend(commands.AutoShardedBot):
             )
 
             await webhook.send(
-              name="pretend",
-              avatar=self.user.display_avatar.url,
+              username="pretend",
+              avatar_url=self.user.display_avatar.url,
               embed=embed,
               file=file
             )
