@@ -33,10 +33,12 @@ class Autopfp(commands.Cog):
         Add an autopfp channel
         """
         
-        webhook = next(
-            iter(await channel.webhooks()),
-            await channel.create_webhook(name="pretend pfps")
-        )
+        webhooks = [w for w in await channel.webhooks() if w.user.id == self.bot.user.id]
+    
+        if len(webhooks) > 0: 
+            webhook = webhooks[0]
+        else: 
+            webhook = await channel.create_webhook(name="pretend pfps")
 
         await self.bot.db.execute(
             """
@@ -95,10 +97,12 @@ class Autopfp(commands.Cog):
         Add an autobanner channel
         """
         
-        webhook = next(
-            iter(await channel.webhooks()),
-            await channel.create_webhook(name="pretend pfps")
-        )
+        webhooks = [w for w in await channel.webhooks() if w.user.id == self.bot.user.id]
+    
+        if len(webhooks) > 0: 
+            webhook = webhooks[0]
+        else: 
+            webhook = await channel.create_webhook(name="pretend pfps")
 
         await self.bot.db.execute(
             """
