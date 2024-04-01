@@ -13,7 +13,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_message_delete")
     async def message_delete_logger(self, message: discord.Message):
         if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", message.guild.id):
-            channel = await self.bot.fetch_channel(check["messages"])
+            channel = self.bot.get_channel(check["messages"])
             if not channel:
                 return await self.bot.db.execute(
                     """
@@ -45,7 +45,7 @@ class Logging(commands.Cog):
     async def message_edit_logger(self, before: discord.Message, after: discord.Message):
         if after.content != before.content:
             if check := await self.bot.db.fetchrow("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
-                channel = await self.bot.fetch_channel(check["messages"])
+                channel = self.bot.get_channel(check["messages"])
                 if not channel:
                     return await self.bot.db.execute(
                         """
@@ -87,7 +87,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_guild_update")
     async def guild_update_logger(self, before: discord.Guild, after: discord.Guild):
         if check := await self.bot.db.fetchrow("SELECT guild FROM logging WHERE guild_id = $1", before.id):
-            channel = await self.bot.fetch_channel(check["guild"])
+            channel = self.bot.get_channel(check["guild"])
             if not channel:
                 await self.bot.db.execute(
                     """
@@ -113,6 +113,9 @@ class Logging(commands.Cog):
             if before.banner != after.banner:
                 actions.append(f"**Old Banner**: {before.banner.url}\n**New Banner** {after.banner.url if after.banner else 'Removed'}")
 
+            if not actions:
+                return
+
             embed = discord.Embed(
                 title="Guild Edited",
                 description="\n".join(actions),
@@ -124,7 +127,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_guild_role_create")
     async def role_create_logger(self, role: discord.Role):
         if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", role.guild.id):
-            channel = await self.bot.fetch_channel(check["roles"])
+            channel = self.bot.get_channel(check["roles"])
             if not channel:
                 await self.bot.db.execute(
                     """
@@ -150,7 +153,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_guild_role_delete")
     async def role_delete_logger(self, role: discord.Role):
         if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", role.guild.id):
-            channel = await self.bot.fetch_channel(check["roles"])
+            channel = self.bot.get_channel(check["roles"])
             if not channel:
                 await self.bot.db.execute(
                     """
@@ -176,7 +179,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_guild_role_update")
     async def role_update_logger(self, before: discord.Role, after: discord.Role):
         if check := await self.bot.db.fetchrow("SELECT roles FROM logging WHERE guild_id = $1", before.id):
-            channel = await self.bot.fetch_channel(check["roles"])
+            channel = self.bot.get_channel(check["roles"])
             if not channel:
                 await self.bot.db.execute(
                     """
