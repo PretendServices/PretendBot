@@ -331,6 +331,7 @@ class Pretend(commands.AutoShardedBot):
     log.info(f"Connected as {self.user}")
     await Music(self).start_nodes()
     await self.start_loops()
+    await asyncio.ensure_future(await self.autopfp())
 
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """
