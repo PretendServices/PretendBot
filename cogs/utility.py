@@ -41,7 +41,9 @@ from tools.handlers.socials.cashapp import CashappUser
 from tools.handlers.socials.weather import WeatherLocation
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
+from aiofiles import open as aio_open
 import re
+import tempfile
 
 class Color(commands.Converter):
     async def convert(self, ctx: PretendContext, argument: str):
@@ -2100,6 +2102,57 @@ class Utility(commands.Cog):
     embed.set_thumbnail(url=("https://place-hold.it/250x219/" + str(color).replace("#", "") + "?text=%20"))
 
     return await ctx.send(embed=embed)
+  
+  @commands.command(
+    name="transparent",
+    aliases=["tp"]
+  )
+  @commands.cooldown(1, 6, commands.BucketType.user)
+  async def transparent(self, ctx: PretendContext, url: str = None):
+    """
+    make an image transparent
+    """
+
+    if not url:
+      url = await ctx.get_attachment()
+      if not url:
+        return await ctx.send_help(ctx.command)
+      
+      url = url.url
+
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"  
+    if not re.findall(regex, url):
+      return await ctx.send_error("The image provided is not an url")
+    
+    async with ctx.channel.typing():
+      image = await self.bot.session.get_bytes(url)
+      
+    with tempfile.TemporaryDirectory() as tdir:
+      temp_file = os.path.join(tdir, f"transparent.png")
+      temp_file_output = os.path.join(f"transparent_output.png")
+
+      async with aio_open(temp_file, "wb") as f:
+        await f.write(image)
+
+      try:
+        term = await asyncio.wait_for(
+          asyncio.create_subprocess_shell(
+            f"rembg i {temp_file} {temp_file_output}",
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+          ),
+          timeout=15
+        )
+        stdout, stderr = await term.communicate()
+      except asyncio.TimeoutError:
+        return await ctx.send_warning(f"Couldn't make the image **transparent** due to a timeout")
+      
+      if not os.path.exists(temp_file_output):
+        return await ctx.send_warning(f"Couldn't make the image **transparent**")
+      
+      await ctx.reply(
+        file=discord.File(temp_file_output),
+      )
 
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Utility(bot))    
