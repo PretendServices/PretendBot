@@ -167,7 +167,7 @@ class Autopfp(commands.Cog):
         embed = discord.Embed(color=self.bot.color)
 
         embed.set_image(url=f"attachment://{file.filename}")
-        embed.set_footer(text=f"{type} module: {category} • id: {image_id}")
+        embed.set_footer(text=f"{type} module: {category} • id: {image_id} • /report")
 
         channel = self.bot.get_channel(1224395162172784670)
         try:
