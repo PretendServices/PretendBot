@@ -248,7 +248,7 @@ class Pretend(commands.AutoShardedBot):
               url=f"attachment://{file.filename}"
             )
             embed.set_footer(
-              text=f"{result['type']} module: {category} • id: {file.filename[:-4]}"
+              text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
             )
 
             await webhook.send(
@@ -331,7 +331,7 @@ class Pretend(commands.AutoShardedBot):
     log.info(f"Connected as {self.user}")
     await Music(self).start_nodes()
     await self.start_loops()
-    await asyncio.ensure_future(await self.autopfp())
+    asyncio.ensure_future(self.autopfp())
 
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """
