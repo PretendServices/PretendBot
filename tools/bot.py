@@ -118,7 +118,7 @@ class Pretend(commands.AutoShardedBot):
    self.pretend_api = os.environ.get("pretend_key")
    self.an = AntinukeMeasures(self)
    self.embed_build = EmbedScript()
-   self.autopfp_send = True
+   self.autopfp_send = False
 
   def run(self):
    """
