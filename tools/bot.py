@@ -118,6 +118,7 @@ class Pretend(commands.AutoShardedBot):
    self.pretend_api = os.environ.get("pretend_key")
    self.an = AntinukeMeasures(self)
    self.embed_build = EmbedScript()
+   self.autopfp_send = True
 
   def run(self):
    """
@@ -216,6 +217,49 @@ class Pretend(commands.AutoShardedBot):
    """
 
    return await super().get_context(message, cls=cls)
+  
+  async def autopfp(self):
+    main_directory = './PretendImages'
+    if self.autopfp_send:
+      results = await self.db.fetch("SELECT * FROM autopfp")
+
+      if not results:
+        self.autopfp_send = False
+        return
+      
+      for result in results:
+        directory = f"{main_directory}/{str(result['type']).capitalize()}"
+        category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
+
+        if category in os.listdir(directory):
+          directory += f"/{category}/"
+          file_path = os.path.join(directory, random.choice(os.listdir(directory)))
+
+          async with aiohttp.ClientSession() as cs:
+            file = discord.File(file_path)
+
+            try:
+              webhook = discord.Webhook.from_url(result["webhook_url"], session=cs)
+            except ValueError:
+              continue
+
+            embed = discord.Embed(color=self.color)
+            embed.set_image(
+              url=f"attachment://{file.filename}"
+            )
+            embed.set_footer(
+              text=f"{result['type']} module: {category} • id: {file.filename[:-4]}"
+            )
+
+            await webhook.send(
+              name="pretend",
+              avatar=self.user.display_avatar.url,
+              embed=embed,
+              file=file
+            )
+            await asyncio.sleep(10)
+
+        return await self.autopfp()
 
   async def start_loops(self) -> None: 
    """
