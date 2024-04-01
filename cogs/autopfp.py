@@ -49,7 +49,7 @@ class Autopfp(commands.Cog):
         
         if not self.bot.autopfp_send: 
             self.bot.autopfp_send = True 
-            asyncio.ensure_future(self.bot.autopfp())
+            asyncio.ensure_future(await self.bot.autopfp())
 
         return await ctx.send_success(f"Sending **{category}** pfps to {channel.mention}")
     
@@ -111,7 +111,7 @@ class Autopfp(commands.Cog):
         
         if not self.bot.autopfp_send: 
             self.bot.autopfp_send = True 
-            asyncio.ensure_future(self.bot.autopfp())
+            asyncio.ensure_future(await self.bot.autopfp())
 
         return await ctx.send_success(f"Sending **{category}** banners to {channel.mention}")
     
