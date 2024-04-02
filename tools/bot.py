@@ -223,15 +223,15 @@ class Pretend(commands.AutoShardedBot):
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
       guild_list = '\n'.join([f"{self.get_guild(r['guild_id'])} ({r['guild_id']})" for r in results])
-      logging.info(f"Sending autopfps in {len(results)}:\n{guild_list}")
+      log.info(f"Sending autopfps in {len(results)}:\n{guild_list}")
       if not results:
-        logging.warn(f"There are no results for {kind}. Stopping")
+        log.warn(f"There are no results for {kind}. Stopping")
         setattr(self, f"{kind}_send", False)
         return
       
       for result in results:
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
-        logging.info(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}")
+        log.info(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}")
         if category in os.listdir(directory):
           directory += f"/{category}/"
           file_path = os.path.join(directory, random.choice(os.listdir(directory)))
@@ -242,7 +242,7 @@ class Pretend(commands.AutoShardedBot):
             try:
               webhook = discord.Webhook.from_url(result["webhook_url"], session=cs)
             except ValueError:
-              logging.warn(f"Webhook for {self.get_guild(result['guild_id'])} doesn't work...")
+              log.warn(f"Webhook for {self.get_guild(result['guild_id'])} doesn't work...")
               continue
 
             embed = discord.Embed(color=self.color)
