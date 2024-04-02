@@ -221,14 +221,17 @@ class Pretend(commands.AutoShardedBot):
   async def autoposting(self, kind: str):
     directory = f'./PretendImages/{kind.capitalize()}'
     if getattr(self, f"{kind}_send"):
+      print(f"Looping thru {kind}")
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
 
       if not results:
+        print(f"There are no results for {kind}. Stopping")
         setattr(self, f"{kind}_send", False)
         return
       
       for result in results:
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
+        print(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}")
         if category in os.listdir(directory):
           directory += f"/{category}/"
           file_path = os.path.join(directory, random.choice(os.listdir(directory)))
@@ -255,7 +258,7 @@ class Pretend(commands.AutoShardedBot):
               embed=embed,
               file=file
             )
-            await asyncio.sleep(10)
+            await asyncio.sleep(3)
 
         return await self.autoposting(kind)
 
