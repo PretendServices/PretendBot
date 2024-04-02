@@ -230,9 +230,7 @@ class Pretend(commands.AutoShardedBot):
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
         if category in os.listdir(directory):
           directory += f"/{category}"
-          print(f"Current directory for {self.get_guild(result['guild_id'])} {directory}")
           file_path = directory + "/" + random.choice(os.listdir(directory))
-          print(f"File path for {self.get_guild(result['guild_id'])} {file_path}")
           file = discord.File(file_path)
           try:
             webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
@@ -247,7 +245,6 @@ class Pretend(commands.AutoShardedBot):
             text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
           )
 
-          print(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}") 
           await webhook.send(
             username="pretend",
             avatar_url=self.user.display_avatar.url,
