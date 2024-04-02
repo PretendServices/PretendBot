@@ -223,7 +223,7 @@ class Pretend(commands.AutoShardedBot):
     if getattr(self, f"{kind}_send"):
       print(f"Looping thru {kind}")
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
-
+      print(f"Sending autopfps in {len(results)}:\n{'\n'.join([f'{self.get_guild(r['guild_id'])} ({r['guild_id']})' for r in results])}")
       if not results:
         print(f"There are no results for {kind}. Stopping")
         setattr(self, f"{kind}_send", False)
