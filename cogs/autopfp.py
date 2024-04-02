@@ -34,7 +34,7 @@ class Autopfp(commands.Cog):
         """
         
         webhook = next(
-            (e for e in await channel.webhooks() if e.token), 
+            (e for e in await channel.webhooks() if e.user.id == self.bot.user.id), 
             await channel.create_webhook(name="pretend - pfps")
         )
 
@@ -96,7 +96,7 @@ class Autopfp(commands.Cog):
         """
         
         webhook = next(
-            (e for e in await channel.webhooks() if e.token), 
+            (e for e in await channel.webhooks() if e.user.id == self.bot.user.id), 
             await channel.create_webhook(name="pretend - pfps")
         )
 
