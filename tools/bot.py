@@ -78,7 +78,7 @@ class Pretend(commands.AutoShardedBot):
           command_prefix=getprefix, 
           intents=intents,
           help_command=PretendHelp(),
-          owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
+          owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051, 1188955485462872226],
           case_insensitive=True, 
           shard_count=3,
           chunk_guilds_at_startup=False,
