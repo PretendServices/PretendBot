@@ -255,7 +255,7 @@ class Pretend(commands.AutoShardedBot):
           )
           await asyncio.sleep(7)
 
-        return await self.autoposting(kind)
+      return await self.autoposting(kind)
 
   async def start_loops(self) -> None: 
    """
