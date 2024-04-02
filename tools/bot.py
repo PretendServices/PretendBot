@@ -231,32 +231,29 @@ class Pretend(commands.AutoShardedBot):
         if category in os.listdir(directory):
           directory += f"/{category}/"
           file_path = os.path.join(directory, random.choice(os.listdir(directory)))
+          file = discord.File(file_path)
+          try:
+            webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
+          except ValueError as e:
+            print(f"Unable to send webhook in {self.get_guild(result['guild_id'])} - {e}")
+            continue
 
-          async with aiohttp.ClientSession() as cs:
-            file = discord.File(file_path)
+          embed = discord.Embed(color=self.color)
+          embed.set_image(
+            url=f"attachment://{file.filename}"
+          )
+          embed.set_footer(
+            text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
+          )
 
-            try:
-              webhook = discord.Webhook.from_url(result["webhook_url"], session=cs)
-            except ValueError as e:
-              print(f"Unable to send webhook in {self.get_guild(result['guild_id'])} - {e}")
-              continue
-
-            embed = discord.Embed(color=self.color)
-            embed.set_image(
-              url=f"attachment://{file.filename}"
-            )
-            embed.set_footer(
-              text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
-            )
-
-            print(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}") 
-            await webhook.send(
-              username="pretend",
-              avatar_url=self.user.display_avatar.url,
-              embed=embed,
-              file=file
-            )
-            await asyncio.sleep(7)
+          print(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}") 
+          await webhook.send(
+            username="pretend",
+            avatar_url=self.user.display_avatar.url,
+            embed=embed,
+            file=file
+          )
+          await asyncio.sleep(7)
 
         return await self.autoposting(kind)
 
