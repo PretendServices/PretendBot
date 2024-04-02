@@ -33,12 +33,10 @@ class Autopfp(commands.Cog):
         Add an autopfp channel
         """
         
-        webhooks = [w for w in await channel.webhooks() if w.user.id == self.bot.user.id]
-    
-        if len(webhooks) > 0: 
-            webhook = webhooks[0]
-        else: 
-            webhook = await channel.create_webhook(name="pretend pfps")
+        webhook = next(
+            (e for e in await channel.webhooks() if e.token), 
+            await channel.create_webhook(name="pretend - pfps")
+        )
 
         await self.bot.db.execute(
             """
@@ -49,9 +47,9 @@ class Autopfp(commands.Cog):
             ctx.guild.id, "pfps", category, webhook.url
         )
         
-        if not self.bot.autopfp_send: 
-            self.bot.autopfp_send = True 
-            asyncio.ensure_future(await self.bot.autopfp())
+        if not self.bot.pfps_send: 
+            self.bot.pfps_send = True 
+            asyncio.ensure_future(await self.bot.autoposting('pfps'))
 
         return await ctx.send_success(f"Sending **{category}** pfps to {channel.mention}")
     
@@ -97,12 +95,10 @@ class Autopfp(commands.Cog):
         Add an autobanner channel
         """
         
-        webhooks = [w for w in await channel.webhooks() if w.user.id == self.bot.user.id]
-    
-        if len(webhooks) > 0: 
-            webhook = webhooks[0]
-        else: 
-            webhook = await channel.create_webhook(name="pretend pfps")
+        webhook = next(
+            (e for e in await channel.webhooks() if e.token), 
+            await channel.create_webhook(name="pretend - pfps")
+        )
 
         await self.bot.db.execute(
             """
@@ -113,9 +109,9 @@ class Autopfp(commands.Cog):
             ctx.guild.id, "banners", category, webhook.url
         )
         
-        if not self.bot.autopfp_send: 
-            self.bot.autopfp_send = True 
-            asyncio.ensure_future(await self.bot.autopfp())
+        if not self.bot.banners_send: 
+            self.bot.banners_send = True 
+            asyncio.ensure_future(await self.bot.autoposting("banners"))
 
         return await ctx.send_success(f"Sending **{category}** banners to {channel.mention}")
     

@@ -31,7 +31,6 @@ from .misc.session import Session
 from .misc.tasks import pomelo_task, snipe_delete, shit_loop, bump_remind, check_monthly_guilds, gw_loop, reminder_task, counter_update
 
 from .handlers.embedbuilder import EmbedScript
-from .exceptions import RenameRateLimit, LastFmException, WrongMessageLink
 
 from io import BytesIO
 
@@ -75,50 +74,52 @@ class Pretend(commands.AutoShardedBot):
   """
 
   def __init__(self, db: asyncpg.Pool=None):
-   super().__init__( 
-    command_prefix=getprefix, 
-    intents=intents,
-    help_command=PretendHelp(),
-    owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
-    case_insensitive=True, 
-    shard_count=3,
-    shard_ids=[0,1,2],
-    strip_after_prefix=True, 
-    enable_debug_events=True,
-    allowed_mentions=discord.AllowedMentions(
-      everyone=False, 
-      roles=False, 
-      replied_user=False
-    ),
-    member_cache=discord.MemberCacheFlags(
-      joined=True,
-      voice=True
-    ),
-    activity=discord.CustomActivity(
-      name="/pretendbot"
-    )
-   )
-   self.db = db
-   self.avqueue = []
-   self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
-   self.color = 0xC294CA
-   self.warning = "<:warn:1189134620718018600>"  
-   self.warning_color = 0xefbc1b
-   self.no = "❌"
-   self.no_color = 0xfc341b
-   self.yes = "<:check:1188943556895838249>"
-   self.yes_color = 0x48db01
-   self.time = datetime.datetime.now()
-   self.mcd = commands.CooldownMapping.from_cooldown(3, 5, commands.BucketType.user)
-   self.ccd = commands.CooldownMapping.from_cooldown(4, 5, commands.BucketType.channel)
-   self.session = Session()
-   self.cache = Cache()
-   self.proxy_url = os.environ.get("proxy_url")
-   self.other_bots = {}
-   self.pretend_api = os.environ.get("pretend_key")
-   self.an = AntinukeMeasures(self)
-   self.embed_build = EmbedScript()
-   self.autopfp_send = True
+      super().__init__( 
+          command_prefix=getprefix, 
+          intents=intents,
+          help_command=PretendHelp(),
+          owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051],
+          case_insensitive=True, 
+          shard_count=3,
+          chunk_guilds_at_startup=False,
+          strip_after_prefix=True, 
+          enable_debug_events=True,
+          allowed_mentions=discord.AllowedMentions(
+            everyone=False, 
+            roles=False, 
+            replied_user=False
+          ),
+          member_cache=discord.MemberCacheFlags(
+            joined=True,
+            voice=True
+          ),
+          activity=discord.CustomActivity(
+            name="/pretendbot"
+          )
+      )
+      self.db = db
+      self.avqueue = []
+      self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
+      self.color = 0xC294CA
+      self.warning = "<:warn:1189134620718018600>"  
+      self.warning_color = 0xefbc1b
+      self.no = "❌"
+      self.no_color = 0xfc341b
+      self.yes = "<:check:1188943556895838249>"
+      self.yes_color = 0x48db01
+      self.time = datetime.datetime.now()
+      self.mcd = commands.CooldownMapping.from_cooldown(3, 5, commands.BucketType.user)
+      self.ccd = commands.CooldownMapping.from_cooldown(4, 5, commands.BucketType.channel)
+      self.session = Session()
+      self.cache = Cache()
+      self.proxy_url = os.environ.get("proxy_url")
+      self.other_bots = {}
+      self.pretend_api = os.environ.get("pretend_key")
+      self.an = AntinukeMeasures(self)
+      self.embed_build = EmbedScript()
+      self.pfps_send = True
+      self.banners_send = True
+
   def run(self):
    """
    Run the bot 
@@ -217,19 +218,17 @@ class Pretend(commands.AutoShardedBot):
 
    return await super().get_context(message, cls=cls)
   
-  async def autopfp(self):
-    main_directory = './PretendImages'
-    if self.autopfp_send:
-      results = await self.db.fetch("SELECT * FROM autopfp")
+  async def autoposting(self, kind: str):
+    directory = f'./PretendImages/{kind.capitalize()}'
+    if getattr(self, f"{kind}_send"):
+      results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
 
       if not results:
-        self.autopfp_send = False
+        setattr(self, f"{kind}_send", False)
         return
       
       for result in results:
-        directory = f"{main_directory}/{str(result['type']).capitalize()}"
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
-
         if category in os.listdir(directory):
           directory += f"/{category}/"
           file_path = os.path.join(directory, random.choice(os.listdir(directory)))
@@ -258,7 +257,7 @@ class Pretend(commands.AutoShardedBot):
             )
             await asyncio.sleep(10)
 
-        return await self.autopfp()
+        return await self.autoposting(kind)
 
   async def start_loops(self) -> None: 
    """
@@ -326,11 +325,18 @@ class Pretend(commands.AutoShardedBot):
    self.add_view(GiveawayView())
    self.add_view(TicketView(self, True))
 
+  async def __chunk_guilds(self):
+    for guild in self.guilds: 
+      await asyncio.sleep(0.001)
+      await guild.chunk(cache=True)
+
   async def on_ready(self) -> None:    
     log.info(f"Connected as {self.user}")
+    asyncio.ensure_future(self.__chunk_guilds())
     await Music(self).start_nodes()
+    asyncio.ensure_future(self.autoposting("pfps"))
+    asyncio.ensure_future(self.autoposting("banners"))
     await self.start_loops()
-    asyncio.ensure_future(self.autopfp())
 
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """

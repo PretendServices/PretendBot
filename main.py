@@ -12,13 +12,13 @@ bot = Pretend()
 @bot.check 
 async def disabled_command(ctx: PretendContext): 
   if await ctx.bot.db.fetchrow(
-   """
-   SELECT * FROM disablecmd
-   WHERE guild_id = $1
-   AND cmd = $2
-   """,
-   ctx.guild.id,
-   str(ctx.command)
+    """
+    SELECT * FROM disablecmd
+    WHERE guild_id = $1
+    AND cmd = $2
+    """,
+    ctx.guild.id,
+    str(ctx.command)
   ):
     if not ctx.author.guild_permissions.administrator:
       await ctx.send_error(f"The command **{str(ctx.command)}** is **disabled** in this server")   
