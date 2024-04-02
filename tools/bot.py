@@ -230,7 +230,7 @@ class Pretend(commands.AutoShardedBot):
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
         if category in os.listdir(directory):
           directory += f"/{category}"
-          file_path = os.path.join(directory, random.choice(os.listdir(directory)))
+          file_path = os.path.join(directory, random.choice(os.listdir(f"{directory}/")))
           file = discord.File(file_path)
           try:
             webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
