@@ -219,7 +219,6 @@ class Pretend(commands.AutoShardedBot):
    return await super().get_context(message, cls=cls)
   
   async def autoposting(self, kind: str):
-    directory = f'./PretendImages/{kind.capitalize()}'
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
       if not results:
@@ -227,7 +226,7 @@ class Pretend(commands.AutoShardedBot):
         return
       
       for result in results:
-        print(f"Current directory for {self.get_guild(result['guild_id'])} {directory}")
+        directory = f'./PretendImages/{kind.capitalize()}'
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
         if category in os.listdir(directory):
           directory += f"/{category}"
