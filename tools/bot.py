@@ -229,7 +229,7 @@ class Pretend(commands.AutoShardedBot):
       for result in results:
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
         if category in os.listdir(directory):
-          directory += f"/{category}/"
+          directory += f"/{category}"
           file_path = os.path.join(directory, random.choice(os.listdir(directory)))
           file = discord.File(file_path)
           try:
