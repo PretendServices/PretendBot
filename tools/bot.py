@@ -249,6 +249,7 @@ class Pretend(commands.AutoShardedBot):
               text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
             )
 
+            print(f"Sending {category} {kind} to {self.get_guild(result['guild_id'])}") 
             await webhook.send(
               username="pretend",
               avatar_url=self.user.display_avatar.url,
