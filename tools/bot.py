@@ -237,7 +237,8 @@ class Pretend(commands.AutoShardedBot):
 
             try:
               webhook = discord.Webhook.from_url(result["webhook_url"], session=cs)
-            except ValueError:
+            except ValueError as e:
+              print(f"Unable to send webhook in {self.get_guild(result['guild_id'])} - {e}")
               continue
 
             embed = discord.Embed(color=self.color)
