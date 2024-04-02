@@ -227,14 +227,17 @@ class Pretend(commands.AutoShardedBot):
         return
       
       for result in results:
+        print(f"Current directory for {self.get_guild(result['guild_id'])}")
         category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
         if category in os.listdir(directory):
           directory += f"/{category}"
+          print(f"Current directory for {self.get_guild(result['guild_id'])}")
           file_path = directory + "/" + random.choice(os.listdir(directory))
+          print(f"File path for {self.get_guild(result['guild_id'])} {file_path}")
           file = discord.File(file_path)
           try:
             webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
-          except ValueError as e:
+          except ValueError:
             continue
 
           embed = discord.Embed(color=self.color)
