@@ -89,7 +89,7 @@ class Autopfp(commands.Cog):
         self, 
         ctx: PretendContext, 
         channel: discord.TextChannel, 
-        category: Literal['random', 'cute', 'mix'] = "random"
+        category: Literal['random', 'cute', 'mix', 'imsg'] = "random"
     ):
         """
         Add an autobanner channel
@@ -120,7 +120,7 @@ class Autopfp(commands.Cog):
     async def autobanner_remove(
         self, 
         ctx: PretendContext, 
-        category: Literal['random', 'cute', 'mix'] = "random"
+        category: Literal['random', 'cute', 'mix', 'imsg'] = "random"
     ): 
         """
         Remove an autobanner channel
