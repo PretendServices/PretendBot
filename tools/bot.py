@@ -35,6 +35,7 @@ from .handlers.embedbuilder import EmbedScript
 from io import BytesIO
 
 from cogs.music import Music
+from cogs.fun import BlackTea
 
 from discord.ext import commands
 
@@ -117,6 +118,7 @@ class Pretend(commands.AutoShardedBot):
       self.pretend_api = os.environ.get("pretend_key")
       self.an = AntinukeMeasures(self)
       self.embed_build = EmbedScript()
+      self.tea = BlackTea(self)
       self.pfps_send = True
       self.banners_send = True
 
