@@ -35,7 +35,6 @@ from .handlers.embedbuilder import EmbedScript
 from io import BytesIO
 
 from cogs.music import Music
-from cogs.fun import BlackTea
 
 from discord.ext import commands
 
