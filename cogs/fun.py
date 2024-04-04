@@ -663,7 +663,7 @@ class Fun(Cog):
     play blacktea with the server members
     """
 
-    self.bot.tea.match_started(ctx.guild.id)
+    BlackTea(self.bot).match_started(ctx.guild.id)
     embed = Embed(color=self.bot.tea.color, title="BlackTea Matchmaking")
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1117819522372616352/1118203618978451596/emoji.png")
     embed.add_field(
@@ -683,7 +683,7 @@ class Fun(Cog):
     
     if len(users) < 2:
      self.bot.tea.MatchStart.remove(ctx.guild.id)
-     return await ctx.send("<a:pepe_sad:1046454975259218102> not enough players to start the blacktea match")
+     return await ctx.send("not enough players to start the blacktea match... 😓")
     
     words = self.bot.tea.get_words()
     self.bot.tea.players.update({f"{ctx.guild.id}": users})

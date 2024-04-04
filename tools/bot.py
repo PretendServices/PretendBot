@@ -118,7 +118,6 @@ class Pretend(commands.AutoShardedBot):
       self.pretend_api = os.environ.get("pretend_key")
       self.an = AntinukeMeasures(self)
       self.embed_build = EmbedScript()
-      self.tea = BlackTea(self)
       self.pfps_send = True
       self.banners_send = True
 
