@@ -228,39 +228,35 @@ class Pretend(commands.AutoShardedBot):
   async def autoposting(self, kind: str):
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
-      if not results:
-        setattr(self, f"{kind}_send", False)
-        return
       
-      for result in results:
-        directory = f'./PretendImages/{kind.capitalize()}'
-        category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
-        if category in os.listdir(directory):
-          directory += f"/{category}"
-          file_path = directory + "/" + random.choice(os.listdir(directory))
-          file = discord.File(file_path)
-          try:
-            webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
-          except ValueError:
-            continue
-
-          embed = discord.Embed(color=self.color)
-          embed.set_image(
-            url=f"attachment://{file.filename}"
-          )
-          embed.set_footer(
-            text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
-          )
-
-          await webhook.send(
-            username="pretend",
-            avatar_url=self.user.display_avatar.url,
-            embed=embed,
-            file=file
-          )
-          await asyncio.sleep(4)
-
-      return await self.autoposting(kind)
+      while results:
+          for result in results:
+            if channel := self.get_channel(result.channel_id):
+                directory = f'./PretendImages/{kind.capitalize()}'
+                category = (result.category if result.category != "random" else random.choice(os.listdir(directory))).capitalize()
+                if category in os.listdir(directory):
+                  directory += f"/{category}"
+                  file_path = directory + "/" + random.choice(os.listdir(directory))
+                  file = discord.File(file_path)
+                  embed = discord.Embed(
+                    color=self.color
+                  )\
+                  .set_image(
+                    url=f"attachment://{file.filename}"
+                  )\
+                  .set_footer(
+                    text=f"{result.type} module: {category} • id: {file.filename[:-4]} • /report"
+                  )
+        
+                  await channel.send(
+                    embed=embed,
+                    file=file
+                  )
+                  await asyncio.sleep(4)
+          
+          results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
+          
+      setattr(self, f"{kind}_send", False)
 
   async def start_loops(self) -> None: 
    """

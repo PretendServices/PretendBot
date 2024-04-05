@@ -577,6 +577,12 @@ class Logs(commands.Cog):
                                     else ', '.join([r.mention for r in entry.changes.before.roles[:5]]) + f" (+ {len(entry.changes.before.roles)-5} more)",
                                     inline=False
                                 )
+                            
+                            embed.add_field(
+                                name="Reason", 
+                                value=entry.reason or "N/A",
+                                inline=False
+                            )
                     case _: 
                         return
 
@@ -597,6 +603,42 @@ class Logs(commands.Cog):
 
         return await ctx.send_help(ctx.command)
     
+    @logs.command(
+        name="settings",
+        aliases=[
+            'stats', 
+            'statistics'
+        ],
+        brief="manage server"
+    )
+    @commands.has_guild_permissions(manage_guild=True)
+    async def logs_settings(self, ctx: Context):
+        """
+        Return logs statistics
+        """
+
+        if record := await self.bot.db.fetchrow("SELECT * FROM logging WHERE guild_id = $1", ctx.guild.id):
+            statistics = [
+                f"{category} <#{getattr(record, category)}>" 
+                for category in ['messages', 'roles', 'members', 'channels', 'guild']
+            ]
+
+            if not statistics: 
+                return await ctx.send_error("Nothing to display") 
+
+            embed = discord.Embed(
+                color=self.bot.color, 
+                title=f"Logging stats",
+                description='\n'.join(statistics)
+            )\
+            .set_author(
+                name=str(ctx.guild),
+                icon_url=ctx.guild.icon
+            )
+
+            return await ctx.reply(embed=embed)
+        return await ctx.send_error("Nothing to display")
+
     @logs.command(
         name="messages",
         aliases=[
