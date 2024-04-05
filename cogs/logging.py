@@ -8,7 +8,7 @@ from collections import defaultdict
 from typing import List, Optional, Union
 
 from tools.bot import Pretend
-from tools.helpers import Context 
+from tools.helpers import PretendContext as Context 
 
 class UserID(discord.ui.Button):
     def __init__(self, id_name: str):
@@ -622,9 +622,9 @@ class Logs(commands.Cog):
                         "UPDATE logging SET messages = $1 WHERE guild_id = $2",
                         None, ctx.guild.id
                     )
-                    return await ctx.reply("No longer logging **messages**")
+                    return await ctx.send_success("No longer logging **messages**")
                 else:
-                    return await ctx.reply("Message logging is **not** enabled")
+                    return await ctx.send_error("Message logging is **not** enabled")
             else: 
                 raise commands.ChannelNotFound(channel)
         
@@ -635,7 +635,7 @@ class Logs(commands.Cog):
             """,
             ctx.guild.id, channel.id
         )
-        return await ctx.reply(f"Sending **message logs** to {channel.mention}")
+        return await ctx.send_success(f"Sending **message logs** to {channel.mention}")
     
     @logs.command(
         name="guild",
@@ -657,9 +657,9 @@ class Logs(commands.Cog):
                         "UPDATE logging SET guild = $1 WHERE guild_id = $2",
                         None, ctx.guild.id
                     )
-                    return await ctx.reply("No longer logging **guild events**")
+                    return await ctx.send_success("No longer logging **guild events**")
                 else:
-                    return await ctx.reply("Guild logging is **not** enabled")
+                    return await ctx.send_error("Guild logging is **not** enabled")
             else:
                 raise commands.ChannelNotFound(channel)
             
@@ -670,7 +670,7 @@ class Logs(commands.Cog):
             """,
             ctx.guild.id, channel.id
         )
-        return await ctx.reply(f"Sending **guild logs** to {channel.mention}")
+        return await ctx.send_success(f"Sending **guild logs** to {channel.mention}")
     
     @logs.command(
         name="roles",
@@ -692,9 +692,9 @@ class Logs(commands.Cog):
                         "UPDATE logging SET roles = $1 WHERE guild_id = $2",
                         None, ctx.guild.id
                     )
-                    return await ctx.reply("No longer logging **roles**")
+                    return await ctx.send_success("No longer logging **roles**")
                 else:
-                    return await ctx.reply("Roles logging is **not** enabled")
+                    return await ctx.send_error("Roles logging is **not** enabled")
             else: 
                 raise commands.ChannelNotFound(channel)
              
@@ -705,7 +705,7 @@ class Logs(commands.Cog):
             """,
             ctx.guild.id, channel.id
         )
-        return await ctx.reply(f"Sending **role logs** to {channel.mention}")
+        return await ctx.send_success(f"Sending **role logs** to {channel.mention}")
     
     @logs.command(
         name="channels",
@@ -727,9 +727,9 @@ class Logs(commands.Cog):
                         "UPDATE logging SET channels = $1 WHERE guild_id = $2",
                         None, ctx.guild.id
                     )
-                    return await ctx.reply("No longer logging **channels**")
+                    return await ctx.send_success("No longer logging **channels**")
                 else:
-                    return await ctx.reply("Channels logging is **not** enabled")
+                    return await ctx.send_error("Channels logging is **not** enabled")
             else: 
                 raise commands.ChannelNotFound(channel)
             
@@ -740,7 +740,7 @@ class Logs(commands.Cog):
             """,
             ctx.guild.id, channel.id
         )
-        return await ctx.reply(f"Sending **channel logs** to {channel.mention}")
+        return await ctx.send_success(f"Sending **channel logs** to {channel.mention}")
     
     @logs.command(
         name="members",
@@ -763,9 +763,9 @@ class Logs(commands.Cog):
                         "UPDATE logging SET members = $1 WHERE guild_id = $2",
                         None, ctx.guild.id
                     )
-                    return await ctx.reply("No longer logging **members**")
+                    return await ctx.send_success("No longer logging **members**")
                 else:
-                    return await ctx.reply("Members logging is **not** enabled")
+                    return await ctx.send_error("Members logging is **not** enabled")
             else:
                 raise commands.ChannelNotFound(channel)
 
@@ -776,7 +776,7 @@ class Logs(commands.Cog):
             """,
             ctx.guild.id, channel.id
         )
-        return await ctx.reply(f"Sending **member logs** to {channel.mention}")
+        return await ctx.send_success(f"Sending **member logs** to {channel.mention}")
 
 async def setup(bot: Pretend) -> None:
     return await bot.add_cog(Logs(bot))
