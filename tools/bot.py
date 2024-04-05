@@ -35,6 +35,7 @@ from .handlers.embedbuilder import EmbedScript
 from io import BytesIO
 
 from cogs.music import Music
+from cogs.logging import UserBan, LogsView
 
 from discord.ext import commands
 
@@ -312,14 +313,17 @@ class Pretend(commands.AutoShardedBot):
    log.info("Loaded views")
   
   async def load_views(self) -> None: 
-   """
-   Add the persistent views
-   """
-
-   vm_results = await self.db.fetch("SELECT * FROM vm_buttons")
-   self.add_view(VoiceMasterView(self, vm_results))
-   self.add_view(GiveawayView())
-   self.add_view(TicketView(self, True))
+      """
+      Add the persistent views
+      """
+      
+      logging_view = LogsView()
+      logging_view.add_item(UserBan())
+      self.add_view(logging_view)
+      vm_results = await self.db.fetch("SELECT * FROM vm_buttons")
+      self.add_view(VoiceMasterView(self, vm_results))
+      self.add_view(GiveawayView())
+      self.add_view(TicketView(self, True))
 
   async def __chunk_guilds(self):
     for guild in self.guilds: 
