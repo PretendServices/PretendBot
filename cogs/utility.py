@@ -125,6 +125,7 @@ class Utility(commands.Cog):
       await self.bot.db.execute("INSERT INTO seen VALUES ($1,$2,$3)", *args)
     else:
       await self.bot.db.execute("UPDATE seen SET time = $3 WHERE user_id = $1 AND guild_id = $2", *args)  
+
   @commands.Cog.listener('on_message')
   async def stickymessage_listener(self, message: discord.Message):
     if message.author.bot: 
@@ -146,6 +147,7 @@ class Utility(commands.Cog):
         await lastmsg.delete()
       newmsg = await message.channel.send(check['message'])
       await self.bot.cache.set(f"sticky-{message.guild.id}-{message.channel.id}", newmsg.id, 3600)
+      
   @commands.Cog.listener('on_message')
   async def afk_listener(self, message: discord.Message):
     if message.is_system():
