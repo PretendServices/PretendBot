@@ -663,36 +663,36 @@ class Fun(Cog):
     play blacktea with the server members
     """
 
-    self.bot.tea.match_started(ctx.guild.id)
-    embed = Embed(color=self.bot.tea.color, title="BlackTea Matchmaking")
+    BlackTea(self.bot).match_started(ctx.guild.id)
+    embed = Embed(color=BlackTea(self.bot).color, title="BlackTea Matchmaking")
     embed.set_thumbnail(url="https://cdn.discordapp.com/attachments/1117819522372616352/1118203618978451596/emoji.png")
     embed.add_field(
       name="guide", 
-      value=f"- React with {self.bot.tea.emoji} to join the round\n- You have 20 seconds to join\n- The game starts only if there are at least 2 joined players\n- Everyone has 3 lifes\n- Think about a word that starts with the specific letters given"
+      value=f"- React with {BlackTea(self.bot).emoji} to join the round\n- You have 20 seconds to join\n- The game starts only if there are at least 2 joined players\n- Everyone has 3 lifes\n- Think about a word that starts with the specific letters given"
     )
     mes = await ctx.send(embed=embed)
-    await mes.add_reaction(self.bot.tea.emoji)
+    await mes.add_reaction(BlackTea(self.bot).emoji)
     await asyncio.sleep(20)
     try: 
       newmes = await ctx.channel.fetch_message(mes.id)
     except:
-      self.bot.tea.MatchStart.remove(ctx.guild.id)
+      BlackTea(self.bot).MatchStart.remove(ctx.guild.id)
       return await ctx.send("The blacktea message was deleted")
     
     users = [u.id async for u in newmes.reactions[0].users() if u.id != self.bot.user.id]
     
     if len(users) < 2:
-     self.bot.tea.MatchStart.remove(ctx.guild.id)
-     return await ctx.send("<a:pepe_sad:1046454975259218102> not enough players to start the blacktea match")
+     BlackTea(self.bot).MatchStart.remove(ctx.guild.id)
+     return await ctx.send("not enough players to start the blacktea match... 😓")
     
-    words = self.bot.tea.get_words()
-    self.bot.tea.players.update({f"{ctx.guild.id}": users})
-    self.bot.tea.lifes.update({f"{ctx.guild.id}": {f"{user}": 0 for user in users}})
+    words = BlackTea(self.bot).get_words()
+    BlackTea(self.bot).players.update({f"{ctx.guild.id}": users})
+    BlackTea(self.bot).lifes.update({f"{ctx.guild.id}": {f"{user}": 0 for user in users}})
     
-    while len(self.bot.tea.players[f'{ctx.guild.id}']) > 1:
+    while len(BlackTea(self.bot).players[f'{ctx.guild.id}']) > 1:
      for user in users: 
-      rand = self.bot.tea.get_string()
-      await self.bot.tea.send_embed(ctx.channel, f"{self.bot.tea.emoji} <@{user}>: Say a word containing **{rand}** in **10 seconds**") 
+      rand = BlackTea(self.bot).get_string()
+      await BlackTea(self.bot).send_embed(ctx.channel, f"{BlackTea(self.bot).emoji} <@{user}>: Say a word containing **{rand}** in **10 seconds**") 
       try: 
         message = await self.bot.wait_for(
           'message', 
@@ -700,15 +700,15 @@ class Fun(Cog):
           timeout=10
         )
         if rand in message.content and message.content in words:
-         await self.bot.tea.send_embed(ctx.channel, f"<a:happybear:1118213146159624243> <@{user}> Correct answer!")
+         await BlackTea(self.bot).send_embed(ctx.channel, f"<a:happybear:1118213146159624243> <@{user}> Correct answer!")
         else: 
-         await self.bot.tea.lost_a_life(user, "wrong", ctx.channel)
+         await BlackTea(self.bot).lost_a_life(user, "wrong", ctx.channel)
       except asyncio.TimeoutError:
-        await self.bot.tea.lost_a_life(user, "timeout", ctx.channel)   
+        await BlackTea(self.bot).lost_a_life(user, "timeout", ctx.channel)   
 
-    await self.bot.tea.add_winner(self.bot.tea.players[f"{ctx.guild.id}"][0])
-    await self.bot.tea.send_embed(ctx.channel, f"👑 <@{self.bot.tea.players[f'{ctx.guild.id}'][0]}> Won the game!!")
-    member = self.bot.tea.players[str(ctx.guild.id)][0]
+    await BlackTea(self.bot).add_winner(BlackTea(self.bot).players[f"{ctx.guild.id}"][0])
+    await BlackTea(self.bot).send_embed(ctx.channel, f"👑 <@{BlackTea(self.bot).players[f'{ctx.guild.id}'][0]}> Won the game!!")
+    member = BlackTea(self.bot).players[str(ctx.guild.id)][0]
     check = await self.bot.db.fetchrow("SELECT * FROM gamestats WHERE user_id = $1 AND game = $2", member, 'blacktea')
     
     if not check: 

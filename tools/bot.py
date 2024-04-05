@@ -252,7 +252,7 @@ class Pretend(commands.AutoShardedBot):
             embed=embed,
             file=file
           )
-          await asyncio.sleep(7)
+          await asyncio.sleep(4)
 
       return await self.autoposting(kind)
 
