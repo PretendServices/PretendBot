@@ -7,7 +7,6 @@ from discord.ext import commands
 from collections import defaultdict
 from typing import List, Optional, Union
 
-from tools.bot import Pretend
 from tools.helpers import PretendContext as Context 
 
 class UserID(discord.ui.Button):
@@ -66,7 +65,7 @@ class LogsView(discord.ui.View):
         )
 
 class Logs(commands.Cog):
-    def __init__(self, bot: Pretend):
+    def __init__(self, bot):
         self.locks = defaultdict(asyncio.Lock)
         self.bot = bot
     
@@ -778,5 +777,5 @@ class Logs(commands.Cog):
         )
         return await ctx.send_success(f"Sending **member logs** to {channel.mention}")
 
-async def setup(bot: Pretend) -> None:
+async def setup(bot) -> None:
     return await bot.add_cog(Logs(bot))
