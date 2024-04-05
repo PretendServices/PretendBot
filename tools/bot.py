@@ -69,6 +69,11 @@ discord.Interaction.warn = CustomInteraction.warn
 discord.Interaction.approve = CustomInteraction.approve 
 discord.Interaction.error = CustomInteraction.error
 
+class Record(asyncpg.Record):
+
+    def __getattr__(self, name: str): 
+        return self[name]
+
 class Pretend(commands.AutoShardedBot):
   """
   The discord bot
@@ -101,6 +106,7 @@ class Pretend(commands.AutoShardedBot):
       self.db = db
       self.avqueue = []
       self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
+      self.login_data['record_class'] = Record
       self.color = 0xC294CA
       self.warning = "<:warn:1189134620718018600>"  
       self.warning_color = 0xefbc1b
