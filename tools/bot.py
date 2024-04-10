@@ -106,7 +106,7 @@ class Pretend(commands.AutoShardedBot):
       )
       @self.after_invoke
       async def after_invoke(ctx):
-        posthog.capture(ctx.author.id, event='command executed', properties={"command name": ctx.command.name}, groups={"guild": ctx.guild.id})
+        posthog.capture(ctx.author.id, event='command executed', properties={"command name": ctx.command.qualified_name}, groups={"guild": ctx.guild.id})
 
       self.db = db
       self.avqueue = []
