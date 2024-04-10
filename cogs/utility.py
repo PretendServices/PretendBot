@@ -125,7 +125,6 @@ class Utility(commands.Cog):
       await self.bot.db.execute("INSERT INTO seen VALUES ($1,$2,$3)", *args)
     else:
       await self.bot.db.execute("UPDATE seen SET time = $3 WHERE user_id = $1 AND guild_id = $2", *args)  
-
   @commands.Cog.listener('on_message')
   async def stickymessage_listener(self, message: discord.Message):
     if message.author.bot: 
