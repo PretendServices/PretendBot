@@ -18,13 +18,13 @@ class Hog(Cog):
     self.bot = bot 
     self.description = "Posthog Analytics"
 
-  @Cog.listener
+  @Cog.listener("on_guild_join")
   async def on_guild_join(self, guild: discord.Guild):
     posthog.group_identify('guild', str(guild.id), {
     'name': guild.name,
     'subscription type': await get_sub_type(self, guild),
  })
-  @Cog.listener
+  @Cog.listener("on_guild_update")
   async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         posthog.group_identify('guild', str(after.id), {
         'name': after.name,
