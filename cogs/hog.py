@@ -31,7 +31,7 @@ class Hog(Cog):
         'subscription type': await get_sub_type(self, after),
     })
 async def get_sub_type(self, guild):
-   auth = await self.bot.db.fetchrow("SELECT * FROM AUTHORIZE WHERE guild_id = $1", float(guild.id))
+   auth = await self.bot.db.fetchrow("SELECT * FROM AUTHORIZE WHERE guild_id = $1", guild.id)
    if auth:
       till = auth.get("till")
       if till:
