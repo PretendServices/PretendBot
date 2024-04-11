@@ -39,5 +39,4 @@ class TikTokUser(commands.Converter):
                  badges.append("<:verified:1111747172677988373>")
 
                data['badges'] = badges 
-               data['display_name'] = data['display']
                return TikTok(**data)

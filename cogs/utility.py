@@ -1023,7 +1023,7 @@ class Utility(commands.Cog):
     embed = discord.Embed(
       color=self.bot.color, 
       url=user.url, 
-      title=f"{user.display_name} ({user.username}) {''.join(user.badges)}" if user.display_name != '⠀⠀' else f"{user.username} {''.join(user.badges)}", 
+      title=f"{user.nickname} ({user.username}) {''.join(user.badges)}" if user.nickname != '⠀⠀' else f"{user.username} {''.join(user.badges)}", 
       description=user.bio
     )\
     .set_author(
