@@ -204,7 +204,6 @@ class Utility(commands.Cog):
              session.close()
              return
         
-          
      cache = self.bot.cache.get(f"profile-{before.id}")
      if cache: 
       await self.cache_profile(after)
@@ -1006,8 +1005,8 @@ class Utility(commands.Cog):
     """
 
     results = await self.bot.session.get_json(
-      "https://api.pretend.best/snapstory",
-      headers={"Authorization": f"Bearer {self.bot.pretend_api}"},
+      "https://v1.pretend.best/snapstory",
+      headers={"api-key": self.bot.pretend_api},
       params={"username": username}
     )
 
@@ -1023,7 +1022,7 @@ class Utility(commands.Cog):
     """
 
     embed = discord.Embed(
-      color=user.color, 
+      color=self.bot.color, 
       url=user.url, 
       title=f"{user.display_name} ({user.username}) {''.join(user.badges)}" if user.display_name != '⠀⠀' else f"{user.username} {''.join(user.badges)}", 
       description=user.bio

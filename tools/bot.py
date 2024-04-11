@@ -232,6 +232,7 @@ class Pretend(commands.AutoShardedBot):
       while results:
           for result in results:
             if channel := self.get_channel(result.channel_id):
+                await asyncio.sleep(0.001)
                 directory = f'./PretendImages/{kind.capitalize()}'
                 category = (result.category if result.category != "random" else random.choice(os.listdir(directory))).capitalize()
                 if category in os.listdir(directory):
@@ -255,7 +256,9 @@ class Pretend(commands.AutoShardedBot):
                   await asyncio.sleep(4)
           
           results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
-          
+          await asyncio.sleep(7)
+
+      await self.get_channel(1224765210850623660).send(f"Stopped sending {kind}")    
       setattr(self, f"{kind}_send", False)
 
   async def start_loops(self) -> None: 

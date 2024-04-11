@@ -24,8 +24,8 @@ class TikTok(BaseModel):
 class TikTokUser(commands.Converter):
     async def convert(self, ctx: PretendContext, argument: str) -> TikTok: 
       async with ctx.typing(): 
-         async with aiohttp.ClientSession(headers={"Authorization": ctx.bot.pretend_api}) as cs: 
-            async with cs.get("https://api.pretend.best/tiktok", params={"username": argument}) as r: 
+         async with aiohttp.ClientSession(headers={"api-key": ctx.bot.pretend_api}) as cs: 
+            async with cs.get("https://v1.pretend.best/tiktok", params={"username": argument}) as r: 
                if r.status != 200: 
                   raise commands.BadArgument("Couldn't get this tiktok page")
 
@@ -40,5 +40,4 @@ class TikTokUser(commands.Converter):
 
                data['badges'] = badges 
                data['display_name'] = data['display']
-               data['color'] = int(data['color'][1], 16)
                return TikTok(**data)
