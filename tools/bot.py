@@ -11,7 +11,8 @@ import datetime
 import colorgram
 import json
 import aiohttp
-
+from posthog import Posthog
+posthog = Posthog("phc_pTxc2ZEgflCq1wBWWtloXS8xqK97FPYjlpWLWseYMt8", "https://hog.semisol.dev")
 from PIL import Image
 from typing import Any, List, Union, Optional, Set
 from copy import copy
@@ -103,6 +104,7 @@ class Pretend(commands.AutoShardedBot):
             name="/pretendbot"
           )
       )
+
       self.db = db
       self.avqueue = []
       self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
@@ -223,8 +225,7 @@ class Pretend(commands.AutoShardedBot):
    Get the bot's custom context
    """
 
-   return await super().get_context(message, cls=cls)
-  
+   return await super().get_context(message, cls=cls) 
   async def autoposting(self, kind: str):
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
@@ -342,7 +343,6 @@ class Pretend(commands.AutoShardedBot):
     asyncio.ensure_future(self.autoposting("pfps"))
     asyncio.ensure_future(self.autoposting("banners"))
     await self.start_loops()
-
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """
     The place where the command errors raise
