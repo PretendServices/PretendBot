@@ -13,7 +13,6 @@ class TikTok(BaseModel):
    username: str 
    nickname: Optional[str] 
    avatar: str 
-   color: int 
    bio: str 
    badges: List[str]
    url: str 
