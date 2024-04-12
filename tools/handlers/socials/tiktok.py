@@ -1,8 +1,8 @@
 import aiohttp 
 
-from typing import List
 from pydantic import BaseModel
 from discord.ext import commands
+from typing import List, Optional
 from tools.helpers import PretendContext
 
 class TikTok(BaseModel):
@@ -11,7 +11,7 @@ class TikTok(BaseModel):
    """
 
    username: str 
-   nickname: str 
+   nickname: Optional[str] 
    avatar: str 
    color: int 
    bio: str 
