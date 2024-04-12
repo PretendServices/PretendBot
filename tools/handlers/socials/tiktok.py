@@ -11,7 +11,7 @@ class TikTok(BaseModel):
    """
 
    username: str 
-   display_name: str 
+   nickname: str 
    avatar: str 
    color: int 
    bio: str 
