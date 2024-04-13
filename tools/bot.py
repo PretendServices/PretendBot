@@ -11,7 +11,8 @@ import datetime
 import colorgram
 import json
 import aiohttp
-
+from posthog import Posthog
+posthog = Posthog("phc_pTxc2ZEgflCq1wBWWtloXS8xqK97FPYjlpWLWseYMt8", "https://hog.semisol.dev")
 from PIL import Image
 from typing import Any, List, Union, Optional, Set
 from copy import copy
@@ -69,6 +70,11 @@ discord.Interaction.warn = CustomInteraction.warn
 discord.Interaction.approve = CustomInteraction.approve 
 discord.Interaction.error = CustomInteraction.error
 
+class Record(asyncpg.Record):
+
+    def __getattr__(self, name: str): 
+        return self[name]
+
 class Pretend(commands.AutoShardedBot):
   """
   The discord bot
@@ -98,9 +104,11 @@ class Pretend(commands.AutoShardedBot):
             name="/pretendbot"
           )
       )
+
       self.db = db
       self.avqueue = []
       self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
+      self.login_data['record_class'] = Record
       self.color = 0xC294CA
       self.warning = "<:warn:1189134620718018600>"  
       self.warning_color = 0xefbc1b
@@ -217,44 +225,42 @@ class Pretend(commands.AutoShardedBot):
    Get the bot's custom context
    """
 
-   return await super().get_context(message, cls=cls)
-  
+   return await super().get_context(message, cls=cls) 
   async def autoposting(self, kind: str):
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
-      if not results:
-        setattr(self, f"{kind}_send", False)
-        return
       
-      for result in results:
-        directory = f'./PretendImages/{kind.capitalize()}'
-        category = (result["category"] if result["category"] != "random" else random.choice(os.listdir(directory))).capitalize()
-        if category in os.listdir(directory):
-          directory += f"/{category}"
-          file_path = directory + "/" + random.choice(os.listdir(directory))
-          file = discord.File(file_path)
-          try:
-            webhook = discord.Webhook.from_url(result["webhook_url"], client=self)
-          except ValueError:
-            continue
+      while results:
+          for result in results:
+            if channel := self.get_channel(result.channel_id):
+                await asyncio.sleep(0.001)
+                directory = f'./PretendImages/{kind.capitalize()}'
+                category = (result.category if result.category != "random" else random.choice(os.listdir(directory))).capitalize()
+                if category in os.listdir(directory):
+                  directory += f"/{category}"
+                  file_path = directory + "/" + random.choice(os.listdir(directory))
+                  file = discord.File(file_path)
+                  embed = discord.Embed(
+                    color=self.color
+                  )\
+                  .set_image(
+                    url=f"attachment://{file.filename}"
+                  )\
+                  .set_footer(
+                    text=f"{result.type} module: {category} • id: {file.filename[:-4]} • /report"
+                  )
+        
+                  await channel.send(
+                    embed=embed,
+                    file=file
+                  )
+                  await asyncio.sleep(4)
+          
+          results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
+          await asyncio.sleep(7)
 
-          embed = discord.Embed(color=self.color)
-          embed.set_image(
-            url=f"attachment://{file.filename}"
-          )
-          embed.set_footer(
-            text=f"{result['type']} module: {category} • id: {file.filename[:-4]} • /report"
-          )
-
-          await webhook.send(
-            username="pretend",
-            avatar_url=self.user.display_avatar.url,
-            embed=embed,
-            file=file
-          )
-          await asyncio.sleep(4)
-
-      return await self.autoposting(kind)
+      await self.get_channel(1224765210850623660).send(f"Stopped sending {kind}")    
+      setattr(self, f"{kind}_send", False)
 
   async def start_loops(self) -> None: 
    """
@@ -337,7 +343,6 @@ class Pretend(commands.AutoShardedBot):
     asyncio.ensure_future(self.autoposting("pfps"))
     asyncio.ensure_future(self.autoposting("banners"))
     await self.start_loops()
-
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """
     The place where the command errors raise

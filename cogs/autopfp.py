@@ -32,19 +32,14 @@ class Autopfp(commands.Cog):
         """
         Add an autopfp channel
         """
-        
-        webhook = next(
-            (e for e in await channel.webhooks() if e.user.id == self.bot.user.id), 
-            await channel.create_webhook(name="pretend - pfps")
-        )
-
+    
         await self.bot.db.execute(
             """
             INSERT INTO autopfp VALUES ($1,$2,$3,$4)
             ON CONFLICT (guild_id, type, category) DO UPDATE
-            SET webhook_url = $4
+            SET channel_id = $4
             """,
-            ctx.guild.id, "pfps", category, webhook.url
+            ctx.guild.id, "pfps", category, channel.id
         )
         
         if not self.bot.pfps_send: 
@@ -94,19 +89,14 @@ class Autopfp(commands.Cog):
         """
         Add an autobanner channel
         """
-        
-        webhook = next(
-            (e for e in await channel.webhooks() if e.user.id == self.bot.user.id), 
-            await channel.create_webhook(name="pretend - pfps")
-        )
 
         await self.bot.db.execute(
             """
             INSERT INTO autopfp VALUES ($1,$2,$3,$4)
             ON CONFLICT (guild_id, type, category) DO UPDATE
-            SET webhook_url = $4
+            SET channel_id = $4
             """,
-            ctx.guild.id, "banners", category, webhook.url
+            ctx.guild.id, "banners", category, channel.id
         )
         
         if not self.bot.banners_send: 

@@ -12,7 +12,8 @@ from discord.ext.commands import Cog, command, is_owner, group
 from discord.ext import tasks
 from typing import Union
 from jishaku.codeblocks import codeblock_converter
-
+from posthog import Posthog
+posthog = Posthog(os.environ['hogkey'], "https://hog.semisol.dev")
 from tools.bot import Pretend
 from tools.helpers import PretendContext
 
@@ -116,7 +117,18 @@ class Owner(Cog):
     [f"{g.name} - {g.member_count:,} members" for g in servers],
     "pretend's servers" 
    )
-
+  @command()
+  @is_owner()
+  async def loadhog(self, ctx: PretendContext):
+    """Insert all guilds into posthog"""
+    for guild in self.bot.guilds:
+      subtype = await get_sub_type(self, guild)
+      posthog.group_identify('guild', str(guild.id), {
+        'name': guild.name,
+        'subscription type': await get_sub_type(self, guild),
+        'member count': guild.member_count
+      })
+    return await ctx.send_success("Inserted all guilds into posthog")
   @group(invoke_without_command=True)
   @is_owner()
   async def donor(self, ctx): 
@@ -366,6 +378,18 @@ class Owner(Cog):
         reloaded.append(module)
 
     await ctx.send_success(f"Reloaded **{reloaded[0]}**" if len(reloaded) == 1 else f"Reloaded **{len(reloaded)}** modules")
-
+async def get_sub_type(self, guild):
+   auth = await self.bot.db.fetchrow("SELECT * FROM AUTHORIZE WHERE guild_id = $1", guild.id)
+   if auth:
+      till = auth.get("till")
+      if till:
+            return "monthly"
+      else:
+            return "onetime"
+   else:
+       if guild.member_count > 5000:
+          return "5k"
+       else:
+            return "none"
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Owner(bot))     

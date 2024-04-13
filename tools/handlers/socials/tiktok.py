@@ -1,8 +1,8 @@
 import aiohttp 
 
-from typing import List
 from pydantic import BaseModel
 from discord.ext import commands
+from typing import List, Optional
 from tools.helpers import PretendContext
 
 class TikTok(BaseModel):
@@ -11,9 +11,8 @@ class TikTok(BaseModel):
    """
 
    username: str 
-   display_name: str 
+   nickname: Optional[str] 
    avatar: str 
-   color: int 
    bio: str 
    badges: List[str]
    url: str 
@@ -24,8 +23,8 @@ class TikTok(BaseModel):
 class TikTokUser(commands.Converter):
     async def convert(self, ctx: PretendContext, argument: str) -> TikTok: 
       async with ctx.typing(): 
-         async with aiohttp.ClientSession(headers={"Authorization": ctx.bot.pretend_api}) as cs: 
-            async with cs.get("https://api.pretend.best/tiktok", params={"username": argument}) as r: 
+         async with aiohttp.ClientSession(headers={"api-key": ctx.bot.pretend_api}) as cs: 
+            async with cs.get("https://v1.pretend.best/tiktok", params={"username": argument}) as r: 
                if r.status != 200: 
                   raise commands.BadArgument("Couldn't get this tiktok page")
 
@@ -39,6 +38,4 @@ class TikTokUser(commands.Converter):
                  badges.append("<:verified:1111747172677988373>")
 
                data['badges'] = badges 
-               data['display_name'] = data['display']
-               data['color'] = int(data['color'][1], 16)
                return TikTok(**data)

@@ -19,8 +19,8 @@ class Snapchat(BaseModel):
 
 class SnapUser(commands.Converter): 
     async def convert(self, ctx: PretendContext, argument: str) -> Snapchat: 
-      async with aiohttp.ClientSession(headers={"Authorization": ctx.bot.pretend_api}) as cs: 
-        async with cs.get("https://api.pretend.best/snapchat", params={"username": argument}) as r: 
+      async with aiohttp.ClientSession(headers={"api-key": ctx.bot.pretend_api}) as cs: 
+        async with cs.get("https://v1.pretend.best/snapchat", params={"username": argument}) as r: 
             if r.status != 200: 
              raise commands.BadArgument(f"Couldn't get information about **{argument}**")
             
