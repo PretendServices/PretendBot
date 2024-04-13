@@ -72,91 +72,6 @@ class Utility(commands.Cog):
     self.tiktok = TikTokApi(debug=True)
     self.afk_cd = commands.CooldownMapping.from_cooldown(3, 3, commands.BucketType.channel)
 
-  def async_executor():
-    def outer(func):
-        @functools.wraps(func)
-        def inner(*args, **kwargs):
-            task = functools.partial(func, *args, **kwargs)
-            return asyncio.get_event_loop().run_in_executor(None, task)
-
-        return inner
-
-    return outer
-  
-  @async_executor()
-  async def _collage_open(self, image: BytesIO):
-      image = (
-          Image.open(image)
-          .convert("RGBA")
-          .resize(
-              (
-                  256,
-                  256,
-              )
-          )
-      )
-      return image
-
-
-  async def _collage_read(self, image: str):
-      async with aiohttp.ClientSession() as session:
-          async with session.get(image) as response:
-              try:
-                  return await self._collage_open(BytesIO(await response.read()))
-              except:
-                  return None
-
-
-  async def _collage_paste(self, image: Image, x: int, y: int, background: Image):
-      background.paste(
-          image,
-          (
-              x * 256,
-              y * 256,
-          ),
-      )
-
-
-  async def collage(self, images: list[str]):
-      tasks = list()
-      for image in images:
-          tasks.append(self._collage_read(image))
-
-      images = [image for image in await asyncio.gather(*tasks) if image]
-      if not images:
-          return None
-
-      rows = int(sqrt(len(images)))
-      columns = (len(images) + rows - 1) // rows
-
-      background = Image.new(
-          "RGBA",
-          (
-              columns * 256,
-              rows * 256,
-          ),
-      )
-      tasks = list()
-      for i, image in enumerate(images):
-          tasks.append(self._collage_paste(image, i % columns, i // columns, background))
-      await asyncio.gather(*tasks)
-
-      buffer = BytesIO()
-      background.save(
-          buffer,
-          format="png",
-      )
-      buffer.seek(0)
-
-      background.close()
-      for image in images:
-          image.close()
-
-      return discord.File(
-          buffer,
-          filename="collage.png",
-      )
-
   def human_format(self, number: int) -> str:
     """
     Humanize a number, if the case
@@ -345,17 +260,13 @@ class Utility(commands.Cog):
     if not results: 
       does = "don't" if member == ctx.author else f"doesn't"
       return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} {does} have an **avatar history**")
-    
-    image = await self.collage([row["avatar"] for row in results])
-    if not image or sys.getsizeof(image.fp) > ctx.guild.filesize_limit:
-      image = None
 
     embed = discord.Embed(
       color=self.bot.color,
       url=f"https://images.pretend.best/avatarhistory/{member.id}",
       title=f"{member.name}'s avatar history ({length})"
     )
-    return await ctx.reply(embed=embed, file=image)
+    return await ctx.reply(embed=embed)
   
   @commands.command(aliases=['clearavs', 'clearavh', 'clearavatarhistory'])
   async def clearavatars(self, ctx: PretendContext):
