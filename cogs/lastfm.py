@@ -8,6 +8,8 @@ from tools.validators import ValidLastFmName
 from tools.helpers import PretendContext
 from tools.bot import Pretend
 
+from io import BytesIO
+from typing import Literal
 from discord import Message, Embed, User, Member, File
 from discord.ext.commands import Cog, group, MissingRequiredArgument, Author, command
 
@@ -119,6 +121,48 @@ class Lastfm(Cog):
    await self.bot.db.execute("DELETE FROM lastfm WHERE user_id = $1", ctx.author.id)
    return await ctx.lastfm_send("Removed your **Last.Fm** account")
   
+  @lastfm.command(name="chart", aliases=['c'])
+  async def lf_chart(
+    self,
+    ctx: PretendContext, 
+    user: Member = Author, 
+    size: str = "3x3", 
+    period: Literal['overall', '7day', '1month', '3month', '6month', '12month'] = 'overall'
+  ):
+    """
+    Create an album chart of the user's top albums
+    """
+    
+    username = await self.bot.db.fetchval("SELECT username FROM lastfm WHERE user_id = $1", user.id)
+
+    if not username: 
+      return await ctx.lastfm_send(f"{user.mention} does not have a lastfm account")
+    
+    params = {
+      'username': username, 
+      'size': size, 
+      'period': period
+    }
+
+    headers = {
+      "api-key": self.bot.pretend_api
+    }
+
+    x = await self.bot.session.get_json(
+      "https://v1.pretend.best/lastfm/chart", 
+      params=params,
+      headers=headers
+    )
+
+    if detail := x.get('detail'):
+      return await ctx.send_error(detail)
+    
+    image = await self.bot.session.get_bytes(x['image_url'])
+    return await ctx.reply(
+      f"{user.mention}'s Last.FM **{size}** album chart ({period})",
+      file = File(BytesIO(image), filename="chart.png")
+    )
+
   @lastfm.command(name="customcommand", aliases=['cc'])
   async def lf_customcommand(self, ctx: PretendContext, *, cmd: str): 
    """
