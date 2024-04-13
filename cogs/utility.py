@@ -363,12 +363,12 @@ class Utility(commands.Cog):
     Clear your avatar history
     """
 
-    check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", ctx.author.id)
+    check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", str(ctx.author.id))
     if not check: 
      return await ctx.send_warning("There are no avatars saved for you")
     
     async def yes_func(interaction: discord.Interaction):
-      await self.bot.db.execute("DELETE FROM avatar_history WHERE user_id = $1", interaction.user.id)
+      await self.bot.db.execute("DELETE FROM avatar_history WHERE user_id = $1", str(interaction.user.id))
       return await interaction.response.edit_message(
         embed=discord.Embed(
          color=self.bot.yes_color, 
