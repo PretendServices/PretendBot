@@ -38,6 +38,7 @@ from tools.handlers.socials.snapchat import SnapUser
 from tools.handlers.socials.roblox import RobloxUser
 from tools.handlers.socials.tiktok import TikTokUser
 from tools.handlers.socials.cashapp import CashappUser
+from tools.handlers.socials.instagram import InstagramUser
 from tools.handlers.socials.weather import WeatherLocation
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
@@ -1013,6 +1014,41 @@ class Utility(commands.Cog):
       return await ctx.send_error(results['detail'])
 
     await ctx.paginator(list(map(lambda s: s['url'], results['stories']))) 
+
+  @commands.hybrid_command(aliases=['ig'])
+  async def instagram(self, ctx: PretendContext, *, user: InstagramUser): 
+    """
+    Get someone's instagram profile 
+    """
+
+    embed = discord.Embed(
+      color=self.bot.color,
+      title=f"@{user.username}", 
+      description=user.bio,
+      url=user.url
+    )\
+    .set_thumbnail(
+      url=user.profile_pic
+    )\
+    .add_field(
+      name="Following", 
+      value=f"{user.following:,}"
+    )\
+    .add_field(
+      name="Followers",
+      value=f"{user.followers:,}"
+    )\
+    .add_field(
+      name="Posts",
+      value=f"{user.posts:,}"
+    )
+
+    if user.pronouns:
+      embed.set_author(
+        name=", ".join(user.pronouns)
+      )
+    
+    return await ctx.reply(embed=embed)
 
   @commands.hybrid_command(aliases=['tt'])
   async def tiktok(self, ctx: PretendContext, *, user: TikTokUser): 

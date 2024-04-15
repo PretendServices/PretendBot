@@ -20,6 +20,8 @@ from copy import copy
 from num2words import num2words
 from humanize import precisedelta
 
+from PretendAPI import API
+
 from discord.gateway import DiscordWebSocket
 
 from .persistent.vm import VoiceMasterView
@@ -124,6 +126,7 @@ class Pretend(commands.AutoShardedBot):
       self.proxy_url = os.environ.get("proxy_url")
       self.other_bots = {}
       self.pretend_api = os.environ.get("pretend_key")
+      self.api = API(self.pretend_api)
       self.an = AntinukeMeasures(self)
       self.embed_build = EmbedScript()
       self.pfps_send = True
@@ -237,24 +240,27 @@ class Pretend(commands.AutoShardedBot):
                 directory = f'./PretendImages/{kind.capitalize()}'
                 category = (result.category if result.category != "random" else random.choice(os.listdir(directory))).capitalize()
                 if category in os.listdir(directory):
-                  directory += f"/{category}"
-                  file_path = directory + "/" + random.choice(os.listdir(directory))
-                  file = discord.File(file_path)
-                  embed = discord.Embed(
-                    color=self.color
-                  )\
-                  .set_image(
-                    url=f"attachment://{file.filename}"
-                  )\
-                  .set_footer(
-                    text=f"{result.type} module: {category} • id: {file.filename[:-4]} • /report"
-                  )
-        
-                  await channel.send(
-                    embed=embed,
-                    file=file
-                  )
-                  await asyncio.sleep(4)
+                  try:
+                    directory += f"/{category}"
+                    file_path = directory + "/" + random.choice(os.listdir(directory))
+                    file = discord.File(file_path)
+                    embed = discord.Embed(
+                      color=self.color
+                    )\
+                    .set_image(
+                      url=f"attachment://{file.filename}"
+                    )\
+                    .set_footer(
+                      text=f"{result.type} module: {category} • id: {file.filename[:-4]} • /report"
+                    )
+          
+                    await channel.send(
+                      embed=embed,
+                      file=file
+                    )
+                    await asyncio.sleep(4)
+                  except Exception as e: 
+                    await self.get_channel(1224765210850623660).send(f"{kind} posting error - {e}")
           
           results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
           await asyncio.sleep(7)
