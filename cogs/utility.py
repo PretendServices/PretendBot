@@ -43,8 +43,13 @@ from tools.handlers.socials.weather import WeatherLocation
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
 from aiofiles import open as aio_open
+
 import re
+import sys
+import functools
 import tempfile
+from math import sqrt
+from PIL import Image
 
 class Color(commands.Converter):
     async def convert(self, ctx: PretendContext, argument: str):
@@ -245,6 +250,7 @@ class Utility(commands.Cog):
       )
 
       await ctx.reply(embed=embed, file=discord.File(fp=bytes_io, filename="pretendTikTok.mp4"))
+
   @commands.command(aliases=['avh'])
   async def avatarhistory(self, ctx: PretendContext, *, member: discord.User=commands.Author):
     """
@@ -255,24 +261,26 @@ class Utility(commands.Cog):
     if not results: 
       does = "don't" if member == ctx.author else f"doesn't"
       return await ctx.send_error(f"{'You' if member == ctx.author else f'{member.mention}'} {does} have an **avatar history**")
+
     embed = discord.Embed(
       color=self.bot.color,
       url=f"https://images.pretend.best/avatarhistory/{member.id}",
       title=f"{member.name}'s avatar history ({length})"
     )
     return await ctx.reply(embed=embed)
+  
   @commands.command(aliases=['clearavs', 'clearavh', 'clearavatarhistory'])
   async def clearavatars(self, ctx: PretendContext):
     """
     Clear your avatar history
     """
 
-    check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", ctx.author.id)
+    check = await self.bot.db.fetchrow("SELECT * FROM avatar_history WHERE user_id = $1", str(ctx.author.id))
     if not check: 
      return await ctx.send_warning("There are no avatars saved for you")
     
     async def yes_func(interaction: discord.Interaction):
-      await self.bot.db.execute("DELETE FROM avatar_history WHERE user_id = $1", interaction.user.id)
+      await self.bot.db.execute("DELETE FROM avatar_history WHERE user_id = $1", str(interaction.user.id))
       return await interaction.response.edit_message(
         embed=discord.Embed(
          color=self.bot.yes_color, 
