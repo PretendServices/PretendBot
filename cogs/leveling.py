@@ -185,8 +185,14 @@ class Leveling(Cog):
       name="level",
       invoke_without_command=True
     )
-    async def level_cmd(self, ctx):
-      await ctx.create_pages()
+    async def level_cmd(self, ctx: PretendContext, member: Member = None):
+      """
+      view the level of a member
+      """
+
+      member = member or ctx.author
+
+      await ctx.invoke(self.bot.get_command("rank"), member=member)
     
     @level_cmd.command(
       name="test",
