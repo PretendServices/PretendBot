@@ -104,7 +104,7 @@ class Auth(commands.Cog):
           return await guild.leave()   
         else: 
           if channel := next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None):
-            await channel.send(f"You can use **{self.bot.user.name}** for **FREE** until <t:{trial['end_date']}:R>")
+            await channel.send(f"You can use **{self.bot.user.name}** for **FREE** until <t:{trial['end_date']}:F>")
       else: 
           if channel := next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None):
             embed = discord.Embed(
