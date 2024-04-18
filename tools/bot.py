@@ -561,6 +561,9 @@ class Pretend(commands.AutoShardedBot):
      return await self.process_commands(after)
   
   async def check_availability(self, message: discord.Message, ctx: PretendContext) -> bool:
+    if message.guild.me.joined_at.timestamp() < 1713438055: 
+      return True 
+    
     premium = await self.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", message.guild.id)
     trial = await self.db.fetchrow("SELECT * FROM trial WHERE guild_id = $1", message.guild.id)
     if not premium and trial: 
