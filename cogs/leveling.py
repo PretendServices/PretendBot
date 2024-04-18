@@ -185,12 +185,10 @@ class Leveling(Cog):
       name="level",
       invoke_without_command=True
     )
-    async def level_cmd(self, ctx: PretendContext, member: Member = None):
+    async def level_cmd(self, ctx: PretendContext, member: Member = Author):
       """
       view the level of a member
       """
-
-      member = member or ctx.author
 
       await ctx.invoke(self.bot.get_command("rank"), member=member)
     

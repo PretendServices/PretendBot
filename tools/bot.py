@@ -38,6 +38,7 @@ from .handlers.embedbuilder import EmbedScript
 from io import BytesIO
 
 from cogs.music import Music
+from cogs.auth import TrialView
 from cogs.logging import UserBan, LogsView
 
 from discord.ext import commands
@@ -545,7 +546,10 @@ class Pretend(commands.AutoShardedBot):
     if channel_rl or member_rl:
      return
     
-    return await super().process_commands(message)
+    ctx = await self.get_context(message)
+
+    if await self.check_availability(message, ctx):
+      return await super().process_commands(message)
   
   async def on_message_edit(self, before: discord.Message, after: discord.Message) -> Any:
    if not after.guild:
@@ -555,6 +559,28 @@ class Pretend(commands.AutoShardedBot):
 
     if after.content.startswith(tuple(await self.get_prefixes(after))) or after.content.startswith(f"<@{self.user.id}>"):
      return await self.process_commands(after)
+  
+  async def check_availability(self, message: discord.Message, ctx: PretendContext) -> bool:
+    premium = await self.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", message.guild.id)
+    trial = await self.db.fetchrow("SELECT * FROM trial WHERE guild_id = $1", message.guild.id)
+    if not premium and trial: 
+      if trial['end_date'] < int(datetime.datetime.now().timestamp()):
+        await ctx.send_error(
+          f"The trial period of using **{self.user.name}** has ended. To continue using this bot please purchase a subscription in our [**support server**](https://discord.gg/pretendbot)"
+        )
+        return False
+    elif not premium and not trial: 
+      embed = discord.Embed(
+        color=self.bot.color, 
+        description=f"Are you sure you want to activate the **7 day** trial for **{self.bot.user.name}**?"
+      )
+      await ctx.reply(
+        embed=embed, 
+        view=TrialView()
+      )
+      return False 
+
+    return True  
 
   async def on_message(self, message: discord.Message) -> Any: 
    if not message.author.bot and message.guild:
@@ -566,14 +592,15 @@ class Pretend(commands.AutoShardedBot):
             member_rl = self.member_cooldown(message)
           
             if not channel_rl and not member_rl:
-              prefixes = ', '.join(f"`{p}`" for p in await self.get_prefixes(message))
               ctx = await self.get_context(message)
-              return await ctx.send(
-                embed = discord.Embed(
-                  color=self.color,
-                  description=f"Your {'prefix is' if len(await self.get_prefixes(message)) == 1 else 'prefixes are'}: {prefixes}"
+              if await self.check_availability(message, ctx):
+                prefixes = ', '.join(f"`{p}`" for p in await self.get_prefixes(message))
+                return await ctx.send(
+                  embed = discord.Embed(
+                    color=self.color,
+                    description=f"Your {'prefix is' if len(await self.get_prefixes(message)) == 1 else 'prefixes are'}: {prefixes}"
+                  )
                 )
-              )
           
           await self.process_commands(message)  
 
