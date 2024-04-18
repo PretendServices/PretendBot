@@ -4,10 +4,37 @@ import datetime
 import aiohttp
 import secrets
 import asyncio
+from cogs.auth import TrialView
 from tools.bot import Pretend 
 from tools.helpers import PretendContext
 
 bot = Pretend()
+
+@bot.check 
+async def check_availability(ctx: PretendContext) -> bool:
+    if ctx.guild.me.joined_at.timestamp() < 1713438055: 
+      return True 
+    
+    premium = await ctx.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", ctx.guild.id)
+    trial = await ctx.bot.db.fetchrow("SELECT * FROM trial WHERE guild_id = $1", ctx.guild.id)
+    if not premium and trial: 
+      if trial['end_date'] < int(datetime.datetime.now().timestamp()):
+        await ctx.send_error(
+          f"The trial period of using **{ctx.bot.user.name}** has ended. To continue using this bot please purchase a subscription in our [**support server**](https://discord.gg/pretendbot)"
+        )
+        return False
+    elif not premium and not trial: 
+      embed = discord.Embed(
+        color=ctx.bot.color, 
+        description=f"Are you sure you want to activate the **7 day** trial for **{ctx.bot.user.name}**?"
+      )
+      await ctx.reply(
+        embed=embed, 
+        view=TrialView()
+      )
+      return False 
+
+    return True  
 
 @bot.check 
 async def disabled_command(ctx: PretendContext): 

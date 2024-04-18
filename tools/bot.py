@@ -230,6 +230,7 @@ class Pretend(commands.AutoShardedBot):
    """
 
    return await super().get_context(message, cls=cls) 
+  
   async def autoposting(self, kind: str):
     if getattr(self, f"{kind}_send"):
       results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
@@ -350,6 +351,7 @@ class Pretend(commands.AutoShardedBot):
     asyncio.ensure_future(self.autoposting("pfps"))
     asyncio.ensure_future(self.autoposting("banners"))
     await self.start_loops()
+
   async def on_command_error(self, ctx: PretendContext, error: commands.CommandError) -> Any:
     """
     The place where the command errors raise
@@ -546,10 +548,7 @@ class Pretend(commands.AutoShardedBot):
     if channel_rl or member_rl:
      return
     
-    ctx = await self.get_context(message)
-
-    if await self.check_availability(message, ctx):
-      return await super().process_commands(message)
+    return await super().process_commands(message)
   
   async def on_message_edit(self, before: discord.Message, after: discord.Message) -> Any:
    if not after.guild:

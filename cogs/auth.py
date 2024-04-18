@@ -91,26 +91,28 @@ class Auth(commands.Cog):
    
   @commands.Cog.listener()
   async def on_guild_join(self, guild: discord.Guild):
-   if guild.member_count < 5000:
+    if not guild.chunked: 
+      await guild.chunk(cache=True)
+
     check = await self.bot.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", guild.id)
     if not check:
       trial = await self.bot.db.fetchrow("SELECT * FROM trial WHERE guild_id = $1", guild.id)
       if trial:
         if trial['end_date'] < int(datetime.datetime.now().timestamp()):
-          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-            await channels[0].send(f"Join https://discord.gg/pretendbot to get your server authorized")
+          if channel := next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None):
+            await channel.send(f"Join https://discord.gg/pretendbot to get your server authorized")
           return await guild.leave()   
         else: 
-          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
-            await channels[0].send(f"You can use **{self.bot.user.name}** for **FREE** until <t:{trial['end_date']}:R>")
+          if channel := next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None):
+            await channel.send(f"You can use **{self.bot.user.name}** for **FREE** until <t:{trial['end_date']}:R>")
       else: 
-          if channels := [c for c in guild.text_channels if c.permissions_for(guild.me).send_messages]:
+          if channel := next((c for c in guild.text_channels if c.permissions_for(guild.me).send_messages), None):
             embed = discord.Embed(
               color=self.bot.color, 
               description=f"Are you sure you want to activate the **7 day** trial for **{self.bot.user.name}**?"
             )
             await self.guild_change("joined", guild)
-            return await channels[0].send(
+            return await channel.send(
               embed=embed, 
               view=TrialView()
             )
@@ -118,8 +120,7 @@ class Auth(commands.Cog):
            return await guild.leave()
     else:
       await self.guild_change("joined", guild)
-   else:
-    await self.guild_change("joined", guild)
+
 
   @commands.group(invoke_without_command=True)
   @auth_perms()
