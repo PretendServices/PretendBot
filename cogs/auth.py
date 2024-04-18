@@ -5,7 +5,6 @@ from discord.ext import commands
 
 from typing import Union 
 
-from tools.bot import Pretend
 from tools.helpers import PretendContext 
 from tools.predicates import auth_perms
 
@@ -53,7 +52,7 @@ class TrialView(discord.ui.View):
    return interaction.user.guild_permissions.administrator
 
 class Auth(commands.Cog): 
-  def __init__(self, bot: Pretend): 
+  def __init__(self, bot): 
     self.bot = bot 
     self.channel_id = 1183429820105900093
   
