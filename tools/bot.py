@@ -266,7 +266,10 @@ class Pretend(commands.AutoShardedBot):
           results = await self.db.fetch("SELECT * FROM autopfp WHERE type = $1", kind)
           await asyncio.sleep(7)
 
-      await self.get_channel(1224765210850623660).send(f"Stopped sending {kind}")    
+      channel = self.get_channel(1224765210850623660)
+      if not channel:
+          return
+      await channel.send(f"Stopped sending {kind}")    
       setattr(self, f"{kind}_send", False)
 
   async def start_loops(self) -> None: 
