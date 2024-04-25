@@ -38,7 +38,6 @@ from .handlers.embedbuilder import EmbedScript
 from io import BytesIO
 
 from cogs.music import Music
-from cogs.auth import TrialView
 from cogs.logging import UserBan, LogsView
 
 from discord.ext import commands
@@ -88,7 +87,7 @@ class Pretend(commands.AutoShardedBot):
           command_prefix=getprefix, 
           intents=intents,
           help_command=PretendHelp(),
-          owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051, 1188955485462872226],
+          owner_ids=[863914425445908490, 930383131863842816, 1161982476143575051, 1188955485462872226, 461914901624127489],
           case_insensitive=True, 
           shard_count=3,
           chunk_guilds_at_startup=False,
@@ -560,29 +559,7 @@ class Pretend(commands.AutoShardedBot):
      return await self.process_commands(after)
   
   async def check_availability(self, message: discord.Message, ctx: PretendContext) -> bool:
-    if message.guild.me.joined_at.timestamp() < 1713438055: 
-      return True 
-    
-    premium = await self.db.fetchrow("SELECT * FROM authorize WHERE guild_id = $1", message.guild.id)
-    trial = await self.db.fetchrow("SELECT * FROM trial WHERE guild_id = $1", message.guild.id)
-    if not premium and trial: 
-      if trial['end_date'] < int(datetime.datetime.now().timestamp()):
-        await ctx.send_error(
-          f"The trial period of using **{self.user.name}** has ended. To continue using this bot please purchase a subscription in our [**support server**](https://discord.gg/pretendbot)"
-        )
-        return False
-    elif not premium and not trial: 
-      embed = discord.Embed(
-        color=self.bot.color, 
-        description=f"Are you sure you want to activate the **7 day** trial for **{self.bot.user.name}**?"
-      )
-      await ctx.reply(
-        embed=embed, 
-        view=TrialView()
-      )
-      return False 
-
-    return True  
+    return True
 
   async def on_message(self, message: discord.Message) -> Any: 
    if not message.author.bot and message.guild:
