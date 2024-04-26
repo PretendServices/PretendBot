@@ -344,7 +344,7 @@ class PretendHelp(Help):
   super().__init__(**kwargs)
 
  async def send_bot_help(self, mapping: Mapping[Cog | None, List[Command[Any, Callable[..., Any], Any]]]) -> Coroutine[Any, Any, None]:
-   await self.context.send(f"{self.context.author.mention} check <https://pretend.best/commands> for the list of all commands")
+   await self.context.send(f"{self.context.author.mention} check <https://pretend.bot/commands> for the list of all commands")
  
  async def send_group_help(self, group: Group):
    embeds = []

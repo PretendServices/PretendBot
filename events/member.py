@@ -34,7 +34,7 @@ class Members(Cog):
         data
       )
   
-      return f"https://pretend.best/images/{member.id}/{token}.{'gif' if member.display_avatar.is_animated() else 'png'}"
+      return f"https://pretend.bot/images/{member.id}/{token}.{'gif' if member.display_avatar.is_animated() else 'png'}"
 
   @Cog.listener('on_user_update')
   async def username_change(self, before: User, after: User): 

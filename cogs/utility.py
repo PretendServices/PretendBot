@@ -264,7 +264,7 @@ class Utility(commands.Cog):
 
     embed = discord.Embed(
       color=self.bot.color,
-      url=f"https://images.pretend.best/avatarhistory/{member.id}",
+      url=f"https://images.pretend.bot/avatarhistory/{member.id}",
       title=f"{member.name}'s avatar history ({length})"
     )
     return await ctx.reply(embed=embed)
@@ -1013,7 +1013,7 @@ class Utility(commands.Cog):
     """
 
     results = await self.bot.session.get_json(
-      "https://v1.pretend.best/snapstory",
+      "https://v1.pretend.bot/snapstory",
       headers={"api-key": self.bot.pretend_api},
       params={"username": username}
     )

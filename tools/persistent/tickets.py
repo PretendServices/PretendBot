@@ -99,7 +99,7 @@ class DeleteTicket(discord.ui.Button):
     messages = await chat_exporter.export(c)
     with open(file, "w", encoding="utf-8") as f:
       f.write(messages)
-    return f"https://logs.pretend.best/{logId}"
+    return f"https://logs.pretend.bot/{logId}"
 
   async def callback(self, interaction: discord.Interaction) -> None: 
    
