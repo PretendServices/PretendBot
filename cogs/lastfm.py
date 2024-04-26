@@ -149,7 +149,7 @@ class Lastfm(Cog):
     }
 
     x = await self.bot.session.get_json(
-      "https://v1.pretend.bot/lastfm/chart", 
+      "https://api.pretend.bot/lastfm/chart", 
       params=params,
       headers=headers
     )
