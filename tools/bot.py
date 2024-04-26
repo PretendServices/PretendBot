@@ -112,11 +112,11 @@ class Pretend(commands.AutoShardedBot):
       self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
       self.login_data['record_class'] = Record
       self.color = 0x729bb0
-      self.warning = "<:warn:1189134620718018600>"  
+      self.warning = "<:warn:1233025512666824796>"  
       self.warning_color = 0xefbc1b
       self.no = "❌"
       self.no_color = 0xfc341b
-      self.yes = "<:check:1188943556895838249>"
+      self.yes = "<:check:1233186176245039155>"
       self.yes_color = 0x48db01
       self.time = datetime.datetime.now()
       self.mcd = commands.CooldownMapping.from_cooldown(3, 5, commands.BucketType.user)
