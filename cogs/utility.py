@@ -1013,7 +1013,7 @@ class Utility(commands.Cog):
     """
 
     results = await self.bot.session.get_json(
-      "https://v1.pretend.best/snapstory",
+      "https://v1.pretend.bot/snapstory",
       headers={"api-key": self.bot.pretend_api},
       params={"username": username}
     )

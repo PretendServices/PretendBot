@@ -24,7 +24,7 @@ class TikTokUser(commands.Converter):
     async def convert(self, ctx: PretendContext, argument: str) -> TikTok: 
       async with ctx.typing(): 
          async with aiohttp.ClientSession(headers={"api-key": ctx.bot.pretend_api}) as cs: 
-            async with cs.get("https://v1.pretend.best/tiktok", params={"username": argument}) as r: 
+            async with cs.get("https://v1.pretend.bot/tiktok", params={"username": argument}) as r: 
                if r.status != 200: 
                   raise commands.BadArgument("Couldn't get this tiktok page")
 
@@ -35,7 +35,7 @@ class TikTokUser(commands.Converter):
                  badges.append("🔒")
                
                if data.get('verified'):
-                 badges.append("<:verified:1111747172677988373>")
+                 badges.append("<:verified:1233237074128277637>")
 
                data['badges'] = badges 
                return TikTok(**data)
