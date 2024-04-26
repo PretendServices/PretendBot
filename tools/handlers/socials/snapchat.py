@@ -22,6 +22,6 @@ class SnapUser(commands.Converter):
       async with aiohttp.ClientSession(headers={"api-key": ctx.bot.pretend_api}) as cs: 
         async with cs.get("https://v1.pretend.bot/snapchat", params={"username": argument}) as r: 
             if r.status != 200: 
-             raise commands.BadArgument(f"Couldn't get information about **{argument}**")
+             raise commands.BadArgument(f"Couldn't get information about **{argument}** (`{r.status}`)")
             
             return Snapchat(**(await r.json()))
