@@ -13,7 +13,7 @@ class Session:
     """
 
     async with aiohttp.ClientSession(headers=headers or self.headers) as cs: 
-     async with cs.post(url, headers=headers, params=params, proxy=proxy) as r: 
+     async with cs.post(url, headers=headers, params=params, proxy=proxy, data=data) as r: 
        return await r.json()
   
   async def get_json(self, url: str, headers: Optional[dict]=None, params: Optional[dict]=None, proxy: Optional[str]=None):
