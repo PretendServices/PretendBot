@@ -2208,11 +2208,12 @@ class Utility(commands.Cog):
     search for an image
     """
 
-    response = await self.bot.session.get_json(
+    response = await self.bot.session.post_json(
       f"https://vile.bot/api/browser/images",
       data=query.replace(" ", ""),
       params=dict(color="true")
     )
+
     if not response:
       return await ctx.send_warning(f"No results found for **{query}**")
     

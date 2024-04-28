@@ -7,7 +7,7 @@ class Session:
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36"
    }
   
-  async def post_json(self, url: str, headers: Optional[dict]=None, params: Optional[dict]=None, proxy: Optional[str]=None):
+  async def post_json(self, url: str, headers: Optional[dict]=None, params: Optional[dict]=None, data: Optional[str]=None, proxy: Optional[str]=None):
     """
     Use the post method to get the json response
     """
