@@ -1453,6 +1453,73 @@ class Moderation(Cog):
    await thread.edit(locked=False, reason=f"Unlocked by {ctx.author} ({ctx.author.id})")
    await ctx.message.add_reaction("✅")
 
+  @thread.command(
+    name="rename",
+    brief="manage threads"
+  )
+  @has_guild_permissions(manage_threads=True)
+  @bot_has_guild_permissions(manage_threads=True)
+  async def thread_rename(
+   self,
+   ctx: PretendContext,
+   thread: Optional[Thread] = None,
+   *,
+   name: str
+  ):
+   """
+   Rename a thread
+   """
+
+   thread = thread or ctx.channel
+
+   if not isinstance(thread, Thread):
+    return await ctx.send_warning(f"{thread.mention} is not a thread")
+   
+   if len(name) > 100:
+    return await ctx.send_warning(f"Thread names can't be over **100 characters**")
+
+   await thread.edit(name=name, reason=f"Edited by {ctx.author} ({ctx.author.id})")
+   await ctx.message.add_reaction("✅")
+
+  @thread.command(
+    name="delete",
+    aliases=["del"]
+  )
+  @has_guild_permissions(manage_threads=True)
+  @bot_has_guild_permissions(manage_threads=True)
+  async def thread_delete(
+   self,
+   ctx: PretendContext,
+   thread: Optional[Thread] = None
+  ):
+   """
+   delete a thread
+   """
+
+   thread = thread or ctx.channel
+
+   if not isinstance(thread, Thread):
+    return await ctx.send_warning(f"{thread.mention} is not a thread")
+   
+   async def yes_callback(interaction: Interaction):
+    await thread.delete()
+    if thread != ctx.channel:
+     await interaction.delete_original_response()
+     await ctx.message.add_reaction("✅")
+
+   async def no_callback(interaction: Interaction):
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{interaction.user.mention}: Cancelling action...",
+      color=self.bot.color
+     )
+    )
+
+   await ctx.confirmation_send(f"Are you sure you want to **delete** {thread.mention}?", yes_callback, no_callback)
+
+   async def no_func(interaction: Interaction):
+    return await ctx.pretend_send(f"Cancelling action...")
+
   @command(
    name="reactionmute",
    aliases=[
