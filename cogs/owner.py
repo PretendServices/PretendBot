@@ -43,18 +43,18 @@ class Owner(Cog):
   
   async def add_donor_role(self, member: User): 
    """add the donor role to a donator"""
-   guild = self.bot.get_guild(1177424668328726548)
+   guild = self.bot.get_guild(1232875191911059476)
    user = guild.get_member(member.id)
    if user: 
-    role = guild.get_role(1183428300807356516)
+    role = guild.get_role(1234224557263556802)
     await user.add_roles(role, reason="member got donator perks")
   
   async def remove_donor_role(self, member: User): 
    """remove the donator role from a donator"""
-   guild = self.bot.get_guild(1177424668328726548)
+   guild = self.bot.get_guild(1232875191911059476)
    user = guild.get_member(member.id)
    if user: 
-    role = guild.get_role(1183428300807356516)
+    role = guild.get_role(1234224557263556802)
     await user.remove_roles(role, reason="member got donator perks")
   
   @Cog.listener()
@@ -66,7 +66,7 @@ class Owner(Cog):
 
   @Cog.listener()
   async def on_member_remove(self, member: Member): 
-   if member.guild.id == 1177424668328726548: 
+   if member.guild.id == 1232875191911059476: 
     check = await self.bot.db.fetchrow("SELECT * FROM donor WHERE user_id = $1 AND status = $2", member.id, "boosted")
     if check: 
      await self.bot.db.execute("DELETE FROM donor WHERE user_id = $1", member.id) 
@@ -74,7 +74,7 @@ class Owner(Cog):
 
   @Cog.listener()
   async def on_member_update(self, before: Member, after: Member): 
-   if before.guild.id == 1177424668328726548: 
+   if before.guild.id == 1232875191911059476: 
     if before.guild.premium_subscriber_role in before.roles and not before.guild.premium_subscriber_role in after.roles: 
      check = await self.bot.db.fetchrow("SELECT * FROM donor WHERE user_id = $1 AND status = $2", before.id, "boosted")
      if check: 

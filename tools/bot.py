@@ -117,7 +117,7 @@ class Pretend(commands.AutoShardedBot):
       self.avqueue = []
       self.login_data = {x: os.environ[x] for x in ['host', 'password', 'database', 'user', 'port']}
       self.login_data['record_class'] = Record
-      self.color = 0x729bb0
+      self.color = 0x808080
       self.warning = "<:warn:1233025512666824796>"  
       self.warning_color = 0xefbc1b
       self.no = "❌"
