@@ -108,9 +108,6 @@ class Pretend(commands.AutoShardedBot):
             joined=True,
             voice=True
           ),
-          activity=discord.CustomActivity(
-            name="/pretendbot"
-          )
       )
 
       self.db = db
