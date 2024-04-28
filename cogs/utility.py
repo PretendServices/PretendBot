@@ -2198,5 +2198,42 @@ class Utility(commands.Cog):
         file=discord.File(temp_file_output),
       )
 
+  @commands.command(
+    name="image",
+    aliases=["img", "im"]
+  )
+  @commands.cooldown(1, 1, commands.BucketType.member)
+  async def image(self, ctx: PretendContext, *, query: str):
+    """
+    search for an image
+    """
+
+    response = await self.bot.session.get_json(
+      f"https://vile.bot/api/browser/images",
+      data=query.replace(" ", ""),
+      params=dict(color="true")
+    )
+    if not response:
+      return await ctx.send_warning(f"No results found for **{query}**")
+    
+    entries = [
+      discord.Embed(
+        title=entry.get("title"),
+        url=f"https://{entry.get('domain')}",
+        color=entry.get("color")
+      ).set_image(
+        url=entry.get("url")
+      ).set_author(
+        name=ctx.author.display_name,
+        icon_url=ctx.author.display_avatar
+      ).set_footer(
+        text="Brave Results",
+        icon_url="https://upload.wikimedia.org/wikipedia/commons/5/51/Brave_icon_lionface.png"
+      )
+      for entry in response
+    ]
+
+    await ctx.paginator(entries)
+
 async def setup(bot: Pretend) -> None: 
   return await bot.add_cog(Utility(bot))    
