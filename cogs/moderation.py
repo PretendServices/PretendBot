@@ -1515,7 +1515,7 @@ class Moderation(Cog):
      )
     )
 
-   await ctx.confirmation_send(f"Are you sure you want to **delete** {thread.mention}?", yes_callback, no_callback)
+   await ctx.confirmation_send(f"{ctx.author.mention}: Are you sure you want to **delete** {thread.mention}?", yes_callback, no_callback)
 
    async def no_func(interaction: Interaction):
     return await ctx.pretend_send(f"Cancelling action...")
