@@ -343,15 +343,15 @@ class VoiceMasterView(View):
 
   async def add_default_buttons(self, guild: Guild): 
    for action in [
-    ("<:lock:1234223571694518333>", "`lock` the voice channel"), 
-    ("<:unlock:1234223586412073011>", "`unlock` the voice channel"), 
-    ("<:ghost:1234223641869156362>", "`hide` the voice channel"),
-    ("<:unghost:1234223631056244847>", "`reveal` the voice channel"), 
-    ("<:rename:1234223687679479879>", "`rename` the voice channel"), 
-    ("<:minus:1234223725004460053>", "`decrease` the member limit"), 
-    ("<:plus:1234223750266880051>", "`increase` the member limit"), 
-    ("<:info:1234223791949746287>", "`info` about the voice channel"), 
-    ("<:kick:1234223809876463657>", "`kick` someone from the voice channel"),
-    ("<:claim:1234223830667624528>", "`claim` the voice channel")
+    ("<:lock:1234223571694518333>", "lock"), 
+    ("<:unlock:1234223586412073011>", "unlock"), 
+    ("<:ghost:1234223641869156362>", "hide"),
+    ("<:unghost:1234223631056244847>", "reveal"), 
+    ("<:rename:1234223687679479879>", "rename"), 
+    ("<:minus:1234223725004460053>", "decrease"), 
+    ("<:plus:1234223750266880051>", "increase"), 
+    ("<:info:1234223791949746287>", "info"), 
+    ("<:kick:1234223809876463657>", "kick"),
+    ("<:claim:1234223830667624528>", "claim")
    ]: 
     await self.add_button(guild, action[1], emoji=action[0])  
