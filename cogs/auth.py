@@ -11,7 +11,7 @@ from tools.predicates import auth_perms
 class Auth(commands.Cog): 
   def __init__(self, bot): 
     self.bot = bot 
-    self.channel_id = 1183429820105900093
+    self.channel_id = 1234229866878992465
   
   async def guild_change(self, state: str, guild: discord.Guild):
    await self.bot.get_channel(self.channel_id).send(
@@ -50,6 +50,8 @@ class Auth(commands.Cog):
   async def on_guild_join(self, guild: discord.Guild):
     if not guild.chunked: 
       await guild.chunk(cache=True)
+
+    await self.guild_change("joined", guild)
 
   @commands.group(invoke_without_command=True)
   @auth_perms()
