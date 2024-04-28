@@ -60,7 +60,7 @@ class LogsView(discord.ui.View):
         self.add_item(
             discord.ui.Button(
                 label="Support Server", 
-                url="https://discord.gg/pretendbot"
+                url="https://discord.gg/jRSdSqJ2YV"
             )
         )
 

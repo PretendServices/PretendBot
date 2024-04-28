@@ -118,7 +118,7 @@ class Info(Cog):
 
     embed = Embed(
       color=self.bot.color, 
-      description=f"Premium multi-purpose discord bot made by [**The Pretend Team**](https://discord.com/invite/pretendbot)\nUsed by **{sum(g.member_count for g in self.bot.guilds):,}** members in **{len(self.bot.guilds):,}** servers"
+      description=f"Premium multi-purpose discord bot made by [**The Pretend Team**](https://discord.gg/jRSdSqJ2YV)\nUsed by **{sum(g.member_count for g in self.bot.guilds):,}** members in **{len(self.bot.guilds):,}** servers"
     )\
     .set_author(
       name=self.bot.user.name, 
