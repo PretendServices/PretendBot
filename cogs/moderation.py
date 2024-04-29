@@ -1794,7 +1794,7 @@ class Moderation(Cog):
     "SELECT COUNT(*) FROM notes WHERE guild_id = $1 AND user_id = $2",
     ctx.guild.id,
     member.id
-   ) or 0 + 1
+   ) + 1
 
    try:
     await self.bot.db.execute(
