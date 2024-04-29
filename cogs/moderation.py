@@ -1482,8 +1482,43 @@ class Moderation(Cog):
    await ctx.message.add_reaction("✅")
 
   @thread.command(
+    name="create",
+    aliases=["open"],
+    brief="create threads"
+  )
+  @has_guild_permissions(create_public_threads=True)
+  @bot_has_guild_permissions(create_public_threads=True)
+  async def thread_create(
+   self,
+   ctx: PretendContext,
+   message: Optional[ValidMessage] = None,
+   *,
+   name: str
+  ):
+   """
+   create a thread
+   """
+
+   message: Message = message or ctx.message
+   
+   if len(name) > 100:
+    return await ctx.send_warning(f"Thread names can't be over **100 characters**")
+   
+   thread = await message.create_thread(
+    name=name,
+    reason=f"Opened by {ctx.author} ({ctx.author.id})"
+   )
+   await thread.send(
+    embed=Embed(
+     description=f"{self.bot.yes} {ctx.author.mention}: Created **thread** {thread.mention}",
+     color=self.bot.yes_color
+    )
+   )
+
+  @thread.command(
     name="delete",
-    aliases=["del"]
+    aliases=["del"],
+    brief="manage threads"
   )
   @has_guild_permissions(manage_threads=True)
   @bot_has_guild_permissions(manage_threads=True)
