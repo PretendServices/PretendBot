@@ -174,7 +174,10 @@ class Logs(commands.Cog):
                                     BytesIO(await attachment.read()),
                                     filename=attachment.filename
                                 )
-                            )  
+                            )
+                    elif not attachment and message.embeds:
+                        a = list((embed.thumbnail or embed.image) for embed in message.embeds if embed.type == "image")
+                        embed.set_image(a[0].url)
                     
                     if sticker := next(
                         iter(message.stickers),
