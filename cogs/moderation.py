@@ -1745,5 +1745,109 @@ class Moderation(Cog):
 
    await ctx.message.add_reaction("✅")
 
+  @group(
+   name="notes",
+   aliases=["note"],
+   invoke_without_command=True
+  )
+  @has_guild_permissions(manage_messages=True)
+  async def notes(self, ctx: PretendContext, member: Member | User):
+   """
+   view a member's notes
+   """
+
+   data = await self.bot.db.fetch(
+    "SELECT * FROM notes WHERE guild_id = $1 AND user_id = $2",
+    ctx.guild.id,
+    member.id
+   )
+   if not data:
+    return await ctx.send_warning(f"There are no **notes** for {member.mention}")
+   
+   await ctx.paginator(
+    [
+     Embed(
+      title=f"Note #{note['id']}",
+      description=f"**Date**: {utils.format_dt(note['timestamp'], style='F')}"
+      + f"\n**Moderator**: {self.bot.get_user(note['moderator_id']) or 'Unkown User'} (`{note['moderator_id']}`)"
+      + f"\n**Note**: {note['note']}",
+     ).set_author(
+      name=ctx.author.display_name,
+      icon_url=ctx.author.display_avatar
+     )
+    ]
+    for note in data
+   )
+
+  @notes.command(
+   name="add"
+  )
+  @has_guild_permissions(manage_messages=True)
+  async def notes_add(self, ctx: PretendContext, member: Member, *, note: str):
+   """
+   add a note for a member
+   """
+
+   _id = await self.bot.db.fetchval(
+    "SELECT COUNT(*) FROM notes WHERE guild_id = $1 AND user_id = $2",
+    ctx.guild.id,
+    member.id
+   ) + 1
+
+   await self.bot.db.execute(
+    "INSERT INTO notes (guild_id, user_id, id, note) VALUES ($1, $2, $3, $4)",
+    ctx.guild.id,
+    member.id,
+    _id,
+    note
+   )
+   await ctx.send_success(f"Added note `#{_id}` for **{member}**")
+
+  @notes.command(
+   name="remove",
+   aliases=["rm", "del", "delete"]
+  )
+  @has_guild_permissions(manage_messages=True)
+  async def notes_remove(self, ctx: PretendContext, member: Member, *, note: str):
+   """
+   remove a note from a member
+   """
+
+   note = note.lower()
+
+   if note.isdigit():
+    _note = await self.bot.db.fetchval(
+     "SELECT COUNT(*) FROM notes WHERE guild_id = $1 AND user_id = $2",
+     ctx.guild.id,
+     member.id
+    )
+    if not _note:
+     return await ctx.send_warning(f"Note ID `{note}` not found for **{member}**")
+    
+    query = [
+     "DELETE FROM notes WHERE guild_id = $1 AND user_id = $2 AND id = $3",
+     ctx.guild.id,
+     member.id,
+     _note
+    ]
+   else:
+    _note = await self.bot.db.fetchval(
+     "SELECT LOWER(note) FROM notes WHERE guild_id = $1 AND user_id = $2",
+     ctx.guild.id,
+     member.id
+    )
+    if not _note:
+     return await ctx.send_warning(f"Note not found for **{member}**")
+    
+    query = [
+     "DELETE FROM notes WHERE guild_id = $1 AND user_id = $2 AND note = $3",
+     ctx.guild.id,
+     member.id,
+     note
+    ]
+
+   await self.bot.db.execute(*query)
+   await ctx.send_success(f"Removed note from **{member}**")
+
 async def setup(bot: Pretend) -> None: 
   await bot.add_cog(Moderation(bot))
