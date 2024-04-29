@@ -212,6 +212,10 @@ class Leveling(Cog):
       )
       channel = ctx.guild.get_channel(res['channel_id']) or ctx.channel 
       mes = res['message']  
+
+      if mes == "none":
+        return await ctx.send_warning(f"There is no **level message** set")
+
       x = await self.bot.embed_build.convert(ctx, await self.level_replace(ctx.author, mes)) 
       await channel.send(**x)
 
