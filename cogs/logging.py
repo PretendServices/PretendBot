@@ -71,43 +71,45 @@ class Logs(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message): 
-        if not before.author.bot: 
-            if record := await self.bot.db.fetchval("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
-                    if channel := before.guild.get_channel(record):
-                        async with self.locks[before.guild.id]:
-                            view = LogsView("Message ID")
-                            embed = discord.Embed(
-                                color=self.bot.color, 
-                                title="Message Edit", 
-                                timestamp=datetime.datetime.now(), 
-                                description=f"{before.author} edited a message"
-                            )\
-                            .set_author(
-                                name=str(after.author),
-                                icon_url=after.author.display_avatar.url
-                            )\
-                            .add_field(
-                                name="Before", 
-                                value=before.content, 
-                                inline=False
-                            )\
-                            .add_field(
-                                name="After", 
-                                value=after.content,
-                                inline=False
-                            )\
-                            .add_field(
-                                name="Channel",
-                                value=f"{after.channel.mention} (`{after.channel.id}`)"
-                            )\
-                            .set_footer(
-                                text=f"ID: {after.id}"
-                            )
-    
-                            return await channel.send(
-                                embed=embed, 
-                                view=view
-                            )
+        if before.author.bot or before.content == after.content:
+            return
+        
+        if record := await self.bot.db.fetchval("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
+            if channel := before.guild.get_channel(record):
+                async with self.locks[before.guild.id]:
+                    view = LogsView("Message ID")
+                    embed = discord.Embed(
+                        color=self.bot.color, 
+                        title="Message Edit", 
+                        timestamp=datetime.datetime.now(), 
+                        description=f"{before.author} edited a message"
+                    )\
+                    .set_author(
+                        name=str(after.author),
+                        icon_url=after.author.display_avatar.url
+                    )\
+                    .add_field(
+                        name="Before", 
+                        value=before.content, 
+                        inline=False
+                    )\
+                    .add_field(
+                        name="After", 
+                        value=after.content,
+                        inline=False
+                    )\
+                    .add_field(
+                        name="Channel",
+                        value=f"{after.channel.mention} (`{after.channel.id}`)"
+                    )\
+                    .set_footer(
+                        text=f"ID: {after.id}"
+                    )
+
+                    return await channel.send(
+                        embed=embed, 
+                        view=view
+                    )
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
