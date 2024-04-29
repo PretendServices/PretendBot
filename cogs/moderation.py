@@ -1792,15 +1792,17 @@ class Moderation(Cog):
     "SELECT COUNT(*) FROM notes WHERE guild_id = $1 AND user_id = $2",
     ctx.guild.id,
     member.id
-   ) + 1
+   ) or 0 + 1
 
    try:
     await self.bot.db.execute(
-      "INSERT INTO notes (guild_id, user_id, id, note) VALUES ($1, $2, $3, $4)",
+      "INSERT INTO notes (guild_id, user_id, moderator_id, id, note, timestamp) VALUES ($1, $2, $3, $4, $5, $6)",
       ctx.guild.id,
       member.id,
+      ctx.author.id,
       _id,
-      note
+      note,
+      datetime.datetime.now()
     )
    except:
     return await ctx.send_warning(f"Note already exists for **{member}**")
