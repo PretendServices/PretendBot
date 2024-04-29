@@ -1164,6 +1164,19 @@ class Moderation(Cog):
     )
 
    await ctx.confirmation_send(f"{ctx.author.mention}: Are you sure you want to **delete** {role.mention}?", yes_func, no_func)
+
+  @role.command(
+    name="all",
+    brief="manage roles"
+  )
+  @has_guild_permissions(manage_roles=True)
+  @bot_has_guild_permissions(manage_roles=True)
+  async def role_all(self, ctx: PretendContext, *, role: NewRoleConverter):
+   """
+   add a role to all members
+   """
+
+   await ctx.invoke(self.roleall(ctx, role=role))
    
   @group(
    name="channel",
