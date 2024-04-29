@@ -1130,7 +1130,7 @@ class Moderation(Cog):
    channel = await ctx.guild.create_text_channel(
     name=name
    )
-   return await ctx.send_success(f"Created {channel.mention}")
+   return await ctx.send_success(f"Created **channel** {channel.mention}")
   
   @channel.command(
    name="remove",
@@ -1152,7 +1152,7 @@ class Moderation(Cog):
    except Forbidden:
     return await ctx.send_warning(f"Couldn't delete {channel.mention}")
 
-   await ctx.send_success(f"Deleted channel `#{channel.name}`")
+   await ctx.send_success(f"Deleted **channel** `#{channel.name}`")
 
   @channel.command(
    name="rename",
@@ -1163,10 +1163,14 @@ class Moderation(Cog):
   )
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
-  async def channel_rename(self, ctx: PretendContext, channel: TextChannel, *, name: str):
+  async def channel_rename(self, ctx: PretendContext, channel: Optional[TextChannel] = None, *, name: str):
    """
    Rename a channel
    """
+
+   channel = channel or ctx.channel
+   if isinstance(channel, Thread):
+    return await ctx.invoke(self.thread_rename(ctx, channel, name))
 
    if len(name) > 150:
     return await ctx.send_error(f"Channel names can't be over **150 characters**")
@@ -1225,10 +1229,12 @@ class Moderation(Cog):
   )
   @has_guild_permissions(manage_channels=True)
   @bot_has_guild_permissions(manage_channels=True)
-  async def channel_topic(self, ctx: PretendContext, channel: TextChannel, *, topic: str):
+  async def channel_topic(self, ctx: PretendContext, channel: Optional[TextChannel] = None, *, topic: str):
    """
    Change a channel's topic
    """
+
+   channel = channel or ctx.channel
 
    if len(topic) > 1024:
     return await ctx.send_warning(f"Channel topics can't be over **1024 characters**")
@@ -1242,7 +1248,8 @@ class Moderation(Cog):
 
   @group(
     name="category",
-    brief="manage channels"
+    brief="manage channels",
+    invoke_without_command=True
   )
   @has_guild_permissions(manage_channels=True)
   async def category(self, ctx: PretendContext):
