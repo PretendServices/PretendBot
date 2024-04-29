@@ -474,7 +474,7 @@ class Pretend(commands.AutoShardedBot):
       )
       embed = discord.Embed(
         description=f"{self.warning} {ctx.author.mention}: An error occurred while running the **{ctx.command.qualified_name}** command."
-        + f"\nPlease report the attached code to a developer in the [pretend server](https://discord.gg/jRSdSqJ2YV)",
+        + f"\nPlease report the attached code to a developer in the [pretend server](https://discord.gg/pretend)",
         color=self.warning_color
       )
 

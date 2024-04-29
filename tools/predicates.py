@@ -174,7 +174,7 @@ def has_perks():
   async def predicate(ctx: PretendContext): 
    check = await ctx.bot.db.fetchrow("SELECT * FROM donor WHERE user_id = $1", ctx.author.id)
    if not check: 
-    await ctx.send_warning(f"You need [**donator**](https://discord.gg/pretendbot) perks to use this command")   
+    await ctx.send_warning(f"You need [**donator**](https://discord.gg/pretend) perks to use this command")   
    return check is not None
   return check(predicate)
 
