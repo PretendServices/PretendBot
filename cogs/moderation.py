@@ -1778,7 +1778,7 @@ class Moderation(Cog):
      )
     )
 
-   await ctx.paginatro(embeds)
+   await ctx.paginator(embeds)
 
   @notes.command(
    name="add"
