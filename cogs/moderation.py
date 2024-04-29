@@ -13,7 +13,7 @@ from humanfriendly import format_timespan
 
 from tools.bot import Pretend
 from tools.helpers import PretendContext, Invoking
-from tools.converters import NoStaff, NewRoleConverter
+from tools.converters import NoStaff, NewRoleConverter, HexColor
 from tools.validators import ValidTime, ValidNickname, ValidMessage
 from tools.predicates import is_jail, admin_antinuke
 from tools.misc.views import BoosterMod
@@ -1063,12 +1063,16 @@ class Moderation(Cog):
       )
     ) 
   
-  @command(brief="manage_roles", aliases=['r'])
+  @group(
+    brief="manage_roles",
+    aliases=['r'],
+    invoke_without_command=True
+  )
   @has_guild_permissions(manage_roles=True)
   @bot_has_guild_permissions(manage_roles=True)
   async def role(self, ctx: PretendContext, member: Member, *, role_string: str):
    """
-   Add roles to a member
+   add roles to a member
    """
     
    roles = [await NewRoleConverter().convert(ctx, r) for r in role_string.split(", ")]
@@ -1097,7 +1101,67 @@ class Moderation(Cog):
      
      return await ctx.send_success(f"Edited {member.mention}'s roles: {', '.join(role_mentions)}") 
    else: 
-    return await ctx.send_error("There are no roles that you can give") 
+    return await ctx.send_error("There are no roles that you can give")
+  
+  @role.command(
+    name="create"
+  )
+  @has_guild_permissions(manage_roles=True)
+  @bot_has_guild_permissions(manage_roles=True)
+  async def role_create(
+   self,
+   ctx: PretendContext,
+   color: Optional[HexColor] = "0",
+   *,
+   name: str
+  ):
+   """
+   create a role
+   """
+
+   role = await ctx.guild.create_role(
+    name=name,
+    color=color,
+    reason=f"Created by {ctx.author} ({ctx.author.id})"
+   )
+   await ctx.send_success(f"Created **role** {role.mention}")
+
+  @role.command(
+    name="delete",
+    aliases=["del", "remove"]
+  )
+  @has_guild_permissions(manage_roles=True)
+  @bot_has_guild_permissions(manage_roles=True)
+  async def role_delete(
+   self,
+   ctx: PretendContext,
+   *,
+   role: NewRoleConverter
+  ):
+   """
+   delete a role
+   """
+
+   async def yes_func(interaction: Interaction):
+    await role.delete(reason=f"Deleted by {interaction.user} ({interaction.user.id})")
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{self.bot.yes} {interaction.user.mention}: Deleted **role** `@{role.name}`",
+      color=self.bot.yes_color
+     ),
+     view=None
+    )
+
+   async def no_func(interaction: Interaction):
+    await interaction.response.edit_message(
+     embed=Embed(
+      description=f"{interaction.user.mention}: Cancelling action...",
+      color=self.bot.color
+     ),
+     view=None
+    )
+
+   await ctx.confirmation_send(f"{ctx.author.mention}: Are you sure you want to **delete** {role.mention}?", yes_func, no_func)
    
   @group(
    name="channel",
