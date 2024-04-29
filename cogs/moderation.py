@@ -31,7 +31,7 @@ from discord.ext.commands import (
 )
 from discord.abc import GuildChannel
 
-from typing import Union, Optional
+from typing import Union, Optional, Literal
 from collections import defaultdict
 from humanfriendly import format_timespan
 
@@ -916,6 +916,7 @@ class Moderation(Cog):
         self,
         ctx: PretendContext,
         member: Union[Member, User],
+        delete_days: Optional[Literal[0, 1, 7]] = 0,
         *,
         reason: str = "No reason provided",
     ):
@@ -934,7 +935,7 @@ class Moderation(Cog):
                 )
                 return await ctx.reply(embed=embed, view=view)
 
-        await ctx.guild.ban(member, reason=reason)
+        await ctx.guild.ban(member, reason=reason, delete_message_days=delete_days)
         await self.punish_a_bitch("ban", ctx.author, "Banning Members")
         if not await Invoking(ctx).send(member, reason):
             return await ctx.send_success(f"Banned {member.mention} - **{reason}**")
