@@ -567,11 +567,13 @@ class Lastfm(Cog):
          a = await asyncio.wait_for(self.lastfmhandler.get_tracks_recent(user, 1), timeout=15)  
          u = await asyncio.wait_for(self.lastfmhandler.get_user_info(user), timeout=15)
      except asyncio.TimeoutError:
-         return await ctx.send_warning("Could not connect to LastFM servers.")
+         return await ctx.send_warning("Could not connect to **LastFM servers**")
+     
      try:
          album = a['recenttracks']['track'][0]['album']['#text']
-     except Exception as e:
-         return await ctx.send_warning("There was an issue fetching your current track.")
+     except IndexError:
+         return await ctx.send_warning(f"There are no **scrobbles** for [`@{user}`](https://last.fm/user/{user})")
+     
      embed = Embed(color=self.bot.color)\
      .set_author(
        name=user, 
