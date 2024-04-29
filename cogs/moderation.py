@@ -1794,14 +1794,18 @@ class Moderation(Cog):
     member.id
    ) + 1
 
-   await self.bot.db.execute(
-    "INSERT INTO notes (guild_id, user_id, id, note) VALUES ($1, $2, $3, $4)",
-    ctx.guild.id,
-    member.id,
-    _id,
-    note
-   )
-   await ctx.send_success(f"Added note `#{_id}` for **{member}**")
+   try:
+    await self.bot.db.execute(
+      "INSERT INTO notes (guild_id, user_id, id, note) VALUES ($1, $2, $3, $4)",
+      ctx.guild.id,
+      member.id,
+      _id,
+      note
+    )
+   except:
+    return await ctx.send_warning(f"Note already exists for **{member}**")
+   else:
+    await ctx.send_success(f"Added note `#{_id}` for **{member}**")
 
   @notes.command(
    name="remove",
