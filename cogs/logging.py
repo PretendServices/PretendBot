@@ -106,6 +106,28 @@ class Logs(commands.Cog):
                         text=f"ID: {after.id}"
                     )
 
+                    if attachment := next(
+                        iter(before.attachments), 
+                        None
+                    ):
+                        if attachment.filename.endswith(('jpg', 'png', 'gif', 'jpeg')):
+                            embed.set_image(url=attachment.url)
+                        else: 
+                            return await channel.send(
+                                embed=embed, 
+                                view=view, 
+                                file=discord.File(
+                                    BytesIO(await attachment.read()),
+                                    filename=attachment.filename
+                                )
+                            )
+
+                    if attachments := next(
+                        iter(before.attachments),
+                        None
+                    ):
+                        embed.set_image(url=attachments)
+
                     return await channel.send(
                         embed=embed, 
                         view=view
@@ -113,57 +135,59 @@ class Logs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
-        if not message.author.bot:
-            if record := await self.bot.db.fetchval("SELECT messages FROM logging WHERE guild_id = $1", message.guild.id):
-                if channel := message.guild.get_channel(record):
-                    async with self.locks[message.guild.id]:
-                        view = LogsView("Message ID")
-                        embed = discord.Embed(
-                            color=self.bot.color, 
-                            title="Message Delete", 
-                            description=message.content if message.content != "" else "No Content",
-                            timestamp=datetime.datetime.now()
-                        )\
-                        .set_author(
-                            name=str(message.author), 
-                            icon_url=message.author.display_avatar.url
-                        )\
-                        .add_field(
-                            name="Channel",
-                            value=f"{message.channel.mention} (`{message.channel.id}`)"
-                        )\
-                        .set_footer(
-                            text=f"ID: {message.id}"
-                        )
+        if message.author.bot:
+            return
         
-                        if attachment := next(
-                            iter(message.attachments), 
-                            None
-                        ):
-                            if attachment.filename.endswith(('jpg', 'png', 'gif', 'jpeg')):
-                                embed.set_image(url=attachment.url)
-                            else: 
-                                return await channel.send(
-                                    embed=embed, 
-                                    view=view, 
-                                    file=discord.File(
-                                        BytesIO(await attachment.read()),
-                                        filename=attachment.filename
-                                    )
-                                )  
-                        
-                        if sticker := next(
-                            iter(message.stickers),
-                            None
-                        ):
-                            embed.set_image(url=sticker.url)
-                            if embed.description != "No Content":
-                                embed.description = sticker.name
-                        
-                        return await channel.send(
-                            embed=embed, 
-                            view=view
-                        )
+        if record := await self.bot.db.fetchval("SELECT messages FROM logging WHERE guild_id = $1", message.guild.id):
+            if channel := message.guild.get_channel(record):
+                async with self.locks[message.guild.id]:
+                    view = LogsView("Message ID")
+                    embed = discord.Embed(
+                        color=self.bot.color, 
+                        title="Message Delete", 
+                        description=message.content if message.content != "" else "No Content",
+                        timestamp=datetime.datetime.now()
+                    )\
+                    .set_author(
+                        name=str(message.author), 
+                        icon_url=message.author.display_avatar.url
+                    )\
+                    .add_field(
+                        name="Channel",
+                        value=f"{message.channel.mention} (`{message.channel.id}`)"
+                    )\
+                    .set_footer(
+                        text=f"ID: {message.id}"
+                    )
+    
+                    if attachment := next(
+                        iter(message.attachments), 
+                        None
+                    ):
+                        if attachment.filename.endswith(('jpg', 'png', 'gif', 'jpeg')):
+                            embed.set_image(url=attachment.url)
+                        else: 
+                            return await channel.send(
+                                embed=embed, 
+                                view=view, 
+                                file=discord.File(
+                                    BytesIO(await attachment.read()),
+                                    filename=attachment.filename
+                                )
+                            )  
+                    
+                    if sticker := next(
+                        iter(message.stickers),
+                        None
+                    ):
+                        embed.set_image(url=sticker.url)
+                        if embed.description != "No Content":
+                            embed.description = sticker.name
+                    
+                    return await channel.send(
+                        embed=embed, 
+                        view=view
+                    )
     
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
