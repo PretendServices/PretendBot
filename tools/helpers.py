@@ -491,7 +491,7 @@ class PretendContext(Context):
     elif isinstance(embeds[0], str):
       return await self.send(embeds[0])
     
-   paginator = Paginator(self, embeds)
+   paginator = Paginator(self, embeds, self.author.id)
    style=ButtonStyle.blurple 
    paginator.add_button('prev', emoji="<:left:1018156480991612999>", style=style)
    paginator.add_button('next', emoji="<:right:1018156484170883154>", style=style)
