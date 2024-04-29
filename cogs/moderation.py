@@ -1104,7 +1104,8 @@ class Moderation(Cog):
     return await ctx.send_error("There are no roles that you can give")
   
   @role.command(
-    name="create"
+    name="create",
+    brief="manage_roles"
   )
   @has_guild_permissions(manage_roles=True)
   @bot_has_guild_permissions(manage_roles=True)
@@ -1128,7 +1129,8 @@ class Moderation(Cog):
 
   @role.command(
     name="delete",
-    aliases=["del", "remove"]
+    aliases=["del", "remove"],
+    brief="manage_roles"
   )
   @has_guild_permissions(manage_roles=True)
   @bot_has_guild_permissions(manage_roles=True)
