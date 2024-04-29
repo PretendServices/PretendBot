@@ -591,7 +591,7 @@ class Lastfm(Cog):
      )\
      .set_footer(
        text=f"{await self.lastfmhandler.get_track_playcount(user, a['recenttracks']['track'][0])} {f'| Album {album}' if len(album) > 0 else ''}", 
-       icon_url="https://cdn.discordapp.com/attachments/1103343252796604580/1110901073473974403/emoji.png"
+       icon_url="https://www.last.fm/static/images/lastfm_avatar_twitter.52a5d69a85ac.png"
      )
      mes = await ctx.send(embed=embed)
     
