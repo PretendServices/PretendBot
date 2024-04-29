@@ -1111,7 +1111,7 @@ class Moderation(Cog):
   async def role_create(
    self,
    ctx: PretendContext,
-   color: Optional[HexColor] = "0",
+   color: Optional[HexColor] = 0,
    *,
    name: str
   ):
