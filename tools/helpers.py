@@ -481,7 +481,7 @@ class PretendContext(Context):
 
   async def lastfm_send(self, message: str, reference: Message=None) -> Message: 
    """Send a lastfm type message to the channel"""
-   return await self.send(embed=Embed(color=0xff0000, description=f"<:lastfm:1188946307704959079> {self.author.mention}: {message}"))
+   return await self.send(embed=Embed(color=0xff0000, description=f"<:lastfm:1234298951125958706> {self.author.mention}: {message}"))
    
   async def paginator(self, embeds: List[Union[Embed, str]]) -> Message: 
    """Sends some paginated embeds to the channel"""

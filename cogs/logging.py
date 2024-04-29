@@ -71,7 +71,7 @@ class Logs(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message): 
-        if before.author.bot or before.content == after.content:
+        if before.author.bot or before.content == after.content and not before.attachments:
             return
         
         if record := await self.bot.db.fetchval("SELECT messages FROM logging WHERE guild_id = $1", before.guild.id):
