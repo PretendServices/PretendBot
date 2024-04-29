@@ -1764,8 +1764,9 @@ class Moderation(Cog):
    if not data:
     return await ctx.send_warning(f"There are no **notes** for {member.mention}")
    
-   await ctx.paginator(
-    [
+   embeds = list()
+   for note in data:
+    embeds.append(
      Embed(
       title=f"Note #{note['id']}",
       description=f"**Date**: {utils.format_dt(note['timestamp'], style='F')}"
@@ -1775,9 +1776,9 @@ class Moderation(Cog):
       name=ctx.author.display_name,
       icon_url=ctx.author.display_avatar
      )
-    ]
-    for note in data
-   )
+    )
+
+   await ctx.paginatro(embeds)
 
   @notes.command(
    name="add"
