@@ -1769,9 +1769,9 @@ class Moderation(Cog):
     embeds.append(
      Embed(
       title=f"Note #{note['id']}",
-      description=f"**Date**: {utils.format_dt(note['timestamp'], style='F')}"
-      + f"\n**Moderator**: {self.bot.get_user(note['moderator_id']) or 'Unkown User'} (`{note['moderator_id']}`)"
-      + f"\n**Note**: {note['note']}",
+      description=f"\n**Note**: {note['note']}"
+      + f"\n**Date**: {utils.format_dt(note['timestamp'], style='F')}"
+      + f"\n**Moderator**: {self.bot.get_user(note['moderator_id']) or 'Unkown User'} (`{note['moderator_id']}`)",
       color=self.bot.color
      ).set_author(
       name=ctx.author.display_name,
