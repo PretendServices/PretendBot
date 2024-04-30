@@ -97,16 +97,15 @@ class Donor(Cog):
     @command(
         brief="manage nicknames & donor",
         aliases=["forcenick", "fn"],
-        usage="forcenick @sent bro\nnone passed as a nickname removes the force nickname",
     )
     @has_perks()
     @has_guild_permissions(manage_nicknames=True)
     @bot_has_guild_permissions(manage_nicknames=True)
     async def forcenickname(
-        self, ctx: PretendContext, member: NoStaff, *, nickname: str
+        self, ctx: PretendContext, member: NoStaff, *, nickname: str = None
     ):
         """lock a nickname to a member"""
-        if nickname.lower() == "none":
+        if not nickname:
             if await self.bot.db.fetchrow(
                 "SELECT * FROM force_nick WHERE guild_id = $1 AND user_id = $2",
                 ctx.guild.id,
@@ -122,9 +121,7 @@ class Donor(Cog):
                 )
                 return await ctx.send_success("Removed the nickname from this member")
             else:
-                return await ctx.send_warning(
-                    "There is no force nickname assigned for this member"
-                )
+                return await ctx.send_help(ctx.command)
         else:
             if await self.bot.db.fetchrow(
                 "SELECT * FROM force_nick WHERE guild_id = $1 AND user_id = $2",
