@@ -271,7 +271,7 @@ class Music(Cog):
         if not player.is_playing:
             player.current_track = track
             await player.do_next(track)
-        await ctx.author.voice.channel.edit(status=f"Playing {track.title}")
+            await ctx.author.voice.channel.edit(status=f"Playing {track.title}")
 
 async def setup(bot) -> None:
     await bot.add_cog(Music(bot))
