@@ -406,7 +406,7 @@ class Messages(Cog):
             return
 
         highlights = await self.bot.db.fetch(
-            "SELECT DISTINCT ON (guild_id, user_id) * FROM highlights WHERE POSITION(word in $1) > 0",
+            "SELECT DISTINCT ON (guild_id, user_id) * FROM highlights WHERE POSITION(word IN $1) > 0",
             message.content.lower()
         )
 
