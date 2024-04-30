@@ -247,12 +247,12 @@ class Utility(commands.Cog):
                             },
                         ) as r:
                             if r.status != 200:
-                                session.close()
+                                await session.close()
                                 return
                             if r.status == 200:
-                                session.close()
+                                await session.close()
                 except Exception as e:
-                    session.close()
+                    await session.close()
                     return
 
             cache = self.bot.cache.get(f"profile-{before.id}")
