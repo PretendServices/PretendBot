@@ -50,7 +50,8 @@ class Player(pomice.Player):
                 description=f"🎵 {self.context.author.mention}: Now playing [**{track.title}**]({track.uri})",
             )
         )
-        
+        await self.context.author.voice.channel.edit(status=f"Playing {track.title}")
+
         if self.awaiting:
             self.awaiting = False
 
