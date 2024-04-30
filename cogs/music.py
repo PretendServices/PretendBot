@@ -50,6 +50,7 @@ class Player(pomice.Player):
                 description=f"🎵 {self.context.author.mention}: Now playing [**{track.title}**]({track.uri})",
             )
         )
+        await self.context.author.voice.channel.edit(status=f"Playing {track.title}")
 
         if self.awaiting:
             self.awaiting = False
@@ -270,7 +271,7 @@ class Music(Cog):
         if not player.is_playing:
             player.current_track = track
             await player.do_next(track)
-
+        await ctx.author.voice.channel.edit(status=f"Playing {track.title}")
 
 async def setup(bot) -> None:
     await bot.add_cog(Music(bot))
