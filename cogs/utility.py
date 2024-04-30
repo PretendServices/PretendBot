@@ -2345,6 +2345,95 @@ class Utility(commands.Cog):
 
         await ctx.paginator(entries)
 
+    @commands.group(
+        name="highlight",
+        aliases=["hl"],
+        invoke_without_command=True
+    )
+    async def highlight(self, ctx: PretendContext):
+        """
+        get notified when a keyword is said
+        """
+
+        await ctx.create_pages()
+
+    @highlight.command(
+        name="add",
+        aliases=["create"]
+    )
+    async def higlight_add(self, ctx: PretendContext, *, word: str):
+        """
+        add a notification keyword
+        """
+
+        if len(word) < 2:
+            return await ctx.send_warning(f"Highlights need more than **2 characters**")
+        elif len(word) > 32:
+            return await ctx.send_warning(f"Highlights need less than **32 characters**")
+        
+        try:
+            await self.bot.db.execute(
+                "INSERT INTO highlights (guild_id, user_id, word) VALUES ($1, $2, $3)",
+                ctx.guild.id,
+                ctx.author.id,
+                word.lower()
+            )
+        except:
+            await ctx.send_warning(f"You're already being notified about **{word}**")
+        else:
+            await ctx.send_success(f"Now being notified for **{word}**")
+
+    @highlight.command(
+        name="remove",
+        aliases=["rm", "delete", "del"]
+    )
+    async def highlight_remove(self, ctx: PretendContext, *, word: str):
+        """
+        remove a notification keyword
+        """
+
+        word = word.lower()
+
+        if not await self.bot.db.fetchrow(
+            "SELECT * FROM highlights WHERE guild_id = $1 AND user_id = $2 AND word = $3",
+            ctx.guild.id,
+            ctx.author.id,
+            word
+        ):
+            return await ctx.send_warning(f"You are **not** being notified about **{word[:32]}**")
+        
+        await self.bot.db.execute(
+            "DELETE FROM highlights WHERE guild_id = $1 AND user_id = $1 AND word = $3",
+            ctx.guild.id,
+            ctx.author.id,
+            word
+        )
+        await ctx.send_success(f"No longer being notified about **{word}**")
+
+    @highlight.command(
+        name="list"
+    )
+    async def highlight_list(self, ctx: PretendContext):
+        """
+        list all notification keywords
+        """
+
+        results = await self.bot.db.fetch(
+            "SELECT * FROM highlights WHERE guild_id = $1 AND user_id = $2",
+            ctx.guild.id,
+            ctx.author.id
+        )
+        if not results:
+            return await ctx.send_warning(f"You have no **highlights** set")
+        
+        await ctx.paginate(
+            [f"**{result.get('word')}**" for result in results],
+            "Highlights",
+            {
+                "name": ctx.author.display_name,
+                "icon_url": ctx.author.display_avatar
+            }
+        )
 
 async def setup(bot: Pretend) -> None:
     return await bot.add_cog(Utility(bot))
