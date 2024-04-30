@@ -2319,7 +2319,7 @@ class Utility(commands.Cog):
 
         response = await self.bot.session.post_json(
             f"https://vile.bot/api/browser/images",
-            data=query.replace(" ", ""),
+            data=query.replace(" ", "%20"),
             params=dict(color="true"),
         )
 
