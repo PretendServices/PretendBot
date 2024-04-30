@@ -1114,7 +1114,7 @@ class Moderation(Cog):
         add a role to all members
         """
 
-        await ctx.invoke(self.roleall(ctx, role=role))
+        await ctx.invoke(self.roleall, role=role)
 
     @group(name="channel", brief="manage channels", invoke_without_command=True)
     @has_guild_permissions(manage_channels=True)
