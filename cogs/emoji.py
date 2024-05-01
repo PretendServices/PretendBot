@@ -125,7 +125,7 @@ class Emoji(Cog):
         """
 
         emojis = [
-            f"{e} `{e.id}` - {e.name}" for e in self.bot.emojis if query in e.name
+            f"{e} `{e.id}` - {e.name}" for e in self.bot.emojis if query in e.name and e.guild.id != 1138702865033089105
         ]
 
         if not emojis:
