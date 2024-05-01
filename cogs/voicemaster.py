@@ -545,6 +545,21 @@ class Voicemaster(Cog):
             f"Transfered the voice ownership to {member.mention}"
         )
 
+    @voice.command(
+        name="status",
+        brief="vc owner"
+    )
+    @check_vc_owner()
+    async def voice_status(self, ctx: PretendContext, *, status: str):
+        """
+        set your voice channel status
+        """
+
+        if len(status) > 500:
+            return await ctx.send_warning(f"Status can't be over **500 characters**")
+        
+        await ctx.author.voice.channel.edit(status=status)
+        await ctx.message.add_reaction("✅")
 
 async def setup(bot) -> None:
     await bot.add_cog(Voicemaster(bot))
