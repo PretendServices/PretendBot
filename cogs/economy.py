@@ -345,7 +345,7 @@ class Economy(Cog):
         results = await self.bot.db.fetch("SELECT * FROM economy")
 
         if not results:
-            return await ctx.send("everybody's poor lol")
+            return await ctx.send("everybody's poor 🤣")
 
         sorted_results = sorted(
             results, key=lambda c: c["cash"] + c["card"], reverse=True
