@@ -1370,7 +1370,7 @@ class Utility(commands.Cog):
 
         try:
             translator = GoogleTranslator(source="auto", target=language)
-            translated = await asyncio.to_thread(translator.translate, message)
+            translated = await self.bot.loop.run_in_executor(self.bot.executor, translator.translate, message)
             embed = discord.Embed(
                 color=self.bot.color,
                 title=f"translated to {language}",
