@@ -86,7 +86,7 @@ class Timezone():
     if not kwargs: 
       raise BadArgument("Wrong location given")
     
-    timezone = await asyncio.to_thread(obj.timezone_at, **kwargs)
+    timezone = await self.loop.run_in_executor(self.bot.executor, obj.timezone_at, **kwargs)
     local = arrow.utcnow().to(timezone).naive
     check = await self.bot.db.fetchrow("SELECT * FROM timezone WHERE user_id = $1", member.id)
     
