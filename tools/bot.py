@@ -60,6 +60,8 @@ from io import BytesIO
 from cogs.music import Music
 from cogs.logging import UserBan, LogsView
 
+from concurrent.futures import ThreadPoolExecutor
+
 from discord.ext import commands
 
 dotenv.load_dotenv(verbose=True)
@@ -159,6 +161,7 @@ class Pretend(commands.AutoShardedBot):
         self.embed_build = EmbedScript()
         self.pfps_send = True
         self.banners_send = True
+        self.executor = ThreadPoolExecutor(max_workers=1)
 
     def run(self):
         """
@@ -237,7 +240,11 @@ class Pretend(commands.AutoShardedBot):
         img = Image.open(BytesIO(await self.session.get_bytes(url)))
         img.thumbnail((32, 32))
 
-        colors = await asyncio.to_thread(lambda: colorgram.extract(img, 1))
+        colors = await self.loop.run_in_executor(
+            self.executor,
+            colorgram.extract, img, 1
+        )
+        
         return discord.Color.from_rgb(*list(colors[0].rgb)).value
 
     async def getbyte(self, url: str) -> BytesIO:
