@@ -182,7 +182,7 @@ class Automod(Cog):
                         if not await self.whitelisted_antispam(message):
                             messages = self.antispam_threshold(message)
                             if len(messages) > check["rate"]:
-                                async with self.locks(message.guild.id+message.author.id):
+                                async with self.locks[message.guild.id+message.author.id]:
                                     res = self.bot.cache.get(
                                         f"antispam-{message.author.id}"
                                     )
