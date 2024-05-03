@@ -2283,7 +2283,7 @@ class Utility(commands.Cog):
             async with ctx.channel.typing(), asyncio.timeout(15):
                 return await ctx.reply(
                     file=discord.File(
-                        BytesIO(await self.bot.loop.run_in_executor(self.bot.executor, rembg.bg.remove, image)),
+                        BytesIO(await self.bot.loop.run_in_executor(self.bot.executor, rembg.bg.remove, await self.bot.session.get_bytes(url))),
                         "transparent.png"
                     )
                 )
