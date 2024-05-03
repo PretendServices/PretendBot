@@ -2259,6 +2259,7 @@ class Utility(commands.Cog):
         return await ctx.send(embed=embed)
 
     @commands.command(name="transparent", aliases=["tp"])
+    @commands.max_concurrency(1, commands.BucketType.channel, wait=True)
     @commands.cooldown(1, 6, commands.BucketType.user)
     async def transparent(self, ctx: PretendContext, url: str = None):
         """
@@ -2275,40 +2276,21 @@ class Utility(commands.Cog):
         regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
         if not re.findall(regex, url):
             return await ctx.send_error("The image provided is not an url")
-
-        async with ctx.channel.typing():
-            image = await self.bot.session.get_bytes(url)
-
-        with tempfile.TemporaryDirectory() as tdir:
-            temp_file = os.path.join(tdir, f"transparent.png")
-            temp_file_output = os.path.join(f"transparent_output.png")
-
-            async with aio_open(temp_file, "wb") as f:
-                await f.write(image)
-
-            try:
-                term = await asyncio.wait_for(
-                    asyncio.create_subprocess_shell(
-                        f"rembg i {temp_file} {temp_file_output}",
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                    ),
-                    timeout=15,
+        
+        try:
+            async with ctx.channel.typing(), asyncio.timeout(15):
+                return await ctx.reply(
+                    file=discord.File(
+                        BytesIO(await self.bot.loop.run_in_executor(self.bot.executor, rembg.bg.remove, image)),
+                        "transparent.png"
+                    )
                 )
-                stdout, stderr = await term.communicate()
-            except asyncio.TimeoutError:
-                return await ctx.send_warning(
-                    f"Couldn't make the image **transparent** due to a timeout"
-                )
-
-            if not os.path.exists(temp_file_output):
-                return await ctx.send_warning(
-                    f"Couldn't make the image **transparent**"
-                )
-
-            await ctx.reply(
-                file=discord.File(temp_file_output),
+                
+        except Exception: 
+            return await ctx.send_warning(
+                f"Couldn't make the image **transparent**"
             )
+                
 
     @commands.command(name="image", aliases=["img", "im"])
     @commands.cooldown(1, 1, commands.BucketType.member)
