@@ -1637,7 +1637,7 @@ class Moderation(Cog):
             return await ctx.send_warning(f"{user.mention} is **not** hardbanned")
 
         if (
-            ctx.author.id != ctx.guild.owner.id
+            ctx.author.id != ctx.guild.owner_id
             and ctx.author.id != check["moderator_id"]
         ):
             moderator = self.bot.get_user(check["moderator_id"])
