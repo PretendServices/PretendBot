@@ -182,32 +182,33 @@ class Automod(Cog):
                         if not await self.whitelisted_antispam(message):
                             messages = self.antispam_threshold(message)
                             if len(messages) > check["rate"]:
-                                res = self.bot.cache.get(
-                                    f"antispam-{message.author.id}"
-                                )
-                                if not res:
-                                    del self.spam_cache[message.guild.id][
-                                        message.author.id
-                                    ]
-                                    timeout = utils.utcnow() + datetime.timedelta(
-                                        seconds=check["timeout"]
+                                async with self.locks(message.guild.id+message.author.id):
+                                    res = self.bot.cache.get(
+                                        f"antispam-{message.author.id}"
                                     )
-                                    await message.channel.delete_messages(messages)
-                                    await message.author.timeout(
-                                        timeout, reason="Flagged by the antispam"
-                                    )
-                                    await message.channel.send(
-                                        embed=Embed(
-                                            color=self.bot.warning_color,
-                                            description=f"> {self.bot.warning} {message.author.mention} has been muted for **{humanfriendly.format_timespan(check['timeout'])}** - ***spamming messages***",
-                                        ),
-                                        delete_after=5,
-                                    )
-                                    await self.bot.cache.set(
-                                        f"antispam-{message.author.id}",
-                                        True,
-                                        expiration=10,
-                                    )
+                                    if not res:
+                                        del self.spam_cache[message.guild.id][
+                                            message.author.id
+                                        ]
+                                        timeout = utils.utcnow() + datetime.timedelta(
+                                            seconds=check["timeout"]
+                                        )
+                                        await message.channel.delete_messages(messages)
+                                        await message.author.timeout(
+                                            timeout, reason="Flagged by the antispam"
+                                        )
+                                        await message.channel.send(
+                                            embed=Embed(
+                                                color=self.bot.warning_color,
+                                                description=f"> {self.bot.warning} {message.author.mention} has been muted for **{humanfriendly.format_timespan(check['timeout'])}** - ***spamming messages***",
+                                            ),
+                                            delete_after=5,
+                                        )
+                                        await self.bot.cache.set(
+                                            f"antispam-{message.author.id}",
+                                            True,
+                                            expiration=10,
+                                        )
 
     @hybrid_group(name="filter", invoke_without_command=True)
     async def chat_filter(self, ctx):
