@@ -53,6 +53,7 @@ from deep_translator.exceptions import LanguageNotSupportedException
 from aiofiles import open as aio_open
 
 import re
+import rembg
 import sys
 import functools
 import tempfile
