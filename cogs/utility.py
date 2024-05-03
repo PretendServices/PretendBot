@@ -51,6 +51,7 @@ from tools.handlers.socials.weather import WeatherLocation
 from deep_translator import GoogleTranslator
 from deep_translator.exceptions import LanguageNotSupportedException
 from aiofiles import open as aio_open
+from io import BytesIO
 
 import re
 import rembg
