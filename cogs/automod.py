@@ -193,16 +193,18 @@ class Automod(Cog):
                                         timeout = utils.utcnow() + datetime.timedelta(
                                             seconds=check["timeout"]
                                         )
-                                        await message.channel.delete_messages(messages)
-                                        await message.author.timeout(
-                                            timeout, reason="Flagged by the antispam"
-                                        )
-                                        await message.channel.send(
-                                            embed=Embed(
-                                                color=self.bot.warning_color,
-                                                description=f"> {self.bot.warning} {message.author.mention} has been muted for **{humanfriendly.format_timespan(check['timeout'])}** - ***spamming messages***",
+                                        await asyncio.gather(
+                                            message.channel.delete_messages(messages),
+                                            message.author.timeout(
+                                                timeout, reason="Flagged by the antispam"
                                             ),
-                                            delete_after=5,
+                                            message.channel.send(
+                                                embed=Embed(
+                                                    color=self.bot.warning_color,
+                                                    description=f"> {self.bot.warning} {message.author.mention} has been muted for **{humanfriendly.format_timespan(check['timeout'])}** - ***spamming messages***",
+                                                ),
+                                                delete_after=5,
+                                            )
                                         )
                                         await self.bot.cache.set(
                                             f"antispam-{message.author.id}",
