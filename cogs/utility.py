@@ -1759,7 +1759,7 @@ class Utility(commands.Cog):
 
         embed = discord.Embed(
             color=self.bot.color,
-            description=f"🕑 {ctx.author.mention}: **{member[0].name}'s** current date **{member[1]}**",
+            description=f"🕑 {ctx.author.mention}: **{member[0].name}'s** current date is **{member[1]}**",
         )
         await ctx.send(embed=embed)
 
