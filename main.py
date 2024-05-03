@@ -9,6 +9,11 @@ from tools.helpers import PretendContext
 
 bot = Pretend()
 
+@bot.before_invoke
+async def chunk_guild(ctx: PretendContext) -> None:
+    if not ctx.guild.chunked:
+        await ctx.guild.chunk(cache=True)
+
 @bot.check 
 async def check_availability(ctx: PretendContext) -> bool:
     return True
