@@ -2289,8 +2289,6 @@ class Utility(commands.Cog):
                 )
                 
         except Exception: 
-            import traceback
-            return await ctx.reply(traceback.format_exc())
             return await ctx.send_warning(
                 f"Couldn't make the image **transparent**"
             )
