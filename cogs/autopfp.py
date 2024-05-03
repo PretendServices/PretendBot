@@ -159,7 +159,7 @@ class Autopfp(commands.Cog):
         Report a picture sent by pretend via autopfp
         """
 
-        directory = f"./PretendImages/{type.capitalize()}/"
+        directory = f"/root/PretendImages/{type.capitalize()}/"
 
         if not category.capitalize() in os.listdir(directory):
             return await ctx.send_warning(f"This is not a **{type}** category")
