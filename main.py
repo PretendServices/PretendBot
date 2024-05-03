@@ -66,7 +66,7 @@ async def disabled_module(ctx: PretendContext):
 
 @bot.check
 async def restricted_command(ctx: PretendContext):
-  if ctx.author.id == ctx.guild.owner.id:
+  if ctx.author.id == ctx.guild.owner_id:
     return True
 
   if check := await ctx.bot.db.fetch(
