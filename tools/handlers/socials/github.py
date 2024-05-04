@@ -15,7 +15,7 @@ class Github(BaseModel):
   username: str
   avatar_url: str 
   url: str 
-  display: str 
+  display: Optional[str]
   company: Optional[str]
   bio: Optional[str]
   repos: int 
