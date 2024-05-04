@@ -27,6 +27,10 @@ class Donor(Cog):
     def __init__(self, bot: Pretend):
         self.bot = bot
         self.description = "Premium commands"
+        
+        genai.configure(api_key="AIzaSyCDSm6b1aI84TJtzWKzdb6oVozeWe3etD8")
+        self.model = genai.GenerativeModel("gemini-pro")
+
 
     def shorten(self, value: str, length: int = 32):
         if len(value) > length:
@@ -247,17 +251,14 @@ class Donor(Cog):
 
     @hybrid_command(name="chatgpt", aliases=["chat", "gpt", "ask"], brief="donor")
     @has_perks()
-    @cooldown(1, 5, commands.BucketType.user)
+    @max_concurrency(1, commands.BucketType.user, wait=True)
     async def chatgpt(self, ctx: PretendContext, *, query: str):
         """
         Talk to AI
         """
 
         async with ctx.channel.typing():
-            genai.configure(api_key="AIzaSyCDSm6b1aI84TJtzWKzdb6oVozeWe3etD8")
-            model = genai.GenerativeModel("gemini-pro")
-
-            response = model.generate_content(query)
+            response = await self.bot.loop.run_in_executor(self.bot.executor, self.model.generate_content, query)
             await ctx.send(response.text, allowed_mentions=AllowedMentions.none())
 
 
