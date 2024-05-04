@@ -19,6 +19,7 @@ from discord.ext.commands import (
     bot_has_guild_permissions,
     Author,
     cooldown,
+    max_concurrency,
     hybrid_command,
 )
 
