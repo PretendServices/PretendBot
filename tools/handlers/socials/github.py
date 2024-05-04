@@ -17,7 +17,7 @@ class Github(BaseModel):
   url: str 
   display: str 
   company: Optional[str]
-  bio: str 
+  bio: Optional[str]
   repos: int 
   followers: int 
   following: int 
