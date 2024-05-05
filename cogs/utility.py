@@ -1750,7 +1750,7 @@ class Utility(commands.Cog):
 
     @commands.group(aliases=["tz"], invoke_without_command=True)
     async def timezone(
-        self, ctx: PretendContext, *, member: Optional[TimezoneMember] = None
+        self, ctx: PretendContext, *, member: TimezoneMember = None
     ):
         """
         Get the member's current date
