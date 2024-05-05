@@ -161,7 +161,7 @@ class Pretend(commands.AutoShardedBot):
         self.embed_build = EmbedScript()
         self.pfps_send = True
         self.banners_send = True
-        self.executor = ThreadPoolExecutor(max_workers=1)
+        self.executor = ThreadPoolExecutor(max_workers=3)
 
     def run(self):
         """
