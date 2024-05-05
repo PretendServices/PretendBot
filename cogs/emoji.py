@@ -129,7 +129,7 @@ class Emoji(Cog):
         ]
 
         if not emojis:
-            return await ctx.warn(f"No **emojis** found")
+            return await ctx.send_warning(f"No **emojis** found")
 
         return await ctx.paginate(emojis, f"Emojis containing {query} ({len(emojis)})")
 
