@@ -138,10 +138,11 @@ class Moderation(Cog):
             guild.id,
             user.id,
         ):
-            user = self.bot.get_user(check["moderator_id"])
+            user = self.bot.get_user(check["user_id"])
+            moderator = self.bot.get_user(check["moderator_id"])
             await guild.ban(
                 user,
-                reason=f"Hard banned by {user.name} ({user.id}): {check['reason']}",
+                reason=f"Hard banned by {moderator.name} ({moderator.id}): {check['reason']}",
             )
 
     @Cog.listener()
