@@ -238,7 +238,7 @@ class Pretend(commands.AutoShardedBot):
             url = url.url
 
         img = Image.open(BytesIO(await self.session.get_bytes(url)))
-        img.thumbnail((32, 32))
+        img.thumbnail((100, 100))
 
         colors = await self.loop.run_in_executor(
             self.executor,

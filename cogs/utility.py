@@ -2328,6 +2328,41 @@ class Utility(commands.Cog):
         ]
 
         await ctx.paginator(entries)
+        
+    
+    # @commands.command(name="inviteinfo", aliases=("ii", "iinfo"))
+    # async def inviteinfo(self, ctx: PretendContext, invite: discord.Invite):
+        
+    #     # Channel & Invite
+    #     ci_data = Munch(
+    #         name = f"{invite.channel.name} ({invite.channel.type})",
+    #         id=invite.channel.id,
+    #         created_at = f"{discord.utils.format_dt(invite.created_at, style='f')} ({discord.utils.format_dt(invite.created_at, style='R')})",
+    #         expiration = invite.expires_at and f"{discord.utils.format_dt(invite.expires_at, style='f')} ({discord.utils.format_dt(invite.expires_at, style='R')})" or "Never",
+    #         inviter = invite.inviter and f"{invite.inviter} ({invite.inviter.id})" or "Unknown",
+    #         temporary = "N/A", # fuck is this
+    #         usage = invite.uses or "N/A"
+    #     )
+        
+    #     # Guild
+    #     g_data = Munch(
+    #         name=invite.guild.name,
+    #         id=invite.guild.id,
+    #         created_at=f"{discord.utils.format_dt(invite.guild.created_at, style='f')} ({discord.utils.format_dt(invite.guild.created_at, style='R')})",
+    #         members=invite.approximate_member_count,
+    #         members_online=invite.approximate_presence_count,
+    #         verification_level=str(invite.guild.verification_level)
+    #     )
+        
+    #     return await ctx.reply(embed=(
+    #         discord.Embed(
+    #             color=self.bot.color,
+    #             title=f"Invite code: {invite.code}"
+    #         )
+    #         .set_thumbnail(url=invite.guild.icon)
+    #         .add_field(name="")
+    #     )
+        
 
 async def setup(bot: Pretend) -> None:
     return await bot.add_cog(Utility(bot))
