@@ -494,10 +494,8 @@ class Pretend(commands.AutoShardedBot):
         ):  # this should never be used anywhere besides ValidCog
             return await ctx.send(error)
 
-        elif isinstance(error, commands.CommandError):
-            print("yes")
-            if not "Command raised an exception: " in str(error):
-                return await ctx.send_warning(error)
+        elif isinstance(error, commands.CommandError) and not "Command raised an exception: " in str(error):
+            return await ctx.send_warning(error)
 
         else:
             
