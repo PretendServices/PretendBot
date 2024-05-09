@@ -417,6 +417,7 @@ class Pretend(commands.AutoShardedBot):
 
         if type(error) in ignored:
             return
+        print(type(error))
 
         if isinstance(error, commands.MemberNotFound):
             return await ctx.send_warning(f"Member not found")
