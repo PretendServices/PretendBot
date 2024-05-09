@@ -499,7 +499,7 @@ class Pretend(commands.Bot):
             return await ctx.send_warning(error)
 
         else:
-            
+            print(str(error))
             code = "".join(
                 random.choice(string.ascii_letters + string.digits) for _ in range(6)
             )
