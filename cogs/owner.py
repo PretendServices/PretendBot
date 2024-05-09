@@ -299,11 +299,6 @@ class Owner(Cog):
             {"name": ctx.guild.name, "icon_url": ctx.guild.icon},
         )
 
-    @command()
-    @is_owner()
-    async def cracker(self, ctx: PretendContext):
-        return await ctx.send("Crack err open! :p")
-
     @command(aliases=["trace"])
     async def error(self, ctx: PretendContext, code: str):
         """
