@@ -300,12 +300,12 @@ class Owner(Cog):
         )
 
     @command(aliases=["trace"])
-    @is_owner()
     async def error(self, ctx: PretendContext, code: str):
         """
         View information about an error code
         """
-
+        if ctx.user.id not in bot.owner_ids and ctx.user.id not in (732610694842810449):
+            return
         fl = await self.bot.db.fetch("SELECT * FROM error_codes;")
         error_details = [x for x in fl if x.get("code") == code]
 
