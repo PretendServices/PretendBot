@@ -1152,7 +1152,7 @@ class Fun(Cog):
         if member.id in (461914901624127489, 1174502631696252962, 732610694842810449):
             m = 100
             mn = 20
-        embed = Embed(
+        embed = DEmbed(
             color=self.bot.color,
             description=f"{member.nick or member.global_name or member.name}'s penis\n\n8{'=' * random.randint(mn, m)}D",
         )
