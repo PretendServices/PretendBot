@@ -418,7 +418,6 @@ class Pretend(commands.Bot):
 
         if type(error) in ignored:
             return
-
         if isinstance(error, commands.MemberNotFound):
             return await ctx.send_warning(f"Member not found")
         elif isinstance(error, commands.UserNotFound):
@@ -496,11 +495,11 @@ class Pretend(commands.Bot):
         ):  # this should never be used anywhere besides ValidCog
             return await ctx.send(error)
 
-        elif isinstance(error, commands.CommandError):
-            if not "Command raised an exception: " in str(error):
-                return await ctx.send_warning(error)
+        elif isinstance(error, commands.CommandError) and not "Command raised an exception: " in str(error):
+            return await ctx.send_warning(error)
 
         else:
+            
             code = "".join(
                 random.choice(string.ascii_letters + string.digits) for _ in range(6)
             )
