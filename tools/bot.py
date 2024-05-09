@@ -417,7 +417,7 @@ class Pretend(commands.AutoShardedBot):
 
         if type(error) in ignored:
             return
-
+        print("test")
         if isinstance(error, commands.MemberNotFound):
             return await ctx.send_warning(f"Member not found")
         elif isinstance(error, commands.UserNotFound):
@@ -500,7 +500,7 @@ class Pretend(commands.AutoShardedBot):
                 return await ctx.send_warning(error)
 
         else:
-            print("yes")
+            
             code = "".join(
                 random.choice(string.ascii_letters + string.digits) for _ in range(6)
             )
