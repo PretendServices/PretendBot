@@ -100,7 +100,7 @@ class Record(asyncpg.Record):
         return self[name]
 
 
-class Pretend(commands.Bot):
+class Pretend(commands.AutoShardedBot):
     """
     The discord bot
     """
@@ -119,7 +119,7 @@ class Pretend(commands.Bot):
                 732610694842810449  # dada (felia)
             ],
             case_insensitive=True,
-            #shard_count=3,
+            shard_count=3,
             chunk_guilds_at_startup=False,
             strip_after_prefix=True,
             enable_debug_events=True,
