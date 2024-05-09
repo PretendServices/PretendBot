@@ -119,7 +119,7 @@ class Pretend(commands.AutoShardedBot):
                 732610694842810449  # dada (felia)
             ],
             case_insensitive=True,
-            shard_count=3,
+            shard_count=1,
             chunk_guilds_at_startup=False,
             strip_after_prefix=True,
             enable_debug_events=True,
