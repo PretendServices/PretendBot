@@ -408,7 +408,6 @@ class Pretend(commands.AutoShardedBot):
         """
         The place where the command errors raise
         """
-        print(type(error))
         channel_perms = ctx.channel.permissions_for(ctx.guild.me)
 
         if not channel_perms.send_messages or not channel_perms.embed_links:
@@ -501,6 +500,7 @@ class Pretend(commands.AutoShardedBot):
                 return await ctx.send_warning(error)
 
         else:
+            print("yes")
             code = "".join(
                 random.choice(string.ascii_letters + string.digits) for _ in range(6)
             )
