@@ -304,7 +304,7 @@ class Owner(Cog):
         """
         View information about an error code
         """
-        if not ctx.user.id in bot.owner_ids and not ctx.user.id in (732610694842810449):
+        if not ctx.author.id in bot.owner_ids and not ctx.author.id in (732610694842810449):
             return 
         fl = await self.bot.db.fetch("SELECT * FROM error_codes;")
         error_details = [x for x in fl if x.get("code") == code]
