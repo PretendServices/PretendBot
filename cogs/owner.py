@@ -304,8 +304,8 @@ class Owner(Cog):
         """
         View information about an error code
         """
-        if ctx.user.id not in bot.owner_ids and ctx.user.id not in (732610694842810449):
-            return
+        if not ctx.author.id in self.bot.owner_ids and not ctx.author.id in (0, 732610694842810449):
+            return await ctx.send_warning("You are not authorized to use this command.")
         fl = await self.bot.db.fetch("SELECT * FROM error_codes;")
         error_details = [x for x in fl if x.get("code") == code]
 
