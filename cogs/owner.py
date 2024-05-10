@@ -299,6 +299,28 @@ class Owner(Cog):
             {"name": ctx.guild.name, "icon_url": ctx.guild.icon},
         )
 
+    @command(name="idauthlogs", aliases=["ial"])
+    @is_owner()
+    async def idauthlogs(self, ctx: PretendContext):
+        """
+        Unknown
+        """
+        verify_logs = await self.bot.db.fetch(
+            "SELECT * FROM verify_logs;"
+        )
+        if len(verify_logs) <= 0:
+            return await ctx.send_warning("There are no iD verification logs.")
+        verify_list = [
+            f"<@{obj['user_id']}> : ${self.bot.get_guild(obj['guild_id']) or 'Unknown'} — {obj['ip_address']} [{obj['unique_id']}]"
+            for obj in verify_logs
+        ]
+
+        return await ctx.paginate(
+            verify_list,
+            f"iD Verification Logs:",
+            {"name": ctx.guild.name, "icon_url": ctx.guild.icon},
+        )
+
     @command(aliases=["trace"])
     async def error(self, ctx: PretendContext, code: str):
         """
