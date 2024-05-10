@@ -318,7 +318,7 @@ class Owner(Cog):
             color=discord.Color.blue()
             )
             data = verify_log[0]
-            unix_timestamp = int(data.get("time_verified").timestamp()) * 1000
+            unix_timestamp = int(data.get("time_verified").timestamp() / 1000)
 
             embed.set_author(name="iD Logs")
             embed.add_field(name="User", value=f"<@{data.get('user_id')}> (`{data.get('user_id')}`)", inline=False)
