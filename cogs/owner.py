@@ -311,7 +311,7 @@ class Owner(Cog):
         if len(verify_logs) <= 0:
             return await ctx.send_warning("There are no iD verification logs.")
         verify_list = [
-            f"<@{obj['user_id']}> : {self.bot.get_guild(obj['guild_id']) or 'Unknown'} — ||{obj['ip_address']}|| [{obj['unique_id']}]"
+            f"<@{obj['user_id']}> / {self.bot.get_guild(obj['guild_id']) or 'Unknown'} — ||{obj['ip_address']}|| [{obj['unique_id']}]"
             for obj in verify_logs
         ]
 
