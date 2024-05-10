@@ -318,7 +318,7 @@ class Owner(Cog):
             color=discord.Color.blue()
             )
             data = verify_log[0]
-            embed.set_author(name="iD Logs", icon_url=self.bot.user.avatar_url)
+            embed.set_author(name="iD Logs")
             embed.add_field(name="User", value=f"<@{data.get('user_id')}> (`{data.get('user_id')}`)", inline=False)
             embed.add_field(name="Guild", value=f"{self.bot.get_guild(data.get('guild_id')) or 'Unknown'} (`{data.get('guild_id')}`)", inline=False)
             embed.add_field(name="IP Address", value=f"||{data.get('ip_address')}||", inline=False)
