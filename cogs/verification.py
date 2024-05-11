@@ -70,7 +70,7 @@ class Verification(Cog):
             description="Click on the button below this message to verify",
             color=discord.Color.blurple()
         ),
-       view=BtnViewStart())
+       view=BtnViewStart)
         await ctx.send_success("Verification setup successfully.")
     @has_guild_permissions(administrator=True)
     @verification.command(name="reset", brief="Administrator")    
