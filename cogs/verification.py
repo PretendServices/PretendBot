@@ -66,7 +66,8 @@ class Verification(Cog):
         embedcode = "{embed}{color: #181a14}$v{title: Verify}$v{description: Click on the button below this message to verify}$v{author: name: {guild.name} && icon: {guild.icon}}"
         await channel.send(await self.bot.embed_build.convert(ctx, embedcode), view=BtnViewStart())
         await ctx.send_success("Verification setup successfully.")
-    @has_guild_permissions(administrator=True)    
+    @has_guild_permissions(administrator=True)
+    @verification.command(name="reset", brief="Administrator")    
     async def verification_reset(self, ctx: PretendContext):
         """reset verification"""
         check = await self.bot.db.fetchrow("SELECT * FROM verify_guilds WHERE guild_id = $1", ctx.guild.id)
