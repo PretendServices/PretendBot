@@ -46,6 +46,7 @@ class BtnViewStart(View):
             matchcode = str(generate_code())
             await interaction.client.db.execute("INSERT INTO verify_codes_discord(user_id, guild_id, guild_name, valid_until, code, match_code, confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7)", interaction.user.id, interaction.guild.id, interaction.guild.name, datetime.datetime.now() + datetime.timedelta(minutes=5), code, matchcode, False)
             await interaction.response.send_message(f"Click the button below to verify {matchcode}", view=BtnViewUrl(f"https://pretend.bot/verify/{code}"), ephemeral=True)
+        self.add_item(verify)
 class Verification(Cog):
     def __init__(self, bot: Pretend):
         self.bot = bot
