@@ -57,7 +57,7 @@ class Verification(Cog):
         await ctx.send_help(ctx.command)
     @has_guild_permissions(administrator=True)
     @verification.command(name="setup", brief="Administrator")
-    async def verification_setup(self, ctx: PretendContext, *, channel: TextChannel, role: Role):
+    async def verification_setup(self, ctx: PretendContext, channel: TextChannel, *, role: Role):
         """setup verification"""
         check = await self.bot.db.fetchrow("SELECT * FROM verify_guilds WHERE guild_id = $1", ctx.guild.id)
         if check:
