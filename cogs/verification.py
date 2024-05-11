@@ -36,17 +36,35 @@ class BtnViewUrl(View):
         super().__init__()
         button = discord.ui.button(label="Verify", style=discord.ButtonStyle.url, url=url)
         self.add_item(button)
-class BtnViewStart(View):
+class BtnViewStart(discord.ui.View):
     def __init__(self):
         super().__init__()
-        @discord.ui.button(label="Verify", style=discord.ButtonStyle.primary)
-        async def verify(self, button: discord.ui.Button, interaction: discord.Interaction):
-            randomalphanumeric5 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-            code = str(randomalphanumeric5)
-            matchcode = str(generate_code())
-            await interaction.client.db.execute("INSERT INTO verify_codes_discord(user_id, guild_id, guild_name, valid_until, code, match_code, confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7)", interaction.user.id, interaction.guild.id, interaction.guild.name, datetime.datetime.now() + datetime.timedelta(minutes=5), code, matchcode, False)
-            await interaction.response.send_message(f"Click the button below to verify {matchcode}", view=BtnViewUrl(f"https://pretend.bot/verify/{code}"), ephemeral=True)
-        self.add_item(verify)
+
+        # Create the button
+        verify_button = discord.ui.Button(label="Verify", style=discord.ButtonStyle.primary)
+        
+
+        verify_button.callback = self.verify
+        
+     
+        self.add_item(verify_button)
+    
+    async def verify(self, button: discord.ui.Button, interaction: discord.Interaction):
+        random_alphanumeric_5 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+        code = str(random_alphanumeric_5)
+        match_code = str(generate_code())
+        
+        await interaction.client.db.execute(
+            "INSERT INTO verify_codes_discord(user_id, guild_id, guild_name, valid_until, code, match_code, confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            interaction.user.id, interaction.guild.id, interaction.guild.name,
+            datetime.datetime.now() + datetime.timedelta(minutes=5), code, match_code, False
+        )
+        
+        await interaction.response.send_message(
+            f"Click the button below to verify {match_code}",
+            view=BtnViewUrl(f"https://pretend.bot/verify/{code}"),
+            ephemeral=True
+        )
 class Verification(Cog):
     def __init__(self, bot: Pretend):
         self.bot = bot
