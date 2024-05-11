@@ -392,7 +392,7 @@ class Pretend(commands.AutoShardedBot):
         self.add_view(VoiceMasterView(self, vm_results))
         self.add_view(GiveawayView())
         self.add_view(TicketView(self, True))
-        self.add_view(VerificationView(self))
+        self.add_view(VerificationView())
 
     async def __chunk_guilds(self):
         for guild in self.guilds:
