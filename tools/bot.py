@@ -51,6 +51,7 @@ from .misc.tasks import (
     gw_loop,
     reminder_task,
     counter_update,
+    verify_task
 )
 
 from .handlers.embedbuilder import EmbedScript
@@ -334,6 +335,7 @@ class Pretend(commands.AutoShardedBot):
         check_monthly_guilds.start(self)
         reminder_task.start(self)
         counter_update.start(self)
+        verify_task.start(self)
 
     def url_encode(self, url: str):
         """
