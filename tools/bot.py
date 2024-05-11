@@ -30,6 +30,7 @@ from discord.gateway import DiscordWebSocket
 from .persistent.vm import VoiceMasterView
 from .persistent.tickets import TicketView
 from .persistent.giveaway import GiveawayView
+from .persistent.verification import VerificationView
 
 from .helpers import (
     PretendContext,
@@ -51,6 +52,7 @@ from .misc.tasks import (
     gw_loop,
     reminder_task,
     counter_update,
+    verify_task
 )
 
 from .handlers.embedbuilder import EmbedScript
@@ -112,11 +114,7 @@ class Pretend(commands.AutoShardedBot):
             help_command=PretendHelp(),
             owner_ids=[
                 863914425445908490,  # nick
-                1161982476143575051,  # adonis
-                #1188955485462872226,  # sent (abc)
                 461914901624127489,  # lucky
-                1109861649910874274,  # k (trey),
-                732610694842810449  # dada (felia)
             ],
             case_insensitive=True,
             shard_count=1,
@@ -334,6 +332,7 @@ class Pretend(commands.AutoShardedBot):
         check_monthly_guilds.start(self)
         reminder_task.start(self)
         counter_update.start(self)
+        verify_task.start(self)
 
     def url_encode(self, url: str):
         """
@@ -389,6 +388,7 @@ class Pretend(commands.AutoShardedBot):
         self.add_view(VoiceMasterView(self, vm_results))
         self.add_view(GiveawayView())
         self.add_view(TicketView(self, True))
+        self.add_view(VerificationView())
 
     async def __chunk_guilds(self):
         for guild in self.guilds:
