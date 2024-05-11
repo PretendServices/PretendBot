@@ -44,7 +44,7 @@ class BtnViewStart(discord.ui.View):
        
         self.add_item(verify_button)
 
-    async def verify(self, button: discord.ui.Button, interaction: discord.Interaction):
+    async def verify(self, interaction: discord.Interaction):
         random_alphanumeric_5 = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
         code = str(random_alphanumeric_5)
         match_code = str(generate_code())
