@@ -51,8 +51,6 @@ async def verify_task(bot: AB):
   results = await bot.db.fetch("SELECT * FROM verify_codes_discord")
   for result in results: 
     if result['confirmed'] == True:
-      print("confirmed")
-      await bot.db.execute("DELETE FROM verify_codes_discord WHERE user_id = $1", result['user_id'])
       guild = bot.get_guild(result['guild_id'])
       if guild: 
         member = guild.get_member(result['user_id'])
@@ -62,6 +60,7 @@ async def verify_task(bot: AB):
             await member.add_roles(role, reason="Verified")
     if datetime.datetime.now().timestamp() > result['valid_until'].timestamp(): 
       await bot.db.execute("DELETE FROM verify_codes_discord WHERE user_id = $1", result['user_id'])
+      await bot.db.execute("DELETE FROM verify_logs WHERE user_id = $1", result['user_id'])
 @tasks.loop(seconds=5)
 async def reminder_task(bot: AB): 
   results = await bot.db.fetch("SELECT * FROM reminder")
