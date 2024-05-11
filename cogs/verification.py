@@ -56,8 +56,7 @@ class BtnViewStart(discord.ui.View):
         )
 
         await interaction.response.send_message(
-            f"Click the button below to verify {match_code}",
-            components=self.to_components(),  # Ensure to call as a method of an instance
+            f"Click the link to verify {match_code}, https://id.pretend.bot/Verify/{code}",
             ephemeral=True
         )
 
