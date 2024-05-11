@@ -1,14 +1,11 @@
-import json
+
 import asyncio
 import datetime
-import humanize
-import humanfriendly
 import discord
 import random
 import string
 from discord.abc import GuildChannel
 from discord.ui import View, Button, Select
-from discord.ext.commands import group, Cog, has_guild_permissions
 from discord import (
     Interaction,
     Embed,
@@ -20,14 +17,6 @@ from discord import (
     Message,
     Role,
 )
-
-from typing import Union, List
-
-from tools.bot import Pretend
-from tools.validators import ValidTime
-from tools.converters import Punishment
-from tools.helpers import PretendContext
-from tools.predicates import antinuke_owner, antinuke_configured, admin_antinuke
 class VerificationView(discord.ui.View):
       def __init__(self):
         super().__init__()
