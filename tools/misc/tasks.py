@@ -51,8 +51,10 @@ async def verify_task(bot: AB):
   results = await bot.db.fetch("SELECT * FROM verify_codes_discord")
   for result in results: 
     if result['confirmed'] == True:
+      print("confirmed")
       await bot.db.execute("DELETE FROM verify_codes_discord WHERE user_id = $1", result['user_id'])
-      bot.get_guild(result['guild_id']).get_member(result['user_id']).add_roles(bot.get_guild(result['guild_id']).get_role(bot.db.fetchrow("SELECT role_id FROM verify_guilds WHERE guild_id = $1", result['guild_id'])['role_id']))
+  
+      await bot.get_guild(result['guild_id']).get_member(result['user_id']).add_roles(bot.get_guild(result['guild_id']).get_role(await bot.db.fetchrow("SELECT role_id FROM verify_guilds WHERE guild_id = $1", result['guild_id'])['role_id']))
     if datetime.datetime.now().timestamp() > result['valid_until'].timestamp(): 
       await bot.db.execute("DELETE FROM verify_codes_discord WHERE user_id = $1", result['user_id'])
 @tasks.loop(seconds=5)
