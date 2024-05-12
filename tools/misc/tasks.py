@@ -58,7 +58,7 @@ async def verify_task(bot: AB):
           role = guild.get_role(await bot.db.fetchval("SELECT role_id FROM verify_guilds WHERE guild_id = $1", guild.id))
           if role: 
             await member.add_roles(role, reason="Verified")
-    if datetime.datetime.now().timestamp() > result['valid_until'].timestamp(): 
+    if datetime.datetime.now().timestamp() > result['valid_until'].timestamp() and not result['confirmed']: 
       await bot.db.execute("DELETE FROM verify_codes_discord WHERE user_id = $1", result['user_id'])
       await bot.db.execute("DELETE FROM verify_logs WHERE user_id = $1", result['user_id'])
 @tasks.loop(seconds=5)
