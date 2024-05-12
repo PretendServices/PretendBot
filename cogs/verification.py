@@ -49,7 +49,6 @@ class Verification(Cog):
         if check:
             return await ctx.send("Verification is already setup in this server.")
         await self.bot.db.execute("INSERT INTO verify_guilds(guild_id, role_id) VALUES ($1, $2)", ctx.guild.id, role.id)
-        embedcode = "{embed}{color: #181a14}$v{title: Verify}$v{description: Click on the button below this message to verify}$v{author: name: {guild.name} && icon: {guild.icon}}"
         await channel.send(
     embed=discord.Embed(
         title="Verify",
