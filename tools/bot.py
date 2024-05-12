@@ -114,11 +114,7 @@ class Pretend(commands.AutoShardedBot):
             help_command=PretendHelp(),
             owner_ids=[
                 863914425445908490,  # nick
-                1161982476143575051,  # adonis
-                #1188955485462872226,  # sent (abc)
                 461914901624127489,  # lucky
-                1109861649910874274,  # k (trey),
-                732610694842810449  # dada (felia)
             ],
             case_insensitive=True,
             shard_count=1,
@@ -392,7 +388,7 @@ class Pretend(commands.AutoShardedBot):
         self.add_view(VoiceMasterView(self, vm_results))
         self.add_view(GiveawayView())
         self.add_view(TicketView(self, True))
-        #self.add_view(VerificationView())
+        self.add_view(VerificationView())
 
     async def __chunk_guilds(self):
         for guild in self.guilds:
