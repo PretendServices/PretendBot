@@ -19,7 +19,6 @@ from discord import (
 )
 class VerificationView(discord.ui.View):
       def __init__(self):
-        self.timeout = None
         super().__init__()
         verify_button = discord.ui.Button(label="Verify", style=discord.ButtonStyle.primary, custom_id="verify:persistent")
       
