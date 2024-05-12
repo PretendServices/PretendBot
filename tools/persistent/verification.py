@@ -34,7 +34,10 @@ class VerificationView(discord.ui.View):
         match_code = str(''.join(random.choice(string.hexdigits.upper()) if i not in (3, 6) else '-' for i in range(11)))
         check = await interaction.client.db.fetchrow("SELECT * FROM verify_codes_discord WHERE user_id = $1 AND guild_id = $2", interaction.user.id, interaction.guild.id)
         if check:
-            return await interaction.response.send_message("You already have a verification code pending", ephemeral=True)
+            if check['confirmed']:
+                return await interaction.response.send_message("You have already verified", ephemeral=True)
+            else:
+             return await interaction.response.send_message("You already have a verification code pending", ephemeral=True)
         await interaction.client.db.execute(
             "INSERT INTO verify_codes_discord(user_id, guild_id, guild_name, valid_until, code, match_code, confirmed) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             interaction.user.id, interaction.guild.id, interaction.guild.name,
