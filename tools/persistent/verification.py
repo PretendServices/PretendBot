@@ -43,17 +43,15 @@ class VerificationView(discord.ui.View):
             interaction.user.id, interaction.guild.id, interaction.guild.name,
             datetime.datetime.now() + datetime.timedelta(minutes=5), code, match_code, False
         )
-
-        await interaction.response.send_message(
-            embed=Embed(
+        embed=Embed(
                 title="Verification",
                 description="Please enter the match code below on the website to verify your account. You have 5 minutes to verify your account.",
                 color=discord.Color.blurple(),
-                fields=[
-                    ("Match Code", match_code)
-                ],
                 url="https://id.pretend.bot/Verify/" + code,
                 timestamp=datetime.datetime.now(),
-            ),
+            )
+        embed.add_field(name="Match Code", value=match_code)
+        await interaction.response.send_message(
+            embed=embed,
             ephemeral=True
             )
